@@ -42,6 +42,17 @@ describe.each(exchanges.map((e) => [e.id, e] as const))('exchange %s', (_id, ex)
     }
   });
 
+  it('flow table data is consistent', () => {
+    const cats = new Set(ex.categories.map((c) => c.id));
+    let last = -Infinity;
+    for (const s of ex.steps) {
+      expect(cats.has(s.category), `${s.id} category ${s.category}`).toBe(true);
+      expect(s.time, `${s.id} time is not before the previous step`).toBeGreaterThanOrEqual(last);
+      last = s.time;
+      expect(s.info.length).toBeGreaterThan(0);
+    }
+  });
+
   it('key fields exist in the default capture', () => {
     for (const s of ex.steps) {
       expect(s.captures.length, s.id).toBeGreaterThan(0);

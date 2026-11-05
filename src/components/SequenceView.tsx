@@ -1,10 +1,10 @@
 import type { Exchange } from '../schema';
 
-const MARGIN = 100;
-const SPACING = 240;
+const MARGIN = 98;
+const SPACING = 200;
 const HEAD = 44;
-const ROW = 46;
-const SLOPE = 16;
+const ROW = 40;
+const SLOPE = 12;
 
 interface Props {
   exchange: Exchange;

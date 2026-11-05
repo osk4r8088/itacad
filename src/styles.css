@@ -168,11 +168,9 @@ main {
   color: var(--muted);
 }
 
-/* ---------- exchange layout ---------- */
-.intro {
-  max-width: 80ch;
-  margin-bottom: 1rem;
-}
+/* ---------- exchange layout ----------
+   Narrow or short screens: panels flow down the page.
+   Wide and tall enough: a dashboard that fills the viewport, panels scroll inside. */
 .scenario {
   font-weight: 600;
 }
@@ -180,61 +178,104 @@ main {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.75rem 0.9rem;
   min-width: 0;
 }
-.views {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
+.panel > h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
 }
-.packet-panel,
-.sources-panel {
-  margin-top: 1rem;
+.exchange {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  max-width: 1900px;
+  margin: 0 auto;
 }
-.packet-view {
+.row-top,
+.row-bottom {
   display: grid;
-  gap: 0 1.75rem;
+  gap: 0.75rem;
   grid-template-columns: minmax(0, 1fr);
 }
-@media (min-width: 1200px) {
-  .packet-view {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  }
-  .packet-right .diagram-title {
-    margin-top: 0;
-  }
+.network svg,
+.sequence svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .sources {
   margin: 0;
   padding-left: 1.2rem;
 }
 
-@media (max-width: 1000px) {
-  .views {
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* toolbar */
+.ex-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+}
+.ex-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.ex-title h1 {
+  display: inline;
+  font-size: 1.15rem;
+  margin: 0;
+}
+.about {
+  position: relative;
+}
+.about summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+.about-pop {
+  position: absolute;
+  z-index: 20;
+  top: 1.8rem;
+  left: 0;
+  width: min(36rem, 90vw);
+  max-height: 70vh;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.25);
+}
+.about-pop h2 {
+  font-size: 0.95rem;
+  margin-top: 1rem;
 }
 
 /* ---------- step controls ---------- */
 .controls {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin: 1rem 0;
-  padding: 0.6rem 0.8rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  gap: 0.5rem;
 }
 .controls button {
-  padding: 0.45rem 0.9rem;
+  padding: 0.3rem 0.8rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   cursor: pointer;
-  min-height: 2.5rem;
+  min-height: 2.2rem;
 }
 .controls button:hover:not(:disabled) {
   border-color: var(--accent);
@@ -249,12 +290,12 @@ main {
 .controls-status {
   display: flex;
   flex-direction: column;
-  min-width: 10rem;
+  min-width: 9rem;
   text-align: center;
-  flex: 1;
+  line-height: 1.2;
 }
 .controls-count {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 .controls-label {
@@ -262,35 +303,180 @@ main {
   font-family: var(--mono);
 }
 .controls-hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
-@media (max-width: 1000px) {
-  .controls {
+
+@media (max-width: 1099px), (max-height: 649px) {
+  .ex-bar {
     position: sticky;
-    bottom: 0.5rem;
-    z-index: 5;
+    top: 0;
+    z-index: 10;
     box-shadow: 0 2px 12px rgb(0 0 0 / 0.15);
+  }
+  .controls {
+    flex: 1 1 100%;
+  }
+  .controls-status {
+    flex: 1;
+    min-width: 0;
   }
   .controls-hint {
     display: none;
   }
+  .network svg {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .sequence svg {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .packet-right {
+    margin-top: 1rem;
+  }
+}
+
+/* ---------- packet flow ---------- */
+:root {
+  --cat-green: #15803d;
+  --cat-yellow: #a16207;
+  --cat-purple: #7c3aed;
+  --cat-gray: #6b7280;
+  --cat-blue: #2563eb;
+  --cat-red: #dc2626;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cat-green: #15803d;
+    --cat-yellow: #a16207;
+    --cat-purple: #7c3aed;
+    --cat-gray: #5f6570;
+    --cat-blue: #2563eb;
+    --cat-red: #dc2626;
+  }
+}
+.cat-green {
+  --cat: var(--cat-green);
+}
+.cat-yellow {
+  --cat: var(--cat-yellow);
+}
+.cat-purple {
+  --cat: var(--cat-purple);
+}
+.cat-gray {
+  --cat: var(--cat-gray);
+}
+.cat-blue {
+  --cat: var(--cat-blue);
+}
+.cat-red {
+  --cat: var(--cat-red);
+}
+.flow-legend {
+  list-style: none;
+  margin: -0.2rem 0 0.4rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: 0 0 auto !important;
+}
+.dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--cat);
+  vertical-align: -0.05rem;
+}
+.flow-scroll {
+  overflow-x: auto;
+}
+.flow-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.flow-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel);
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.flow-table td {
+  padding: 0.18rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.flow-table .num {
+  text-align: right;
+}
+.flow-table tbody tr {
+  cursor: pointer;
+}
+.flow-table tbody tr:hover {
+  background: var(--bg);
+}
+.flow-table tr.current {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.flow-table tr.current:hover {
+  background: var(--accent-soft);
+}
+.flow-table tr.lost td {
+  opacity: 0.6;
+}
+.step-dot {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--cat);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+}
+.badge {
+  margin-left: 0.6rem;
+  padding: 0 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+.osi-bar {
+  display: inline-flex;
+  gap: 1px;
+}
+.osi-bar span {
+  width: 0.95rem;
+  height: 1.15rem;
+  font-size: 0.65rem;
+  line-height: 1.05rem;
+  text-align: center;
+  border: 1px solid;
+  border-radius: 2px;
+  font-family: var(--mono);
+}
+.osi-bar .off {
+  border-color: var(--border);
+  color: var(--muted);
+  opacity: 0.5;
 }
 
 /* ---------- network view ---------- */
-.network svg,
-.sequence svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.network svg {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-.sequence svg {
-  max-width: 640px;
-  margin: 0 auto;
-}
 .link line {
   stroke: var(--border);
   stroke-width: 3;
@@ -299,7 +485,7 @@ main {
   stroke: var(--accent);
 }
 .link-label {
-  font-size: 10px;
+  font-size: 11.5px;
   fill: var(--muted);
 }
 .node-shape > :first-child {
@@ -318,12 +504,12 @@ main {
   stroke-width: 1.5;
 }
 .node-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   fill: var(--text);
 }
 .node-addr {
-  font-size: 10px;
+  font-size: 11.5px;
   font-family: var(--mono);
   fill: var(--muted);
 }
@@ -806,5 +992,108 @@ main {
   }
   .controls-status {
     min-width: 0;
+  }
+}
+
+/* Dashboard rules come last so they override the flowing layout above. */
+/* ---------- dashboard ---------- */
+@media (min-width: 1100px) and (min-height: 650px) {
+  html {
+    font-size: 14px;
+  }
+  .exchange {
+    height: 100vh;
+    overflow: hidden;
+    gap: 0.6rem;
+    padding: 0.6rem;
+  }
+  .row-top {
+    flex: 0 0 auto;
+    height: clamp(210px, 32vh, 380px);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 3.5fr);
+  }
+  .row-bottom {
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) minmax(0, 2.6fr);
+  }
+  .row-top > .panel,
+  .row-bottom > .panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .row-top > .panel > :not(h2),
+  .row-bottom > .panel > :not(h2) {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+  .area-details > .step-details {
+    overflow-y: auto;
+    padding-right: 0.4rem;
+  }
+  .network,
+  .sequence {
+    display: flex;
+    flex-direction: column;
+  }
+  .network svg,
+  .sequence svg {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .flow {
+    display: flex;
+    flex-direction: column;
+  }
+  .flow-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: auto;
+  }
+  .packet-view {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: 0 1rem;
+  }
+  .packet-left,
+  .packet-right {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 0.3rem;
+  }
+  .packet-right .diagram-title {
+    margin-top: 0;
+  }
+  .stack {
+    grid-template-columns: 6.4rem 4.6rem minmax(0, 1fr);
+    grid-auto-rows: minmax(2rem, auto);
+    font-size: 0.78rem;
+    gap: 2px 4px;
+  }
+  .stack-osi {
+    padding: 0 0.2rem;
+    gap: 0.2rem;
+  }
+  .stack-osi .num {
+    width: 1rem;
+  }
+  .stack-block {
+    padding: 0.2rem 0.4rem;
+  }
+  .encap-part {
+    min-width: 2.6rem;
+    font-size: 0.72rem;
+  }
+  .diagram-ruler,
+  .diagram-row {
+    min-width: 0;
+  }
+  .cell {
+    min-height: 2.6rem;
   }
 }

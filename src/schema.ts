@@ -130,6 +130,26 @@ export interface Step {
   /** Frames on the links of interest. The first one is shown by default. */
   captures: Capture[];
   sources: Source[];
+
+  // ---- packet flow table
+  /** When the sender transmits the message, in milliseconds since the first step. */
+  time: number;
+  /** Id of a category from Exchange.categories, used for the color in the flow table. */
+  category: string;
+  /** Protocol column in the flow table, for example 'TCP'. */
+  protocol: string;
+  /** Info column in the flow table, in the style of a packet analyzer. */
+  info: string;
+  /** The message is lost on the way and never reaches the receiver. */
+  lost?: boolean;
+}
+
+export type CategoryColor = 'green' | 'yellow' | 'purple' | 'gray' | 'blue' | 'red';
+
+export interface Category {
+  id: string;
+  label: string;
+  color: CategoryColor;
 }
 
 export interface Exchange {
@@ -146,5 +166,7 @@ export interface Exchange {
   links: Link[];
   /** Protocol state of participants before the first step. */
   initialStates?: Record<string, string>;
+  /** Legend of the packet flow table. */
+  categories: Category[];
   steps: Step[];
 }

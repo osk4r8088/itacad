@@ -1,4 +1,4 @@
-import type { Capture, Exchange, LayerInstance } from '../schema';
+import type { Capture, Exchange, LayerInstance, Step } from '../schema';
 import { ethIpv4Tcp } from '../headers/stacks';
 import type { TcpParams } from '../headers/tcp';
 import { textPayload } from '../headers/payload';
@@ -87,6 +87,33 @@ const S2C = [...C2S].reverse();
 
 const rel = (abs: number, isn: number) => `Relative ${abs - isn} (ISN + ${abs - isn}).`;
 
+// Info column in the style of Wireshark: relative sequence numbers, flags in Wireshark order.
+const INFO_FLAGS: [string, string][] = [
+  ['flagFIN', 'FIN'],
+  ['flagSYN', 'SYN'],
+  ['flagRST', 'RST'],
+  ['flagPSH', 'PSH'],
+  ['flagACK', 'ACK'],
+  ['flagURG', 'URG'],
+  ['flagECE', 'ECE'],
+  ['flagCWR', 'CWR'],
+];
+
+function withInfo(steps: Omit<Step, 'info' | 'protocol'>[]): Step[] {
+  return steps.map((s) => {
+    const layers = s.captures[0].layers;
+    const t = layers.find((l) => l.def.id === 'tcp')!;
+    const v = (id: string) => Number(t.values[id].display.split(' ')[0]);
+    const len = layers.slice(layers.indexOf(t) + 1).reduce((n, l) => n + l.bytes.length, 0);
+    const [ownIsn, peerIsn] = s.from === 'client' ? [C_ISN, S_ISN] : [S_ISN, C_ISN];
+    const flags = INFO_FLAGS.filter(([id]) => v(id) === 1).map(([, n]) => n);
+    const parts = [`${v('srcPort')} → ${v('dstPort')} [${flags.join(', ')}]`, `Seq=${v('seq') - ownIsn}`];
+    if (flags.includes('ACK')) parts.push(`Ack=${v('ack') - peerIsn}`);
+    parts.push(`Win=${v('window')}`, `Len=${len}`);
+    return { ...s, protocol: 'TCP', info: parts.join(' ') };
+  });
+}
+
 // Timestamps: client clock starts at 1500000, server clock at 900000, both in milliseconds.
 // One-way delay 10 ms. Client time t corresponds to server clock 900000 + (t - 10).
 
@@ -140,7 +167,13 @@ export const tcpExchange: Exchange = {
     { id: 'lan-b', a: 'routerB', b: 'server', label: 'Server LAN' },
   ],
   initialStates: { client: 'CLOSED', server: 'LISTEN' },
-  steps: [
+  categories: [
+    { id: 'handshake', label: 'Handshake and ACKs', color: 'green' },
+    { id: 'client-data', label: 'Data from client', color: 'yellow' },
+    { id: 'server-data', label: 'Data from server', color: 'purple' },
+    { id: 'closing', label: 'Closing (FIN)', color: 'gray' },
+  ],
+  steps: withInfo([
     // ---------------------------------------------------------------- 1 SYN
     {
       id: 'syn',
@@ -148,6 +181,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: 'SYN',
+      time: 0,
+      category: 'handshake',
       states: { client: 'SYN-SENT' },
       details: {
         what:
@@ -199,6 +234,8 @@ export const tcpExchange: Exchange = {
       to: 'client',
       path: S2C,
       label: 'SYN, ACK',
+      time: 10,
+      category: 'handshake',
       states: { server: 'SYN-RECEIVED', client: 'ESTABLISHED' },
       details: {
         what:
@@ -244,6 +281,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: 'ACK',
+      time: 20,
+      category: 'handshake',
       states: { server: 'ESTABLISHED' },
       details: {
         what:
@@ -282,6 +321,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: `PSH, ACK len=${REQ_LEN}`,
+      time: 20,
+      category: 'client-data',
       details: {
         what: `The client sends its HTTP request: ${REQ_LEN} octets of data. The Sequence Number is the number of the first data octet (client ISN + 1). PSH asks the receiver to hand the data to the application right away.`,
         why:
@@ -320,6 +361,8 @@ export const tcpExchange: Exchange = {
       to: 'client',
       path: S2C,
       label: `PSH, ACK len=${RES_LEN}`,
+      time: 31,
+      category: 'server-data',
       details: {
         what: `The server sends the HTTP response, ${RES_LEN} octets. The same segment acknowledges the request: Acknowledgment Number = client ISN + 1 + ${REQ_LEN}.`,
         why:
@@ -361,6 +404,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: 'ACK',
+      time: 41,
+      category: 'handshake',
       details: {
         what: `The client acknowledges the response: Acknowledgment Number = server ISN + 1 + ${RES_LEN}. The segment carries no data.`,
         why: 'Until this acknowledgment arrives, the server must keep the response in its send buffer in case it has to retransmit it.',
@@ -392,6 +437,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: 'FIN, ACK',
+      time: 50,
+      category: 'closing',
       states: { client: 'FIN-WAIT-1', server: 'CLOSE-WAIT' },
       details: {
         what:
@@ -423,6 +470,8 @@ export const tcpExchange: Exchange = {
       to: 'client',
       path: S2C,
       label: 'ACK',
+      time: 60,
+      category: 'closing',
       states: { client: 'FIN-WAIT-2' },
       details: {
         what: 'The server acknowledges the FIN: Acknowledgment Number = previous value + 1. On receipt the client moves to FIN-WAIT-2 and waits for the FIN of the server.',
@@ -449,6 +498,8 @@ export const tcpExchange: Exchange = {
       to: 'client',
       path: S2C,
       label: 'FIN, ACK',
+      time: 61,
+      category: 'closing',
       states: { server: 'LAST-ACK', client: 'TIME-WAIT' },
       details: {
         what:
@@ -478,6 +529,8 @@ export const tcpExchange: Exchange = {
       to: 'server',
       path: C2S,
       label: 'ACK',
+      time: 71,
+      category: 'closing',
       states: { server: 'CLOSED' },
       details: {
         what:
@@ -504,7 +557,7 @@ export const tcpExchange: Exchange = {
       }),
       sources: [{ rfc: 9293, section: '3.6' }, { rfc: 9293, section: '3.4.2' }],
     },
-  ],
+  ]),
 };
 
 export default tcpExchange;

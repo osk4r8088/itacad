@@ -12,18 +12,20 @@ export function App() {
     document.title = exchange ? `${exchange.title} | Protocol Explorer` : 'Protocol Explorer';
   }, [exchange]);
 
+  // Exchange pages render their own toolbar with the step controls.
+  if (exchange && route.page === 'exchange') return <ExchangePage key={exchange.id} exchange={exchange} stepNumber={route.step} />;
+
   return (
     <>
       <header className="site-header">
         <a href="#/" className="site-title">
           Protocol Explorer
         </a>
-        {exchange && <span className="crumb">{exchange.title}</span>}
       </header>
       <main>
-        {route.page === 'index' && <ProtocolIndex />}
-        {route.page === 'exchange' && exchange && <ExchangePage key={exchange.id} exchange={exchange} stepNumber={route.step} />}
-        {route.page === 'exchange' && !exchange && (
+        {route.page === 'index' ? (
+          <ProtocolIndex />
+        ) : (
           <p className="notice">
             Unknown protocol "{route.id}". <a href="#/">Back to the overview</a>.
           </p>

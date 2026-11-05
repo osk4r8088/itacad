@@ -8,6 +8,7 @@ import { StepDetails } from './StepDetails';
 import { PacketView } from './PacketView';
 import { SourceList } from './SourceList';
 import { Prose } from './Prose';
+import { FlowTable } from './FlowTable';
 
 export interface Selection {
   layer: string;
@@ -75,18 +76,25 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
 
   return (
     <div className="exchange">
-      <section className="intro">
-        <h1>{exchange.title}</h1>
-        <p className="scenario">{exchange.scenario}</p>
-        <Prose text={exchange.intro} />
-      </section>
-
-      <section className="panel" aria-label="Network view">
-        <h2>Network</h2>
-        <NetworkView exchange={exchange} step={step} />
-      </section>
-
-      <StepControls
+      <header className="ex-bar">
+        <div className="ex-title">
+          <a href="#/" className="site-title">
+            Protocol Explorer
+          </a>
+          <span className="crumb">
+            <h1>{exchange.title}</h1>
+          </span>
+          <details className="about">
+            <summary>About this exchange</summary>
+            <div className="about-pop">
+              <p className="scenario">{exchange.scenario}</p>
+              <Prose text={exchange.intro} />
+              <h2>Sources</h2>
+              <SourceList sources={exchange.sources} />
+            </div>
+          </details>
+        </div>
+        <StepControls
         index={index}
         count={count}
         label={step.label}
@@ -99,35 +107,48 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
           if (!playing && index >= count - 1) goTo(0);
           setPlaying(!playing);
         }}
-      />
+        />
+      </header>
 
-      <div className="views">
-        <section className="panel" aria-label="Sequence view">
+      <div className="row-top">
+        <section className="panel area-network" aria-label="Network view">
+          <h2>Network</h2>
+          <NetworkView exchange={exchange} step={step} />
+        </section>
+        <section className="panel area-flow" aria-label="Packet flow">
+          <h2>Packet flow</h2>
+          <FlowTable
+            exchange={exchange}
+            index={index}
+            onSelect={(i) => {
+              setPlaying(false);
+              goTo(i);
+            }}
+          />
+        </section>
+      </div>
+
+      <div className="row-bottom">
+        <section className="panel area-seq" aria-label="Sequence view">
           <h2>Sequence</h2>
           <SequenceView exchange={exchange} index={index} onSelect={goTo} />
         </section>
-        <section className="panel" aria-label="Step details">
+        <section className="panel area-details" aria-label="Step details">
           <StepDetails
             exchange={exchange}
             step={step}
             index={index}
             onSelectField={(s) => {
               setSelection(s);
-              document.getElementById('packet')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+              document.getElementById('packet')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
             }}
           />
         </section>
+        <section className="panel area-packet" id="packet" aria-label="Packet view">
+          <h2>Packet</h2>
+          <PacketView exchange={exchange} step={step} capture={capture} onLink={setLink} selection={selection} onSelect={setSelection} />
+        </section>
       </div>
-
-      <section className="panel packet-panel" id="packet" aria-label="Packet view">
-        <h2>Packet</h2>
-        <PacketView exchange={exchange} step={step} capture={capture} onLink={setLink} selection={selection} onSelect={setSelection} />
-      </section>
-
-      <section className="panel sources-panel">
-        <h2>Sources</h2>
-        <SourceList sources={exchange.sources} />
-      </section>
     </div>
   );
 }

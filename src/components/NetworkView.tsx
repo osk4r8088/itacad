@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import type { Exchange, Participant, Step } from '../schema';
 import { useReducedMotion } from '../hooks/useHashRoute';
 
-const UNIT_X = 78;
+const UNIT_X = 68;
 const UNIT_Y = 120;
-const PAD_X = 70;
+const PAD_X = 64;
 const PAD_TOP = 56;
 const MS_PER_HOP = 450;
 
@@ -101,7 +101,9 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
   const pathLinks = new Set(
     step.path.slice(1).map((id, i) => [step.path[i], id].sort().join('|')),
   );
-  const packet = pointAlong(points, t);
+  // On arrival the packet rests just above the receiver, so it does not cover the node.
+  const along = pointAlong(points, t);
+  const packet = { x: along.x, y: along.y - 36 * Math.max(0, (t - 0.9) / 0.1) };
 
   return (
     <div className="network">

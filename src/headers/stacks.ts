@@ -3,6 +3,7 @@ import { concat } from '../lib/encode';
 import { ethernet, physical, type EthernetParams } from './ethernet';
 import { ipv4, type Ipv4Params } from './ipv4';
 import { tcp, type TcpParams } from './tcp';
+import { udp, type UdpParams } from './udp';
 
 /** Bytes of a layer including everything inside it. */
 function wire(layer: LayerInstance, inner: Uint8Array): Uint8Array {
@@ -64,4 +65,20 @@ export function ipDatagram(c: Capture): Uint8Array {
   const i = c.layers.findIndex((l) => l.def.id === 'ipv4');
   if (i < 0) throw new Error('capture has no IPv4 layer');
   return nestedBytes(c.layers.slice(i));
+}
+
+export interface EthIpv4UdpParams {
+  link: string;
+  note?: string;
+  eth: Omit<EthernetParams, 'type'>;
+  ip: Omit<Ipv4Params, 'protocol'>;
+  udp: UdpParams;
+  /** Application message carried in the datagram. */
+  app: LayerInstance;
+}
+
+/** Ethernet II / IPv4 / UDP / application message, with all lengths and checksums computed. */
+export function ethIpv4Udp(p: EthIpv4UdpParams): Capture {
+  const u = udp(p.udp, { srcIp: p.ip.src, dstIp: p.ip.dst }, p.app.bytes);
+  return ethIpv4({ link: p.link, note: p.note, eth: p.eth, ip: { ...p.ip, protocol: 17 }, inner: [u, p.app] });
 }

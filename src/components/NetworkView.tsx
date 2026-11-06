@@ -183,10 +183,14 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
               <g key={l.id} className={`link${active ? ' active' : ''}`}>
                 <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
                 {active && !reduced && <line className="flow" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />}
-                <rect className="link-pill" x={mx - w / 2} y={my - 8} width={w} height={16} rx={3} />
-                <text x={mx} y={my + 3.5} textAnchor="middle" className="link-label">
-                  {l.label}
-                </text>
+                {l.label && (
+                  <>
+                    <rect className="link-pill" x={mx - w / 2} y={my - 8} width={w} height={16} rx={3} />
+                    <text x={mx} y={my + 3.5} textAnchor="middle" className="link-label">
+                      {l.label}
+                    </text>
+                  </>
+                )}
               </g>
             );
           })}

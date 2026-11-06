@@ -19,7 +19,7 @@ export interface Selection {
 /** Relative width of the sequence column in the dashboard: more lifelines need more room. */
 function seqWeight(exchange: Exchange): string {
   const n = exchange.participants.filter((p) => p.lifeline).length;
-  return `${n <= 2 ? 0.95 : n === 3 ? 1.25 : 1.5}fr`;
+  return `${n <= 2 ? 0.95 : n === 3 ? 1.25 : n === 4 ? 1.5 : 1.8}fr`;
 }
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;

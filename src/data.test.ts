@@ -4,6 +4,7 @@ import type { Capture, LayerInstance } from './schema';
 import { concat, crc32, internetChecksum } from './lib/encode';
 import { innerLengths } from './components/PacketView';
 import { ipv4Fragments } from './exchanges/ipv4';
+import { ntpTiming } from './exchanges/ntp';
 
 const u32 = (b: Uint8Array, o: number) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
 const u16 = (b: Uint8Array, o: number) => (b[o] << 8) | b[o + 1];
@@ -220,5 +221,114 @@ describe('ICMP errors quote the original packet', () => {
     let expected = sum('ping-request') + 0x0800;
     expected = (expected & 0xffff) + (expected >>> 16);
     expect(sum('ping-reply')).toBe(expected);
+  });
+});
+
+// ---- application protocols over UDP
+
+const appLayer = (c: Capture, id: string) => {
+  const l = layer(c, id);
+  if (!l) throw new Error(`no ${id} layer`);
+  return l;
+};
+
+/** Reads a DNS name at `offset`, following compression pointers (RFC 1035 section 4.1.4). */
+function readName(msg: Uint8Array, offset: number): { name: string; end: number } {
+  const labels: string[] = [];
+  let pos = offset;
+  let end = -1;
+  for (let jumps = 0; jumps < 20; jumps++) {
+    const len = msg[pos];
+    if (len === 0) return { name: labels.join('.'), end: end < 0 ? pos + 1 : end };
+    if ((len & 0xc0) === 0xc0) {
+      if (end < 0) end = pos + 2;
+      const target = ((len & 0x3f) << 8) | msg[pos + 1];
+      expect(target, 'pointer points backwards').toBeLessThan(pos);
+      pos = target;
+      continue;
+    }
+    labels.push(new TextDecoder().decode(msg.subarray(pos + 1, pos + 1 + len)));
+    pos += 1 + len;
+  }
+  throw new Error('pointer loop');
+}
+
+describe('DHCP messages', () => {
+  const ex = exchanges.find((e) => e.id === 'dhcp')!;
+  const types = [1, 2, 3, 5];
+  it('have a 236-octet fixed part, the magic cookie, the right message type and End', () => {
+    ex.steps.forEach((s, i) => {
+      const m = appLayer(s.captures[0], 'dhcp').bytes;
+      expect(u32(m, 236), `${s.id} cookie`).toBe(0x63825363);
+      // Walk the options: code, length, value; stop at End.
+      let pos = 240;
+      const seen = new Map<number, Uint8Array>();
+      while (m[pos] !== 255) {
+        seen.set(m[pos], m.subarray(pos + 2, pos + 2 + m[pos + 1]));
+        pos += 2 + m[pos + 1];
+        expect(pos, `${s.id} options inside the message`).toBeLessThan(m.length);
+      }
+      expect(pos, `${s.id} End is the last octet`).toBe(m.length - 1);
+      expect(seen.get(53)?.[0], `${s.id} message type`).toBe(types[i]);
+      expect(u32(m, 4), `${s.id} same xid`).toBe(u32(appLayer(ex.steps[0].captures[0], 'dhcp').bytes, 4));
+      // Offer and Ack must carry Server Identifier and Lease Time (RFC 2131 Table 3).
+      if (types[i] === 2 || types[i] === 5) expect(seen.has(54) && seen.has(51), s.id).toBe(true);
+      // A Request in SELECTING state must carry Requested IP Address and Server Identifier (RFC 2131 4.3.2).
+      if (types[i] === 3) expect(seen.has(50) && seen.has(54), s.id).toBe(true);
+      // Discover must not carry a Server Identifier (RFC 2131 Table 5).
+      if (types[i] === 1) expect(seen.has(54), s.id).toBe(false);
+    });
+  });
+});
+
+describe('DNS messages', () => {
+  const ex = exchanges.find((e) => e.id === 'dns')!;
+  it('decode to the names and counts shown, with valid compression pointers', () => {
+    for (const s of ex.steps) {
+      const l = appLayer(s.captures[0], 'dns');
+      const m = l.bytes;
+      const counts = [u16(m, 4), u16(m, 6), u16(m, 8), u16(m, 10)];
+      expect(counts, s.id).toEqual(['question', 'answer', 'authority', 'additional'].map((f) => l.values[f].items?.length ?? 0));
+      const q = readName(m, 12);
+      expect(q.name, `${s.id} QNAME`).toBe('www.example.com');
+      let pos = q.end + 4;
+      for (const section of ['answer', 'authority', 'additional'])
+        for (const rr of l.values[section].items ?? []) {
+          const n = readName(m, pos);
+          expect(rr.values.name.display.startsWith(n.name), `${s.id} ${section} name ${n.name}`).toBe(true);
+          const type = u16(m, n.end);
+          const rdlen = u16(m, n.end + 8);
+          const rdata = n.end + 10;
+          if (type === 2) expect(rr.values.rdata.display.startsWith(readName(m, rdata).name), `${s.id} NS target`).toBe(true);
+          if (type === 1) expect([...m.subarray(rdata, rdata + 4)].join('.'), `${s.id} A`).toBe(rr.values.rdata.display);
+          pos = rdata + rdlen;
+        }
+      expect(pos, `${s.id} message fully parsed`).toBe(m.length);
+    }
+  });
+
+  it('every response carries the ID of the query it answers', () => {
+    const ids = ex.steps.map((s) => u16(appLayer(s.captures[0], 'dns').bytes, 0));
+    expect(ids[0]).toBe(ids[7]);
+    for (const i of [1, 3, 5]) expect(ids[i]).toBe(ids[i + 1]);
+  });
+});
+
+describe('NTP timestamps', () => {
+  const ex = exchanges.find((e) => e.id === 'ntp')!;
+  const ts = (m: Uint8Array, o: number) => (BigInt(u32(m, o)) << 32n) | BigInt(u32(m, o + 4));
+  it('the response echoes T1 and the offset and delay follow from the packets', () => {
+    const req = appLayer(ex.steps[0].captures[0], 'ntp').bytes;
+    const res = appLayer(ex.steps[1].captures[0], 'ntp').bytes;
+    expect(req.length).toBe(48);
+    expect(ts(res, 24), 'Origin = request Transmit').toBe(ts(req, 40));
+    // Convert to microseconds since T0 and recompute the RFC 5905 section 8 formulas.
+    const T0 = BigInt(ntpTiming.T0) + 2208988800n;
+    const us = (t: bigint) => Number(((t >> 32n) - T0) * 1000000n + (((t & 0xffffffffn) * 1000000n + (1n << 31n)) >> 32n));
+    const [t1, t2, t3] = [us(ts(res, 24)), us(ts(res, 32)), us(ts(res, 40))];
+    const t4 = ntpTiming.t4;
+    expect([t1, t2, t3]).toEqual([ntpTiming.t1, ntpTiming.t2, ntpTiming.t3]);
+    expect((t2 - t1 + (t3 - t4)) / 2).toBe(ntpTiming.offset);
+    expect(t4 - t1 - (t3 - t2)).toBe(ntpTiming.delay);
   });
 });

@@ -49,6 +49,8 @@ function OsiBar({ capture }: { capture: Capture }) {
 
 export function FlowTable({ exchange, index, onSelect }: Props) {
   const color = new Map(exchange.categories.map((c) => [c.id, c.color]));
+  // Show microseconds when steps are less than a millisecond apart (LAN exchanges).
+  const digits = exchange.steps.some((s) => !Number.isInteger(s.time)) ? 6 : 3;
   const body = useRef<HTMLTableSectionElement>(null);
 
   // Keep the current row visible when stepping through long exchanges.
@@ -105,7 +107,7 @@ export function FlowTable({ exchange, index, onSelect }: Props) {
                       {i + 1}
                     </button>
                   </td>
-                  <td className="mono">{(s.time / 1000).toFixed(3)}s</td>
+                  <td className="mono">{(s.time / 1000).toFixed(digits)}s</td>
                   <td className="mono">{src}</td>
                   <td className="mono">{dst}</td>
                   <td>{s.protocol}</td>

@@ -1,7 +1,8 @@
 import type { Exchange } from '../schema';
 
 const MARGIN = 98;
-const SPACING = 200;
+/** Distance between lifelines: wide for two, tighter for more, so the diagram stays readable. */
+const spacingFor = (n: number) => Math.min(200, Math.max(130, 330 / Math.max(n - 1, 1)));
 const HEAD = 44;
 const ROW = 40;
 const SLOPE = 12;
@@ -14,6 +15,7 @@ interface Props {
 
 export function SequenceView({ exchange, index, onSelect }: Props) {
   const lifelines = exchange.participants.filter((p) => p.lifeline).sort((a, b) => a.pos.x - b.pos.x);
+  const SPACING = spacingFor(lifelines.length);
   const xOf = new Map(lifelines.map((p, i) => [p.id, MARGIN + i * SPACING]));
   const width = MARGIN * 2 + (lifelines.length - 1) * SPACING;
   const top = HEAD + 28;
@@ -74,7 +76,22 @@ export function SequenceView({ exchange, index, onSelect }: Props) {
               }}
             >
               <rect x={Math.min(x1, x2)} y={y - 22} width={Math.abs(x2 - x1)} height={ROW - 4} className="hit" />
-              <line x1={x1 + dir * 2} y1={y} x2={x2 - dir * 3} y2={y + SLOPE} markerEnd={`url(#${status === 'current' ? 'arrow-current' : 'arrow'})`} />
+              {(s.extraPaths ?? []).map((p, k) => {
+                // Copies of a broadcast: thin dashed arrows to the other receivers that have a lifeline.
+                const xe = xOf.get(p[p.length - 1]);
+                if (xe === undefined) return null;
+                const d = Math.sign(xe - x1);
+                return <line key={k} className="copy" x1={x1 + d * 2} y1={y} x2={xe - d * 3} y2={y + SLOPE * 0.5} markerEnd="url(#arrow)" />;
+              })}
+              {s.lost ? (
+                // A lost message ends between the lifelines with a cross.
+                <>
+                  <line x1={x1 + dir * 2} y1={y} x2={x1 + (x2 - x1) * 0.6} y2={y + SLOPE * 0.6} />
+                  <path className="lost-mark" d={`M${x1 + (x2 - x1) * 0.6 - 5} ${y + SLOPE * 0.6 - 5} l10 10 m0 -10 l-10 10`} />
+                </>
+              ) : (
+                <line x1={x1 + dir * 2} y1={y} x2={x2 - dir * 3} y2={y + SLOPE} markerEnd={`url(#${status === 'current' ? 'arrow-current' : 'arrow'})`} />
+              )}
               <text x={(x1 + x2) / 2} y={y - 2} textAnchor="middle" className="message-label">
                 <tspan className="step-no">{i + 1}</tspan> {s.label}
               </text>

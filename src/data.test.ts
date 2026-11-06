@@ -3,6 +3,7 @@ import { exchanges } from './exchanges';
 import type { Capture, LayerInstance } from './schema';
 import { concat, crc32, internetChecksum } from './lib/encode';
 import { innerLengths } from './components/PacketView';
+import { ipv4Fragments } from './exchanges/ipv4';
 
 const u32 = (b: Uint8Array, o: number) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
 const u16 = (b: Uint8Array, o: number) => (b[o] << 8) | b[o + 1];
@@ -37,7 +38,11 @@ describe.each(exchanges.map((e) => [e.id, e] as const))('exchange %s', (_id, ex)
       expect(s.path.at(-1)).toBe(s.to);
       for (let i = 1; i < s.path.length; i++) expect(linkBetween(s.path[i - 1], s.path[i]), `${s.id} hop ${i}`).toBeDefined();
       for (const id of Object.keys(s.states ?? {})) expect(lifelines.has(id), `${s.id} state ${id}`).toBe(true);
-      const pathLinks = s.path.slice(1).map((id, i) => linkBetween(s.path[i], id)!.id);
+      for (const extra of s.extraPaths ?? []) {
+        expect(extra[0], `${s.id} extra path starts at sender`).toBe(s.from);
+        for (let i = 1; i < extra.length; i++) expect(linkBetween(extra[i - 1], extra[i]), `${s.id} extra hop ${i}`).toBeDefined();
+      }
+      const pathLinks = [s.path, ...(s.extraPaths ?? [])].flatMap((path) => path.slice(1).map((id, i) => linkBetween(path[i], id)!.id));
       for (const c of s.captures) expect(pathLinks, `${s.id} capture ${c.link}`).toContain(c.link);
     }
   });
@@ -98,6 +103,21 @@ describe.each(exchanges.map((e) => [e.id, e] as const))('exchange %s', (_id, ex)
             expect(internetChecksum(concat(pseudo, segment)), `${s.id} TCP checksum`).toBe(0);
             expect((l.bytes[12] >> 4) * 4, `${s.id} Data Offset`).toBe(l.bytes.length);
           }
+          if (l.def.id === 'udp') {
+            const ip = c.layers[i - 1];
+            const fragmented = (ip.bytes[6] & 0x20) !== 0 || ((ip.bytes[6] & 0x1f) << 8 | ip.bytes[7]) !== 0;
+            if (!fragmented) {
+              const dgram = wire(c.layers, i);
+              expect(u16(l.bytes, 4), `${s.id} UDP Length`).toBe(dgram.length);
+              const pseudo = concat(ip.bytes.subarray(12, 20), Uint8Array.of(0, 17, dgram.length >> 8, dgram.length & 0xff));
+              expect(internetChecksum(concat(pseudo, dgram)), `${s.id} UDP checksum`).toBe(0);
+            }
+          }
+          if (l.def.id.startsWith('icmp-')) {
+            expect(c.layers[i - 1].bytes[9], `${s.id} IPv4 protocol 1`).toBe(1);
+            expect(internetChecksum(wire(c.layers, i)), `${s.id} ICMP checksum`).toBe(0);
+            if (l.values.original) expect(c.layers[i - 1].bytes.length + wire(c.layers, i).length, `${s.id} ICMP error at most 576 octets`).toBeLessThanOrEqual(576);
+          }
           if (l.def.id === 'ethernet') {
             const frame = wire(c.layers, i);
             expect(frame.length, `${s.id} minimum frame size`).toBeGreaterThanOrEqual(64);
@@ -149,5 +169,56 @@ describe('TCP sequence numbers', () => {
       expect(Math.abs(ipA[8] - ipB[8]), `${s.id} TTL difference`).toBe(8);
       expect(ipA.subarray(12)).toEqual(ipB.subarray(12));
     }
+  });
+});
+
+describe('IPv4 fragmentation', () => {
+  it('the fragments reassemble into the original datagram', () => {
+    const { original, fragments } = ipv4Fragments;
+    const ipOf = (c: Capture) => c.layers.find((l) => l.def.id === 'ipv4')!;
+    const payloadOf = (c: Capture) => wire(c.layers, c.layers.indexOf(ipOf(c)) + 1);
+    const whole = payloadOf(original);
+    const rebuilt = new Uint8Array(whole.length);
+    let covered = 0;
+    let sawLast = false;
+    for (const f of fragments) {
+      const h = ipOf(f).bytes;
+      expect(u16(h, 4), 'same Identification').toBe(u16(ipOf(original).bytes, 4));
+      const offset = ((h[6] & 0x1f) << 8 | h[7]) * 8;
+      const mf = (h[6] & 0x20) !== 0;
+      const data = payloadOf(f);
+      if (mf) expect(data.length % 8, 'non-last fragments carry multiples of 8 octets').toBe(0);
+      else sawLast = true;
+      expect(20 + data.length, 'fragment fits the MTU of 1000').toBeLessThanOrEqual(1000);
+      rebuilt.set(data, offset);
+      covered += data.length;
+    }
+    expect(sawLast).toBe(true);
+    expect(covered).toBe(whole.length);
+    expect(rebuilt).toEqual(whole);
+  });
+});
+
+describe('ICMP errors quote the original packet', () => {
+  it('each quote is a prefix of the packet that caused it', () => {
+    const icmp = exchanges.find((e) => e.id === 'icmp')!;
+    const quote = (stepId: string) => {
+      const c = icmp.steps.find((s) => s.id === stepId)!.captures[0];
+      const l = c.layers.find((x) => x.def.id === 'icmp-time-exceeded')!;
+      return l.bytes.subarray(8);
+    };
+    const probe1 = icmp.steps.find((s) => s.id === 'probe-1')!.captures[0];
+    const ipIdx = probe1.layers.findIndex((l) => l.def.id === 'ipv4');
+    expect(quote('te-1')).toEqual(wire(probe1.layers, ipIdx));
+    // The probe for hop 8 arrives at Router B with TTL 1.
+    expect(quote('te-8')[8]).toBe(1);
+  });
+
+  it('an Echo Reply checksum differs from the request by 0x0800 when only Type changes', () => {
+    const icmp = exchanges.find((e) => e.id === 'icmp')!;
+    const sum = (id: string) => u16(icmp.steps.find((s) => s.id === id)!.captures[0].layers.find((l) => l.def.id === 'icmp-echo')!.bytes, 2);
+    let expected = sum('ping-request') + 0x0800;
+    expected = (expected & 0xffff) + (expected >>> 16);
+    expect(sum('ping-reply')).toBe(expected);
   });
 });

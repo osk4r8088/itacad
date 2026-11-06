@@ -16,6 +16,12 @@ export interface Selection {
   field?: string;
 }
 
+/** Relative width of the sequence column in the dashboard: more lifelines need more room. */
+function seqWeight(exchange: Exchange): string {
+  const n = exchange.participants.filter((p) => p.lifeline).length;
+  return `${n <= 2 ? 0.95 : n === 3 ? 1.25 : 1.5}fr`;
+}
+
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function defaultSelection(exchange: Exchange, index: number): Selection {
@@ -76,7 +82,7 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
   const capture = step.captures.find((c) => c.link === link) ?? step.captures[0];
 
   return (
-    <div className="exchange">
+    <div className="exchange" style={{ '--seq-fr': seqWeight(exchange) } as React.CSSProperties}>
       <header className="ex-bar">
         <div className="ex-title">
           <a href="#/" className="site-title">

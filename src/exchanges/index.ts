@@ -1,8 +1,12 @@
 import type { Exchange } from '../schema';
 import { tcpExchange } from './tcp';
+import { udpExchange } from './udp';
+import { ipv4Exchange } from './ipv4';
+import { icmpExchange } from './icmp';
+import { arpExchange } from './arp';
 
 /** All exchanges. Add new ones here; their `group` decides where they appear in the navigation. */
-export const exchanges: Exchange[] = [tcpExchange];
+export const exchanges: Exchange[] = [tcpExchange, udpExchange, ipv4Exchange, icmpExchange, arpExchange];
 
 /** Navigation groups, top to bottom in the order of the protocol stack. */
 export const GROUPS = ['Application', 'Security', 'Transport', 'Internet', 'Link'] as const;
@@ -19,10 +23,6 @@ export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
   { title: 'NTP', group: 'Application' },
   { title: 'TLS 1.3', group: 'Security' },
   { title: 'SSH', group: 'Security' },
-  { title: 'UDP', group: 'Transport' },
-  { title: 'IPv4', group: 'Internet' },
-  { title: 'ICMP', group: 'Internet' },
-  { title: 'ARP', group: 'Link' },
 ];
 
 export interface NavEntry {

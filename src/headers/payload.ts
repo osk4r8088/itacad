@@ -34,3 +34,34 @@ export function textPayload(p: PayloadParams): LayerInstance {
   const display = p.text.replace(/\r\n/g, '\\r\\n\n');
   return buildStruct(def, { data: { raw: bytes, display } }, {}, p.summary ?? `${bytes.length} octets`);
 }
+
+export interface BinaryPayloadParams {
+  id: string;
+  name: string;
+  short: string;
+  about: string;
+  bytes: Uint8Array;
+  /** What to show instead of the bytes, for example "1372 octets of application data". */
+  display: string;
+  osi: OsiLayer[];
+  tcpip: TcpIpLayer;
+  osiNote?: string;
+  sources: Source[];
+  summary?: string;
+}
+
+/** Opaque binary data, for payloads whose content is not the topic. */
+export function binaryPayload(p: BinaryPayloadParams): LayerInstance {
+  const def: LayerDef = {
+    id: p.id,
+    name: p.name,
+    short: p.short,
+    osi: p.osi,
+    tcpip: p.tcpip,
+    ...(p.osiNote ? { osiNote: p.osiNote } : {}),
+    about: p.about,
+    fields: [{ id: 'data', name: 'Data', bits: 'variable', compact: true, about: 'Opaque data. Its content does not matter for this example.' }],
+    sources: p.sources,
+  };
+  return buildStruct(def, { data: { raw: p.bytes, display: p.display } }, {}, p.summary ?? `${p.bytes.length} octets`);
+}

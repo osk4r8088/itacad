@@ -71,7 +71,9 @@ function NodeShape({ p, active }: { p: Participant; active: boolean }) {
 export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step }) {
   const reduced = useReducedMotion();
   const byId = new Map(exchange.participants.map((p) => [p.id, p]));
-  const points = step.path.map((id) => center(byId.get(id)!));
+  // The main path plus any copies of the same message (broadcast, flooding).
+  const paths = [step.path, ...(step.extraPaths ?? [])];
+  const pointSets = paths.map((path) => path.map((id) => center(byId.get(id)!)));
   const [t, setT] = useState(reduced ? 1 : 0);
   const [replay, setReplay] = useState(0);
 
@@ -80,7 +82,7 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
       setT(1);
       return;
     }
-    const duration = MS_PER_HOP * Math.max(points.length - 1, 1);
+    const duration = MS_PER_HOP * Math.max(...pointSets.map((pts) => pts.length - 1), 1);
     let frame = 0;
     const start = performance.now();
     const tick = (now: number) => {
@@ -97,15 +99,16 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
   const maxY = Math.max(...exchange.participants.map((p) => p.pos.y));
   const width = PAD_X * 2 + maxX * UNIT_X;
   const height = PAD_TOP + maxY * UNIT_Y + 72;
-  const onPath = new Set(step.path);
-  const pathLinks = new Set(
-    step.path.slice(1).map((id, i) => [step.path[i], id].sort().join('|')),
-  );
+  const onPath = new Set(paths.flat());
+  const pathLinks = new Set(paths.flatMap((path) => path.slice(1).map((id, i) => [path[i], id].sort().join('|'))));
   // On arrival the packet rests just above the receiver, so it does not cover the node.
   // A lost message stops halfway.
-  const along = pointAlong(points, step.lost ? t * 0.5 : t);
   const lift = step.lost ? 0 : 36 * Math.max(0, (t - 0.9) / 0.1);
-  const packet = { x: along.x, y: along.y - lift };
+  const packets = pointSets.map((pts) => {
+    const along = pointAlong(pts, step.lost ? t * 0.5 : t);
+    return { x: along.x, y: along.y - lift };
+  });
+  const receivers = new Set(paths.map((path) => path[path.length - 1]));
 
   return (
     <div className="network">
@@ -125,11 +128,11 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
         })}
         {exchange.participants.map((p) => {
           const c = center(p);
-          const role = p.id === step.from ? 'sender' : p.id === step.to ? 'receiver' : '';
+          const role = p.id === step.from ? 'sender' : receivers.has(p.id) ? 'receiver' : '';
           return (
             <g key={p.id} transform={`translate(${c.x} ${c.y})`} className={`node ${role}`}>
               <title>{[p.label, p.addr?.ipv4, p.addr?.mac, p.note].filter(Boolean).join('\n')}</title>
-              <NodeShape p={p} active={p.id === step.from || p.id === step.to || (onPath.has(p.id) && t > 0 && t < 1)} />
+              <NodeShape p={p} active={p.id === step.from || receivers.has(p.id) || (onPath.has(p.id) && t > 0 && t < 1)} />
               <text y={46} textAnchor="middle" className="node-label">
                 {p.label}
               </text>
@@ -142,17 +145,22 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
             </g>
           );
         })}
-        <g className="packet" transform={`translate(${packet.x} ${packet.y})`}>
-          <rect x={-9} y={-7} width={18} height={14} rx={3} />
-          <text y={-14} textAnchor="middle" className="packet-label">
-            {step.label}
-          </text>
-        </g>
+        {packets.map((pk, i) => (
+          <g key={i} className="packet" transform={`translate(${pk.x} ${pk.y})`}>
+            <rect x={-9} y={-7} width={18} height={14} rx={3} />
+            {i === 0 && (
+              <text y={-14} textAnchor="middle" className="packet-label">
+                {step.label}
+              </text>
+            )}
+          </g>
+        ))}
       </svg>
       <div className="network-foot">
         <span className="muted">
           {byId.get(step.from)!.label} to {byId.get(step.to)!.label}
           {step.path.length > 2 && <> via {step.path.slice(1, -1).map((id) => byId.get(id)!.label).join(', ')}</>}
+          {step.extraPaths && step.extraPaths.length > 0 && <> (copies also reach {step.extraPaths.map((x) => byId.get(x[x.length - 1])!.label).join(', ')})</>}
           {step.lost && <strong> (lost on the way)</strong>}
         </span>
         {!reduced && (

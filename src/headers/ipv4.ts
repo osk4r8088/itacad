@@ -136,6 +136,10 @@ export interface Ipv4Params extends Annotations {
   id: number;
   protocol: number;
   df?: boolean;
+  /** More Fragments flag. */
+  mf?: boolean;
+  /** Fragment Offset in units of 8 octets. */
+  fragOffset?: number;
   dscp?: number;
   ecn?: number;
 }
@@ -152,8 +156,8 @@ export function ipv4(p: Ipv4Params, payload: Uint8Array): LayerInstance {
     id: { raw: p.id, display: `${hex(p.id, 4)} (${p.id})` },
     reserved: { raw: 0, display: '0' },
     df: { raw: df ? 1 : 0, display: df ? '1' : '0' },
-    mf: { raw: 0, display: '0' },
-    fragOffset: { raw: 0, display: '0' },
+    mf: { raw: p.mf ? 1 : 0, display: p.mf ? '1' : '0' },
+    fragOffset: { raw: p.fragOffset ?? 0, display: p.fragOffset ? `${p.fragOffset} (${p.fragOffset * 8} octets)` : '0' },
     ttl: { raw: p.ttl, display: String(p.ttl) },
     protocol: { raw: p.protocol, display: `${p.protocol} (${PROTOCOLS[p.protocol] ?? 'unknown'})` },
     checksum: { raw: checksum, display: hex(checksum, 4) },
@@ -163,5 +167,6 @@ export function ipv4(p: Ipv4Params, payload: Uint8Array): LayerInstance {
   });
   const draft = buildStruct(ipv4Def, fields(0));
   const checksum = internetChecksum(draft.bytes);
-  return buildStruct(ipv4Def, fields(checksum), p, `${p.src} to ${p.dst}, TTL ${p.ttl}`);
+  const frag = p.mf || p.fragOffset ? `, fragment at ${(p.fragOffset ?? 0) * 8}${p.mf ? ', MF' : ''}` : '';
+  return buildStruct(ipv4Def, fields(checksum), p, `${p.src} to ${p.dst}, TTL ${p.ttl}${frag}`);
 }

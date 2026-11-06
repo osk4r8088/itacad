@@ -561,6 +561,15 @@ main {
   stroke: var(--text);
   stroke-width: 1.5;
 }
+.message line.copy {
+  stroke-dasharray: 4 3;
+  stroke-width: 1;
+}
+.lost-mark {
+  stroke: var(--cat-red);
+  stroke-width: 2.5;
+  fill: none;
+}
 .message-label {
   font-size: 12px;
   font-family: var(--mono);
@@ -1197,7 +1206,7 @@ main {
     flex: 1 1 0;
     min-height: 0;
     grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) minmax(0, 2.6fr);
+    grid-template-columns: minmax(0, var(--seq-fr, 0.95fr)) minmax(0, 1.05fr) minmax(0, 2.6fr);
   }
   .row-top > .panel,
   .row-bottom > .panel {

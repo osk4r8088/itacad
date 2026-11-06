@@ -29,3 +29,39 @@ export function ethIpv4Tcp(p: EthIpv4TcpParams): Capture {
   const layers = [physical(), eth, ip, t, ...(p.payload ? [p.payload] : [])];
   return { link: p.link, ...(p.note ? { note: p.note } : {}), layers };
 }
+
+/** Bytes of a list of layers nested in each other (outermost first). */
+export function nestedBytes(layers: LayerInstance[]): Uint8Array {
+  if (layers.length === 0) return new Uint8Array(0);
+  return wire(layers[0], nestedBytes(layers.slice(1)));
+}
+
+export interface EthIpv4Params {
+  link: string;
+  note?: string;
+  eth: Omit<EthernetParams, 'type'>;
+  ip: Ipv4Params;
+  /** Layers inside IP, already built (transport header, data, or an ICMP message). */
+  inner: LayerInstance[];
+}
+
+/** Ethernet II / IPv4 / anything, with IP length, IP checksum and FCS computed. */
+export function ethIpv4(p: EthIpv4Params): Capture {
+  const payload = nestedBytes(p.inner);
+  const ip = ipv4(p.ip, payload);
+  const eth = ethernet({ ...p.eth, type: 0x0800 }, wire(ip, payload));
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, ip, ...p.inner] };
+}
+
+/** Ethernet II / ARP. */
+export function ethArp(p: { link: string; note?: string; eth: Omit<EthernetParams, 'type'>; arp: LayerInstance }): Capture {
+  const eth = ethernet({ ...p.eth, type: 0x0806 }, p.arp.bytes);
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, p.arp] };
+}
+
+/** The IP datagram of a capture (IP header and everything inside), as a receiver sees it. */
+export function ipDatagram(c: Capture): Uint8Array {
+  const i = c.layers.findIndex((l) => l.def.id === 'ipv4');
+  if (i < 0) throw new Error('capture has no IPv4 layer');
+  return nestedBytes(c.layers.slice(i));
+}

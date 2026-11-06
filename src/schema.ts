@@ -24,6 +24,8 @@ export interface FieldDef {
   bits: number | 'variable';
   about: string;
   source?: Source;
+  /** Draw as one row in the header diagram, not to scale (long opaque data). */
+  compact?: boolean;
 }
 
 /** A structure made of fields: a protocol header or a sub-structure such as a TCP option. */
@@ -122,6 +124,8 @@ export interface Step {
   to: string;
   /** Participants the message passes, from sender to receiver. */
   path: string[];
+  /** Further paths taken by copies of the same message, for broadcast or flooding. */
+  extraPaths?: string[][];
   /** Short arrow label for the sequence view. */
   label: string;
   /** Protocol state of participants after this step, only where it changes. */

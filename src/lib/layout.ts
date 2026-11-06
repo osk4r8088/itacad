@@ -19,7 +19,7 @@ export function segments(inst: StructInstance, payloadOctets: number): Segment[]
   let pos = 0;
   for (const field of inst.def.fields) {
     const value = inst.values[field.id];
-    const compact = field.bits === 'variable' && !value.items && value.bits > 64;
+    const compact = (field.compact && value.bits > 64) || (field.bits === 'variable' && !value.items && value.bits > 64);
     out.push({ kind: 'field', id: field.id, field, value, start: pos, bits: value.bits, inTrailer: false, ...(compact ? { compact } : {}) });
     pos += value.bits;
   }
@@ -27,7 +27,8 @@ export function segments(inst: StructInstance, payloadOctets: number): Segment[]
   pos = 0;
   for (const field of inst.def.trailer ?? []) {
     const value = inst.values[field.id];
-    out.push({ kind: 'field', id: field.id, field, value, start: pos, bits: value.bits, inTrailer: true });
+    const compact = (field.compact && value.bits > 64) || (field.bits === 'variable' && !value.items && value.bits > 64);
+    out.push({ kind: 'field', id: field.id, field, value, start: pos, bits: value.bits, inTrailer: true, ...(compact ? { compact } : {}) });
     pos += value.bits;
   }
   return out;

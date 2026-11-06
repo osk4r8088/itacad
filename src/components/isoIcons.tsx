@@ -47,20 +47,6 @@ function Box({ w, d, h, z = 0 }: { w: number; d: number; h: number; z?: number }
   );
 }
 
-/** Rectangle on the front left face (y fixed), from x0 to x1 and z0 to z1. */
-const onLeft = (y: number, x0: number, x1: number, z0: number, z1: number): P3[] => [
-  [x0, y, z0],
-  [x1, y, z0],
-  [x1, y, z1],
-  [x0, y, z1],
-];
-/** Rectangle on the front right face (x fixed), from y0 to y1 and z0 to z1. */
-const onRight = (x: number, y0: number, y1: number, z0: number, z1: number): P3[] => [
-  [x, y0, z0],
-  [x, y1, z0],
-  [x, y1, z1],
-  [x, y0, z1],
-];
 /** Rectangle on a top face at height z. */
 const onTop = (z: number, x0: number, x1: number, y0: number, y1: number): P3[] => [
   [x0, y0, z],
@@ -70,21 +56,11 @@ const onTop = (z: number, x0: number, x1: number, y0: number, y1: number): P3[] 
 ];
 
 function Laptop() {
-  const keysX = [-11, -6, -1, 4];
   return (
     <>
-      <Box w={34} d={26} h={3} />
-      <Quad className="detail" ps={onTop(3, -12, 7, -10, 10)} />
-      {keysX.map((x) => (
-        <Line key={x} className="detail-line" a={[x, -10, 3]} b={[x, 10, 3]} />
-      ))}
-      {[-5, 0, 5].map((y) => (
-        <Line key={y} className="detail-line" a={[-12, y, 3]} b={[7, y, 3]} />
-      ))}
-      <Quad className="detail" ps={onTop(3, 9.5, 14.5, -4, 4)} />
+      <Box w={28} d={20} h={2} />
       {/* Screen, hinged at the back edge and tilted slightly backwards. */}
-      <Quad className="face-screen" ps={[[-17, -13, 3], [-17, 13, 3], [-21, 13, 26], [-21, -13, 26]]} />
-      <Quad className="detail" ps={[[-17.4, -10.5, 5.5], [-17.4, 10.5, 5.5], [-20.6, 10.5, 23.5], [-20.6, -10.5, 23.5]]} />
+      <Quad className="face-screen" ps={[[-14, -10, 2], [-14, 10, 2], [-17, 10, 20], [-17, -10, 20]]} />
     </>
   );
 }
@@ -92,15 +68,8 @@ function Laptop() {
 function Router() {
   return (
     <>
-      <Box w={30} d={24} h={11} />
-      <Line className="antenna" a={[-11, -8, 11]} b={[-11, -8, 30]} />
-      <circle className="antenna-tip" cx={iso([-11, -8, 31.5])[0]} cy={iso([-11, -8, 31.5])[1]} r={2.2} />
-      {[-10, -5, 0, 5].map((x) => (
-        <Quad key={x} className="led" ps={onTop(11, x, x + 3, 6, 8.5)} />
-      ))}
-      <Quad className="detail" ps={onLeft(12, -11, -6, 3, 8)} />
-      <Quad className="detail" ps={onLeft(12, -3, 2, 3, 8)} />
-      <Quad className="detail" ps={onRight(15, 8, -8, 3, 8)} />
+      <Box w={26} d={20} h={8} />
+      <Line a={[-9, -6, 8]} b={[-9, -6, 21]} />
     </>
   );
 }
@@ -108,82 +77,61 @@ function Router() {
 function Switch() {
   return (
     <>
-      <Box w={42} d={18} h={9} />
-      {[-17, -11, -5, 1, 7, 13].map((x) => (
-        <Quad key={x} className="detail" ps={onLeft(9, x, x + 4, 2.5, 6.5)} />
-      ))}
-      <Quad className="led" ps={onTop(9, 14, 17, 3, 6)} />
+      <Box w={34} d={14} h={6} />
+      <Line className="detail-line" a={[-12, 7, 3]} b={[12, 7, 3]} />
     </>
   );
 }
 
-function Server({ bays }: { bays: number }) {
-  const h = 6 + bays * 12;
+function Server({ h }: { h: number }) {
+  const lines = h > 25 ? [h / 3, (2 * h) / 3] : [h / 2];
   return (
     <>
-      <Box w={24} d={24} h={h} />
-      <Quad className="detail" ps={onTop(h, -7, 7, -7, 7)} />
-      {Array.from({ length: bays }, (_, i) => {
-        const z0 = 4 + i * 12;
-        return (
-          <g key={i}>
-            <Quad className="detail" ps={onLeft(12, -9, 9, z0, z0 + 9)} />
-            <Quad className="led" ps={onLeft(12, 4, 7, z0 + 3, z0 + 6)} />
-            <Line className="detail-line" a={[-7, 12, z0 + 4.5]} b={[1, 12, z0 + 4.5]} />
-          </g>
-        );
-      })}
-      {Array.from({ length: bays * 2 }, (_, i) => (
-        <Line key={i} className="detail-line" a={[12, 7, 6 + i * 6]} b={[12, -7, 6 + i * 6]} />
+      <Box w={20} d={20} h={h} />
+      {lines.map((z) => (
+        <Line key={z} className="detail-line" a={[-10, 10, z]} b={[10, 10, z]} />
       ))}
     </>
   );
 }
 
 function Cloud() {
-  return (
-    <g transform="translate(0 -16)">
-      <path className="face-top" d="M-30 16 a12 12 0 0 1 -2 -23 a14 14 0 0 1 18 -12 a17 17 0 0 1 30 2 a12 12 0 0 1 16 14 a10 10 0 0 1 -4 19 z" />
-      <circle className="detail" r={10} />
-      <ellipse className="detail-line" rx={4.5} ry={10} />
-      <path className="detail-line" d="M-10 0 H10 M-8.5 -5 H8.5 M-8.5 5 H8.5" />
-    </g>
-  );
+  return <path className="face-top" transform="translate(2.6 0)" d="M-22 2 a8 8 0 0 1 -1 -16 a10 10 0 0 1 13 -8 a12 12 0 0 1 22 2 a8 8 0 0 1 11 10 a7 7 0 0 1 -3 12 z" />;
 }
 
 /** Highest point of each icon above the ground centre, in screen pixels (positive = up). */
 export const ICON_TOP: Record<ParticipantKind, number> = {
-  host: 43,
-  router: 44,
-  switch: 25,
-  server: 54,
-  resolver: 42,
-  internet: 38,
+  host: 34,
+  router: 30,
+  switch: 18,
+  server: 42,
+  resolver: 32,
+  internet: 30,
 };
 
 /** Half the screen width of each icon, so link labels can be centred in the free space between two icons. */
 export const ICON_HALF: Record<ParticipantKind, number> = {
-  host: 27,
-  router: 24,
-  switch: 26,
-  server: 21,
-  resolver: 21,
-  internet: 46,
+  host: 23,
+  router: 20,
+  switch: 21,
+  server: 18,
+  resolver: 18,
+  internet: 28,
 };
 
 /** Footprint used for the ground tile under each icon (width along x, depth along y). */
 const FOOTPRINT: Record<ParticipantKind, [number, number]> = {
-  host: [40, 32],
-  router: [38, 32],
-  switch: [50, 26],
-  server: [32, 32],
-  resolver: [32, 32],
+  host: [34, 26],
+  router: [32, 26],
+  switch: [40, 20],
+  server: [26, 26],
+  resolver: [26, 26],
   internet: [0, 0],
 };
 
 export function GroundTile({ kind }: { kind: ParticipantKind }) {
   const [w, d] = FOOTPRINT[kind];
-  if (kind === 'internet') return <ellipse className="ground" cx={0} cy={4} rx={42} ry={12} />;
+  if (kind === 'internet') return <ellipse className="ground" cx={0} cy={4} rx={32} ry={9} />;
   return <Quad className="ground" ps={onTop(0, -w / 2, w / 2, -d / 2, d / 2)} />;
 }
 
@@ -194,9 +142,9 @@ export function IsoIcon({ kind }: { kind: ParticipantKind }) {
     case 'switch':
       return <Switch />;
     case 'server':
-      return <Server bays={3} />;
+      return <Server h={32} />;
     case 'resolver':
-      return <Server bays={2} />;
+      return <Server h={22} />;
     case 'internet':
       return <Cloud />;
     default:
@@ -206,7 +154,7 @@ export function IsoIcon({ kind }: { kind: ParticipantKind }) {
 
 /** The packet: a small cube. */
 export function PacketCube() {
-  return <Box w={11} d={11} h={8} z={-4} />;
+  return <Box w={10} d={10} h={7} z={-3.5} />;
 }
 
 /** Size of one cell of the background grid, in screen pixels (width and height of a rhombus). */

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { Capture, Exchange, OsiLayer, Step } from '../schema';
-import { OSI_LAYERS } from '../layers';
+import type { Capture, Exchange, Step } from '../schema';
 import { layerKind } from './PacketView';
 
 interface Props {
@@ -23,28 +22,6 @@ function endpoints(step: Step, exchange: Exchange): [string, string] {
 /** Frame size from destination MAC to FCS: everything except layer 1 framing. */
 function frameSize(c: Capture): number {
   return c.layers.filter((l) => layerKind(l) !== 'phy').reduce((n, l) => n + l.bytes.length + (l.trailerBytes?.length ?? 0), 0);
-}
-
-/** For each OSI layer, the kind of the layer instance that covers it, if any. */
-function osiCoverage(c: Capture): (string | null)[] {
-  const out: (string | null)[] = new Array(8).fill(null);
-  for (const l of c.layers) for (const o of l.def.osi) out[o] = layerKind(l);
-  return out;
-}
-
-function OsiBar({ capture }: { capture: Capture }) {
-  const cov = osiCoverage(capture);
-  const present = ([1, 2, 3, 4, 5, 6, 7] as OsiLayer[]).filter((o) => cov[o]);
-  const label = `OSI layers present: ${present.map((o) => `${o} ${OSI_LAYERS[o].name}`).join(', ')}`;
-  return (
-    <span className="osi-bar" role="img" aria-label={label} title={label}>
-      {([1, 2, 3, 4, 5, 6, 7] as OsiLayer[]).map((o) => (
-        <span key={o} className={cov[o] ? `on kind-${cov[o]}` : 'off'}>
-          {o}
-        </span>
-      ))}
-    </span>
-  );
 }
 
 export function FlowTable({ exchange, index, onSelect }: Props) {
@@ -81,9 +58,6 @@ export function FlowTable({ exchange, index, onSelect }: Props) {
               <th scope="col">Source</th>
               <th scope="col">Destination</th>
               <th scope="col">Protocol</th>
-              <th scope="col" title="OSI layers carried in this message, 1 (Physical) to 7 (Application)">
-                OSI
-              </th>
               <th scope="col">Info</th>
               <th scope="col" className="num" title="Frame size from destination MAC address to FCS, without preamble. Packet analyzers usually show 4 octets less, because the network card strips the FCS.">
                 Size
@@ -112,9 +86,6 @@ export function FlowTable({ exchange, index, onSelect }: Props) {
                   <td className="mono">{src}</td>
                   <td className="mono">{dst}</td>
                   <td>{s.protocol}</td>
-                  <td>
-                    <OsiBar capture={s.captures[0]} />
-                  </td>
                   <td className="mono info-cell">
                     {s.info}
                     {s.lost && <span className="badge">LOST</span>}

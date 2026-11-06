@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Exchange, Participant, Step } from '../schema';
 import { useReducedMotion } from '../hooks/useHashRoute';
 import { GRID, GroundTile, ICON_HALF, ICON_TOP, IsoIcon, PacketCube } from './isoIcons';
 
-// One position unit is 2.5 grid cells across and four down. Nodes snap to the nearest
+// One position unit is 2.5 grid cells across and 3.5 down. Nodes snap to the nearest
 // vertex of the isometric background grid, so every node sits on a grid point.
 const CELLS_X = 2.5;
-const UNIT_Y = 8 * GRID.h;
+const UNIT_Y = 7 * GRID.h;
 const PAD_X = 2 * GRID.w;
 const MS_PER_HOP = 450;
 /** Distance from the ground centre of a node to its name label. */
-const LABEL_Y = 32;
+const LABEL_Y = 26;
+/** Same condition as the dashboard layout in styles.css, where the panel has a fixed height. */
+const DASHBOARD = '(min-width: 1100px) and (min-height: 650px)';
 
 type Point = { x: number; y: number };
 
@@ -66,14 +68,33 @@ function Node({ p, at, role, busy }: { p: Participant; at: Point; role: Role; bu
 export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step }) {
   const reduced = useReducedMotion();
   const byId = new Map(exchange.participants.map((p) => [p.id, p]));
-  const color = exchange.categories.find((c) => c.id === step.category)?.color ?? 'blue';
   const [t, setT] = useState(reduced ? 1 : 0);
   const [replay, setReplay] = useState(0);
+  const svgRef = useRef<SVGSVGElement>(null);
+  // Size of the drawing area in the dashboard, where the panel has a fixed size. Null elsewhere.
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const mq = window.matchMedia(DASHBOARD);
+    const measure = () => {
+      const r = svg.getBoundingClientRect();
+      setBox(mq.matches && r.width > 0 && r.height > 0 ? { w: r.width, h: r.height } : null);
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(svg);
+    mq.addEventListener('change', measure);
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener('change', measure);
+    };
+  }, []);
 
   // Room above the top row for the tallest icon plus the packet and its tag resting on it.
   const minY = Math.min(...exchange.participants.map((p) => p.pos.y));
   const tallest = Math.max(...exchange.participants.filter((p) => p.pos.y === minY).map((p) => ICON_TOP[p.kind]));
-  const padTop = Math.ceil((tallest + 50) / GRID.h) * GRID.h;
+  const padTop = Math.ceil((tallest + 44) / GRID.h) * GRID.h;
   const center = (p: Participant): Point => ({ x: PAD_X + Math.round(p.pos.x * CELLS_X) * GRID.w, y: padTop + (p.pos.y - minY) * UNIT_Y });
 
   // The main path plus any copies of the same message (broadcast, flooding).
@@ -101,7 +122,16 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
   const maxX = Math.max(...exchange.participants.map((p) => p.pos.x));
   const maxY = Math.max(...exchange.participants.map((p) => p.pos.y));
   const width = PAD_X * 2 + Math.round(maxX * CELLS_X) * GRID.w;
-  const height = padTop + (maxY - minY) * UNIT_Y + LABEL_Y + 26;
+  const height = padTop + (maxY - minY) * UNIT_Y + LABEL_Y + 22;
+  // In the dashboard the view fills its panel at no more than 1:1, so every exchange is drawn at the same size
+  // as long as it fits; smaller topologies get more grid around them instead of being blown up.
+  let viewBox = `0 0 ${width} ${height}`;
+  if (box) {
+    const scale = Math.min(1, box.w / width, box.h / height);
+    const vw = box.w / scale;
+    const vh = box.h / scale;
+    viewBox = `${(width - vw) / 2} ${(height - vh) / 2} ${vw} ${vh}`;
+  }
   const linkKey = (a: string, b: string) => [a, b].sort().join('|');
   const pathLinks = new Set(paths.flatMap((path) => path.slice(1).map((id, i) => linkKey(path[i], id))));
   const receivers = new Set(paths.map((path) => path[path.length - 1]));
@@ -126,16 +156,17 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
 
   return (
     <div className="network">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${byId.get(step.from)!.label} sends ${label} to ${byId.get(step.to)!.label}`}>
+      <svg ref={svgRef} viewBox={viewBox} role="img" aria-label={`${byId.get(step.from)!.label} sends ${label} to ${byId.get(step.to)!.label}`}>
         <defs>
           <pattern id="net-grid" width={GRID.w} height={GRID.h} patternUnits="userSpaceOnUse" patternTransform={`translate(${PAD_X} ${padTop})`}>
             <path d={`M0 0 L${GRID.w} ${GRID.h} M${GRID.w} 0 L0 ${GRID.h}`} className="grid-line" />
           </pattern>
         </defs>
-        <rect width={width} height={height} className="net-bg" />
-        <rect width={width} height={height} fill="url(#net-grid)" />
+        {/* Background and grid reach far beyond the drawing, so they fill the whole panel whatever its shape. */}
+        <rect x={-2000} y={-2000} width={width + 4000} height={height + 4000} className="net-bg" />
+        <rect x={-2000} y={-2000} width={width + 4000} height={height + 4000} fill="url(#net-grid)" />
 
-        <g className={`cat-${color}`}>
+        <g>
           {exchange.links.map((l) => {
             const a = center(byId.get(l.a)!);
             const b = center(byId.get(l.b)!);

@@ -1,7 +1,14 @@
-import type { Exchange, Step } from '../schema';
+import type { Exchange, OsiLayer, Step } from '../schema';
+import { OSI_LAYERS } from '../layers';
 import type { Selection } from './ExchangePage';
 import { Prose } from './Prose';
 import { SourceLink } from './SourceList';
+
+/** OSI layers carried in the first capture of a step, as "1 Physical", "2 Data Link", ... */
+function osiLayers(step: Step): string[] {
+  const present = new Set(step.captures[0].layers.flatMap((l) => l.def.osi));
+  return ([1, 2, 3, 4, 5, 6, 7] as OsiLayer[]).filter((o) => present.has(o)).map((o) => `${o} ${OSI_LAYERS[o].name}`);
+}
 
 interface Props {
   exchange: Exchange;
@@ -37,6 +44,7 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
           </>
         )}
       </p>
+      <p className="muted osi-line">OSI layers: {osiLayers(step).join(', ')}</p>
 
       <h3>In this step</h3>
       <Prose text={d.what} />

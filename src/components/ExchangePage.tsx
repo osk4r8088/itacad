@@ -9,6 +9,7 @@ import { PacketView } from './PacketView';
 import { SourceList } from './SourceList';
 import { Prose } from './Prose';
 import { FlowTable } from './FlowTable';
+import { ProtocolSwitcher } from './ProtocolSwitcher';
 
 export interface Selection {
   layer: string;
@@ -49,7 +50,7 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
       const t = e.target;
-      if (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"], .switcher-menu')) return;
       const map: Record<string, number> = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: count - 1 };
       if (e.key in map) {
         e.preventDefault();
@@ -82,7 +83,7 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
             Protocol Explorer
           </a>
           <span className="crumb">
-            <h1>{exchange.title}</h1>
+            <ProtocolSwitcher currentId={exchange.id} currentTitle={exchange.title} />
           </span>
           <details className="about">
             <summary>About this exchange</summary>

@@ -35,7 +35,12 @@ export function HeaderDiagram({ inst, payloadOctets, payloadName, selected, onSe
             const narrow = c.span < 8;
             const vertical = c.span <= 2;
             const label = narrow ? (f.short ?? f.name) : f.name;
-            const display = c.seg.compact ? `${v.display.replace(/\s+/g, ' ')} (${v.bits / 8} octets, not to scale)` : v.display;
+            // Narrow cells show only the value itself ("8" instead of "8 (32 octets)"); the details panel has the rest.
+            const display = c.seg.compact
+              ? `${v.display.replace(/\s+/g, ' ')} (${v.bits / 8} octets, not to scale)`
+              : c.span < 12
+                ? v.display.split(' ')[0]
+                : v.display;
             return (
               <button
                 type="button"

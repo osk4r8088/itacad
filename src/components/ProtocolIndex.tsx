@@ -1,29 +1,37 @@
-import { exchanges } from '../exchanges';
+import { navGroups } from '../exchanges';
 
+/** Overview: all protocols, grouped by layer from top (application) to bottom (link). */
 export function ProtocolIndex() {
-  const groups = [...new Set(exchanges.map((e) => e.group))];
   return (
     <div className="index">
       <p className="lead">
-        Step through real protocol exchanges. Each step shows the message on the network, in a sequence diagram, and as a packet with every header field, layer by layer.
+        Step through real protocol exchanges. Each step shows the message on the network, in a packet flow table and a sequence diagram, and as a packet with every header field, layer by layer.
       </p>
-      {groups.map((g) => (
-        <section key={g}>
-          <h2>{g}</h2>
-          <ul className="cards">
-            {exchanges
-              .filter((e) => e.group === g)
-              .map((e) => (
-                <li key={e.id}>
-                  <a className="card" href={`#/${e.id}/1`}>
-                    <strong>{e.title}</strong>
-                    <span>{e.summary}</span>
-                  </a>
+      <div className="layer-map">
+        {navGroups().map((g) => (
+          <section key={g.group} className="layer-row">
+            <h2>{g.group}</h2>
+            <ul className="cards">
+              {g.entries.map((e) => (
+                <li key={e.title}>
+                  {e.id ? (
+                    <a className="card" href={`#/${e.id}/1`}>
+                      <strong>{e.title}</strong>
+                      <span>{e.summary}</span>
+                    </a>
+                  ) : (
+                    <div className="card planned" aria-disabled="true">
+                      <strong>{e.title}</strong>
+                      <span>Planned</span>
+                    </div>
+                  )}
                 </li>
               ))}
-          </ul>
-        </section>
-      ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+      <p className="muted small">Shortcut on protocol pages: press / to switch protocol, arrow keys to step.</p>
     </div>
   );
 }

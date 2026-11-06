@@ -995,6 +995,186 @@ main {
   }
 }
 
+/* ---------- network footer ---------- */
+.network-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.82rem;
+  flex: 0 0 auto !important;
+}
+.network svg {
+  margin: auto;
+}
+
+/* ---------- protocol switcher ---------- */
+.crumb {
+  display: inline-flex;
+  align-items: baseline;
+}
+.switcher {
+  position: relative;
+}
+.switcher-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  cursor: pointer;
+}
+.switcher-button:hover,
+.switcher-button[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+.switcher-button h1 {
+  display: inline;
+  font-size: 1.1rem;
+  margin: 0;
+}
+.caret {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.switcher-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: min(30rem, 92vw);
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.3);
+}
+.switcher-menu input {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.switcher-groups {
+  overflow-y: auto;
+}
+.switcher-groups section {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.switcher-groups section:last-child {
+  border-bottom: none;
+}
+.switcher-groups h2 {
+  margin: 0.25rem 0 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.switcher-groups ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.switcher-groups a,
+.switcher-groups .planned {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+.switcher-groups a {
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.switcher-groups a:hover,
+.switcher-groups a:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.switcher-groups a[aria-current='page'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.switcher-groups .planned {
+  color: var(--muted);
+  border: 1px dashed var(--border);
+}
+.switcher-foot {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+/* ---------- overview layer map ---------- */
+.index {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.layer-map {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+.layer-row {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.layer-row h2 {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.layer-row .cards {
+  margin: 0;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+.card.planned {
+  border-style: dashed;
+  color: var(--muted);
+  background: transparent;
+}
+@media (max-width: 640px) {
+  .switcher-menu {
+    position: fixed;
+    top: 3.5rem;
+    left: 3vw;
+    right: 3vw;
+    width: auto;
+  }
+  .switcher-groups section {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+  .layer-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}
+
 /* Dashboard rules come last so they override the flowing layout above. */
 /* ---------- dashboard ---------- */
 @media (min-width: 1100px) and (min-height: 650px) {
@@ -1009,9 +1189,9 @@ main {
   }
   .row-top {
     flex: 0 0 auto;
-    height: clamp(210px, 32vh, 380px);
+    height: clamp(200px, 29vh, 340px);
     grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 3.5fr);
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 3.3fr);
   }
   .row-bottom {
     flex: 1 1 0;
@@ -1086,8 +1266,8 @@ main {
     padding: 0.2rem 0.4rem;
   }
   .encap-part {
-    min-width: 2.6rem;
-    font-size: 0.72rem;
+    min-width: 3.5rem;
+    font-size: 0.7rem;
   }
   .diagram-ruler,
   .diagram-row {

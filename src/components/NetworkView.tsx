@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import type { Exchange, Participant, Step } from '../schema';
 import { useReducedMotion } from '../hooks/useHashRoute';
 
-const UNIT_X = 68;
+const UNIT_X = 56;
 const UNIT_Y = 120;
-const PAD_X = 64;
+const PAD_X = 52;
 const PAD_TOP = 56;
 const MS_PER_HOP = 450;
 
@@ -96,14 +96,16 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
   const maxX = Math.max(...exchange.participants.map((p) => p.pos.x));
   const maxY = Math.max(...exchange.participants.map((p) => p.pos.y));
   const width = PAD_X * 2 + maxX * UNIT_X;
-  const height = PAD_TOP + maxY * UNIT_Y + 92;
+  const height = PAD_TOP + maxY * UNIT_Y + 72;
   const onPath = new Set(step.path);
   const pathLinks = new Set(
     step.path.slice(1).map((id, i) => [step.path[i], id].sort().join('|')),
   );
   // On arrival the packet rests just above the receiver, so it does not cover the node.
-  const along = pointAlong(points, t);
-  const packet = { x: along.x, y: along.y - 36 * Math.max(0, (t - 0.9) / 0.1) };
+  // A lost message stops halfway.
+  const along = pointAlong(points, step.lost ? t * 0.5 : t);
+  const lift = step.lost ? 0 : 36 * Math.max(0, (t - 0.9) / 0.1);
+  const packet = { x: along.x, y: along.y - lift };
 
   return (
     <div className="network">
@@ -115,7 +117,7 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
           return (
             <g key={l.id} className={`link${active ? ' active' : ''}`}>
               <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
-              <text x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 8} textAnchor="middle" className="link-label">
+              <text x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 + 16} textAnchor="middle" className="link-label">
                 {l.label}
               </text>
             </g>
@@ -128,17 +130,13 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
             <g key={p.id} transform={`translate(${c.x} ${c.y})`} className={`node ${role}`}>
               <title>{[p.label, p.addr?.ipv4, p.addr?.mac, p.note].filter(Boolean).join('\n')}</title>
               <NodeShape p={p} active={p.id === step.from || p.id === step.to || (onPath.has(p.id) && t > 0 && t < 1)} />
-              <text y={44} textAnchor="middle" className="node-label">
+              <text y={46} textAnchor="middle" className="node-label">
                 {p.label}
               </text>
+              {/* IP address under the node; the MAC address is in the tooltip and in the packet view per link. */}
               {p.addr?.ipv4 && (
-                <text y={58} textAnchor="middle" className="node-addr">
+                <text y={62} textAnchor="middle" className="node-addr">
                   {p.addr.ipv4}
-                </text>
-              )}
-              {p.addr?.mac && (
-                <text y={p.addr.ipv4 ? 71 : 58} textAnchor="middle" className="node-addr">
-                  {p.addr.mac}
                 </text>
               )}
             </g>
@@ -151,11 +149,18 @@ export function NetworkView({ exchange, step }: { exchange: Exchange; step: Step
           </text>
         </g>
       </svg>
-      {!reduced && (
-        <button type="button" className="link-button replay" onClick={() => setReplay((r) => r + 1)}>
-          Replay animation
-        </button>
-      )}
+      <div className="network-foot">
+        <span className="muted">
+          {byId.get(step.from)!.label} to {byId.get(step.to)!.label}
+          {step.path.length > 2 && <> via {step.path.slice(1, -1).map((id) => byId.get(id)!.label).join(', ')}</>}
+          {step.lost && <strong> (lost on the way)</strong>}
+        </span>
+        {!reduced && (
+          <button type="button" className="link-button" onClick={() => setReplay((r) => r + 1)}>
+            Replay
+          </button>
+        )}
+      </div>
     </div>
   );
 }

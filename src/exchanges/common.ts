@@ -26,3 +26,21 @@ export function filler(length: number, seed = 0): Uint8Array {
   }
   return out;
 }
+
+/**
+ * Deterministic bytes that look random (xorshift32), for values that are random in reality:
+ * nonces, key shares, session IDs and ciphertext. They are not real keys or real ciphertext.
+ */
+export function randomBytes(length: number, seed: number): Uint8Array {
+  const out = new Uint8Array(length);
+  let x = (seed * 2654435761) >>> 0 || 1;
+  for (let i = 0; i < length; i++) {
+    x ^= x << 13;
+    x >>>= 0;
+    x ^= x >>> 17;
+    x ^= x << 5;
+    x >>>= 0;
+    out[i] = x & 0xff;
+  }
+  return out;
+}

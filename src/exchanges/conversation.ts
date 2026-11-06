@@ -1,5 +1,5 @@
 import type { Capture, LayerInstance } from '../schema';
-import { ethIpv4Tcp } from '../headers/stacks';
+import { ethIpv4Tcp, nestedBytes } from '../headers/stacks';
 import type { TcpFlag } from '../headers/tcp';
 
 export interface Host {
@@ -46,13 +46,13 @@ export class TcpConversation {
     return (this.next[side] - this.p[side].isn - 1) >>> 0;
   }
 
-  segment(from: Side, payload?: LayerInstance, flags: TcpFlag[] = ['PSH', 'ACK'], note?: string): Capture {
+  segment(from: Side, payload?: LayerInstance | LayerInstance[], flags: TcpFlag[] = ['PSH', 'ACK'], note?: string): Capture {
     const to: Side = from === 'client' ? 'server' : 'client';
     const me = this.p[from];
     const peer = this.p[to];
     const syn = flags.includes('SYN');
     const seq = syn ? me.isn : this.next[from];
-    const len = payload ? payload.bytes.length : 0;
+    const len = payload ? nestedBytes(Array.isArray(payload) ? payload : [payload]).length : 0;
     if (!syn) this.next[from] = (seq + len + (flags.includes('FIN') ? 1 : 0)) >>> 0;
     const c = from === 'client';
     const ttl = c ? 64 : 64 - this.p.hops;

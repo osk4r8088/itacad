@@ -16,18 +16,20 @@ export interface EthIpv4TcpParams {
   eth: Omit<EthernetParams, 'type'>;
   ip: Omit<Ipv4Params, 'protocol'>;
   tcp: TcpParams;
-  payload?: LayerInstance;
+  /** Application data: one layer, or several nested in each other (outermost first). */
+  payload?: LayerInstance | LayerInstance[];
 }
 
 /** Ethernet II / IPv4 / TCP [/ application data], with all lengths and checksums computed. */
 export function ethIpv4Tcp(p: EthIpv4TcpParams): Capture {
-  const app = p.payload ? p.payload.bytes : new Uint8Array(0);
+  const inner = p.payload ? (Array.isArray(p.payload) ? p.payload : [p.payload]) : [];
+  const app = nestedBytes(inner);
   const t = tcp(p.tcp, { srcIp: p.ip.src, dstIp: p.ip.dst }, app);
   const tBytes = wire(t, app);
   const ip = ipv4({ ...p.ip, protocol: 6 }, tBytes);
   const ipBytes = wire(ip, tBytes);
   const eth = ethernet({ ...p.eth, type: 0x0800 }, ipBytes);
-  const layers = [physical(), eth, ip, t, ...(p.payload ? [p.payload] : [])];
+  const layers = [physical(), eth, ip, t, ...inner];
   return { link: p.link, ...(p.note ? { note: p.note } : {}), layers };
 }
 

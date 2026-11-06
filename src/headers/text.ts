@@ -1,4 +1,4 @@
-import type { FieldDef, LayerDef, LayerInstance, Source } from '../schema';
+import type { FieldDef, LayerDef, LayerInstance, OsiLayer, Source } from '../schema';
 import { buildStruct } from '../lib/build';
 import { ascii } from '../lib/encode';
 
@@ -22,6 +22,9 @@ export interface TextMessageParams {
   sources: Source[];
   parts: TextPart[];
   summary: string;
+  /** OSI layers, 7 by default. */
+  osi?: OsiLayer[];
+  osiNote?: string;
 }
 
 /** Makes CR LF visible but keeps the line break, so the text stays readable. */
@@ -41,7 +44,17 @@ export function textMessage(p: TextMessageParams): LayerInstance {
     about: part.about,
     ...(part.source ? { source: part.source } : {}),
   }));
-  const def: LayerDef = { id: p.id, name: p.name, short: p.short, osi: [7], tcpip: 'application', about: p.about, fields, sources: p.sources };
+  const def: LayerDef = {
+    id: p.id,
+    name: p.name,
+    short: p.short,
+    osi: p.osi ?? [7],
+    ...(p.osiNote ? { osiNote: p.osiNote } : {}),
+    tcpip: 'application',
+    about: p.about,
+    fields,
+    sources: p.sources,
+  };
   const inputs = Object.fromEntries(
     p.parts.map((part) => [
       part.id,

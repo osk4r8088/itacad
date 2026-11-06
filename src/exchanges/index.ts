@@ -11,6 +11,9 @@ import { http1Exchange } from './http1';
 import { smtpExchange } from './smtp';
 import { imapExchange } from './imap';
 import { ftpExchange } from './ftp';
+import { websocketExchange } from './websocket';
+import { tlsExchange } from './tls';
+import { sshExchange } from './ssh';
 
 /** All exchanges. Add new ones here; their `group` decides where they appear in the navigation. */
 export const exchanges: Exchange[] = [
@@ -21,6 +24,9 @@ export const exchanges: Exchange[] = [
   smtpExchange,
   imapExchange,
   ftpExchange,
+  websocketExchange,
+  tlsExchange,
+  sshExchange,
   tcpExchange,
   udpExchange,
   ipv4Exchange,
@@ -35,9 +41,6 @@ export const GROUPS = ['Application', 'Security', 'Transport', 'Internet', 'Link
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
   { title: 'HTTP/2', group: 'Application' },
   { title: 'HTTP/3 and QUIC', group: 'Application' },
-  { title: 'WebSocket', group: 'Application' },
-  { title: 'TLS 1.3', group: 'Security' },
-  { title: 'SSH', group: 'Security' },
 ];
 
 export interface NavEntry {

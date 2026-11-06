@@ -5,6 +5,7 @@ import { concat, crc32, internetChecksum } from './lib/encode';
 import { innerLengths } from './components/PacketView';
 import { ipv4Fragments } from './exchanges/ipv4';
 import { ntpTiming } from './exchanges/ntp';
+import { WS_ACCEPT, WS_KEY } from './exchanges/websocket';
 
 const u32 = (b: Uint8Array, o: number) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
 const u16 = (b: Uint8Array, o: number) => (b[o] << 8) | b[o + 1];
@@ -157,7 +158,7 @@ describe.each(exchanges.filter((e) => e.steps.some((s) => layer(s.captures[0], '
       const ackFlag = !!(flags & 0x10);
       const seq = u32(t.bytes, 4);
       const ack = u32(t.bytes, 8);
-      const dataLen = c.layers.slice(c.layers.indexOf(t) + 1).reduce((n, l) => n + l.bytes.length, 0);
+      const dataLen = wire(c.layers, c.layers.indexOf(t) + 1).length;
       // Exchanges may start on an open connection; the first segment seen from a side sets its stream.
       if (!syn && next[me] !== undefined) expect(seq, `${s.id} seq continues the stream`).toBe(next[me]);
       if (ackFlag && next[peer] !== undefined) expect(ack, `${s.id} ack`).toBe(next[peer]);
@@ -377,5 +378,92 @@ describe('Text protocols over TCP', () => {
     const [, , , , p1, p2] = /\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/.exec(reply)!.slice(1).map(Number);
     const syn = layer(steps.find((x) => x.id === 'data-syn')!.captures[0], 'tcp')!;
     expect(u16(syn.bytes, 2)).toBe(p1 * 256 + p2);
+  });
+});
+
+describe('TLS 1.3 records', () => {
+  const ex = exchanges.find((e) => e.id === 'tls')!;
+  const u24 = (b: Uint8Array, o: number) => (b[o] << 16) | (b[o + 1] << 8) | b[o + 2];
+  it('record, handshake and extension lengths are consistent', () => {
+    for (const s of ex.steps) {
+      const c = s.captures[0];
+      const i = c.layers.findIndex((l) => l.def.id === 'tls-record');
+      const rec = c.layers[i].bytes;
+      expect(u16(rec, 3), `${s.id} record length`).toBe(wire(c.layers, i + 1).length);
+      const inner = c.layers[i + 1];
+      if (inner.def.id === 'tls-client-hello' || inner.def.id === 'tls-server-hello') {
+        const m = inner.bytes;
+        expect(u24(m, 1), `${s.id} handshake length`).toBe(m.length - 4);
+        // Walk the extensions at the end: type, length, data.
+        const extLen = u16(m, m.length - inner.values.extensions.bits / 8 - 2);
+        let pos = m.length - extLen;
+        while (pos < m.length) pos += 4 + u16(m, pos + 2);
+        expect(pos, `${s.id} extensions fill the message exactly`).toBe(m.length);
+      }
+      if (inner.def.id === 'tls-encrypted') expect(rec[0], `${s.id} encrypted records show type 23`).toBe(23);
+    }
+  });
+
+  it('the server echoes the session ID and picks an offered suite and group', () => {
+    const ch = appLayer(ex.steps[0].captures[0], 'tls-client-hello');
+    const sh = appLayer(ex.steps[1].captures[0], 'tls-server-hello');
+    expect(sh.bytes.subarray(39, 39 + 32)).toEqual(ch.bytes.subarray(39, 39 + 32));
+    const suite = u16(sh.bytes, 71);
+    const offered = ch.bytes.subarray(73, 73 + u16(ch.bytes, 71));
+    expect([...Array(offered.length / 2).keys()].map((k) => u16(offered, k * 2))).toContain(suite);
+  });
+});
+
+describe('SSH packets', () => {
+  const ex = exchanges.find((e) => e.id === 'ssh')!;
+  it('binary packets are padded to a multiple of 8 with at least 4 octets', () => {
+    for (const s of ex.steps) {
+      const c = s.captures[0];
+      const i = c.layers.findIndex((l) => l.def.id === 'ssh-packet');
+      if (i < 0) continue;
+      const whole = wire(c.layers, i);
+      const pad = whole[4];
+      expect(u32(whole, 0), `${s.id} packet_length`).toBe(whole.length - 4);
+      expect(whole.length % 8, `${s.id} multiple of 8`).toBe(0);
+      expect(pad, `${s.id} padding`).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('negotiation picks the first client algorithm the server supports', () => {
+    const lists = (id: string) => {
+      const m = appLayer(ex.steps.find((s) => s.id === id)!.captures[0], 'ssh-kexinit').bytes;
+      const out: string[][] = [];
+      let pos = 17;
+      for (let k = 0; k < 10; k++) {
+        const n = u32(m, pos);
+        out.push(new TextDecoder().decode(m.subarray(pos + 4, pos + 4 + n)).split(','));
+        pos += 4 + n;
+      }
+      expect(pos + 5, `${id} KEXINIT fully parsed`).toBe(m.length);
+      return out;
+    };
+    const [c, sv] = [lists('client-kexinit'), lists('server-kexinit')];
+    const pick = (k: number) => c[k].find((a) => sv[k].includes(a));
+    expect([pick(0), pick(1), pick(2), pick(3), pick(6)]).toEqual(['curve25519-sha256', 'ssh-ed25519', 'chacha20-poly1305@openssh.com', 'chacha20-poly1305@openssh.com', 'none']);
+  });
+});
+
+describe('WebSocket', () => {
+  const ex = exchanges.find((e) => e.id === 'websocket')!;
+  it('Sec-WebSocket-Accept is the SHA-1 of key and GUID', async () => {
+    const digest = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(`${WS_KEY}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`));
+    const accept = btoa(String.fromCharCode(...new Uint8Array(digest)));
+    expect(accept).toBe(WS_ACCEPT);
+    const res = appLayer(ex.steps[1].captures[0], 'http').values.headers.display;
+    expect(res).toContain(`Sec-WebSocket-Accept: ${accept}`);
+  });
+
+  it('the masked "Hello" frame matches RFC 6455 section 5.7, client frames are masked, server frames are not', () => {
+    const hello = appLayer(ex.steps.find((s) => s.id === 'hello')!.captures[0], 'ws-frame').bytes;
+    expect([...hello]).toEqual([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]);
+    for (const s of ex.steps) {
+      const f = layer(s.captures[0], 'ws-frame');
+      if (f) expect(f.bytes[1] >> 7, s.id).toBe(s.from === 'client' ? 1 : 0);
+    }
   });
 });

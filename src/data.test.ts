@@ -140,14 +140,17 @@ describe.each(exchanges.map((e) => [e.id, e] as const))('exchange %s', (_id, ex)
   });
 });
 
-describe('TCP sequence numbers', () => {
-  const ex = exchanges.find((e) => e.id === 'tcp')!;
-
-  it('every ACK acknowledges exactly what the peer has sent so far', () => {
+describe.each(exchanges.filter((e) => e.steps.some((s) => layer(s.captures[0], 'tcp'))).map((e) => [e.id, e] as const))('TCP sequence numbers in %s', (_id, ex) => {
+  it('every segment continues its stream and acknowledges what the peer has sent so far', () => {
+    // Per connection (address and port pair) and direction: the next sequence number expected.
     const next: Record<string, number> = {};
     for (const s of ex.steps) {
       const c = s.captures[0];
-      const t = layer(c, 'tcp')!;
+      const t = layer(c, 'tcp');
+      if (!t) continue;
+      const ip = layer(c, 'ipv4')!.bytes;
+      const end = (o: number, p: number) => `${[...ip.subarray(o, o + 4)].join('.')}:${u16(t.bytes, p)}`;
+      const [me, peer] = [end(12, 0), end(16, 2)];
       const flags = t.bytes[13];
       const syn = !!(flags & 0x02);
       const fin = !!(flags & 0x01);
@@ -155,11 +158,17 @@ describe('TCP sequence numbers', () => {
       const seq = u32(t.bytes, 4);
       const ack = u32(t.bytes, 8);
       const dataLen = c.layers.slice(c.layers.indexOf(t) + 1).reduce((n, l) => n + l.bytes.length, 0);
-      if (!syn) expect(seq, `${s.id} seq continues the stream`).toBe(next[s.from]);
-      if (ackFlag) expect(ack, `${s.id} ack`).toBe(next[s.to]);
-      next[s.from] = (seq + (syn ? 1 : 0) + dataLen + (fin ? 1 : 0)) >>> 0;
+      // Exchanges may start on an open connection; the first segment seen from a side sets its stream.
+      if (!syn && next[me] !== undefined) expect(seq, `${s.id} seq continues the stream`).toBe(next[me]);
+      if (ackFlag && next[peer] !== undefined) expect(ack, `${s.id} ack`).toBe(next[peer]);
+      if (ackFlag && next[peer] === undefined) next[peer] = ack;
+      next[me] = (seq + (syn ? 1 : 0) + dataLen + (fin ? 1 : 0)) >>> 0;
     }
   });
+});
+
+describe('TCP exchange', () => {
+  const ex = exchanges.find((e) => e.id === 'tcp')!;
 
   it('the same segment looks the same on both links apart from TTL and checksum', () => {
     for (const s of ex.steps) {
@@ -330,5 +339,43 @@ describe('NTP timestamps', () => {
     expect([t1, t2, t3]).toEqual([ntpTiming.t1, ntpTiming.t2, ntpTiming.t3]);
     expect((t2 - t1 + (t3 - t4)) / 2).toBe(ntpTiming.offset);
     expect(t4 - t1 - (t3 - t2)).toBe(ntpTiming.delay);
+  });
+});
+
+describe('Text protocols over TCP', () => {
+  const text = (b: Uint8Array) => new TextDecoder().decode(b);
+  it('HTTP Content-Length matches the body, and responses without one have no body', () => {
+    for (const s of exchanges.find((e) => e.id === 'http1')!.steps) {
+      const h = appLayer(s.captures[0], 'http');
+      const headers = h.values.headers.display;
+      const body = h.values.body.bits / 8;
+      const m = /Content-Length: (\d+)/.exec(headers);
+      if (m) expect(Number(m[1]), s.id).toBe(body);
+      else expect(body, s.id).toBe(0);
+      expect(text(h.bytes).endsWith('\r\n\r\n') || body > 0, `${s.id} header section ends with an empty line`).toBe(true);
+    }
+  });
+
+  it('every SMTP, FTP and IMAP line ends with CR LF', () => {
+    for (const id of ['smtp', 'ftp', 'imap'])
+      for (const s of exchanges.find((e) => e.id === id)!.steps) {
+        const l = layer(s.captures[0], id);
+        if (l) expect(text(l.bytes).endsWith('\r\n'), `${id} ${s.id}`).toBe(true);
+      }
+  });
+
+  it('the IMAP literal has exactly the announced length', () => {
+    const s = exchanges.find((e) => e.id === 'imap')!.steps.find((x) => x.id === 'fetched')!;
+    const l = appLayer(s.captures[0], 'imap');
+    const n = Number(/\{(\d+)\}\r\n$/.exec(text(l.bytes.subarray(0, l.values.untagged.bits / 8)))![1]);
+    expect(l.values.literal.bits / 8).toBe(n);
+  });
+
+  it('the FTP 227 reply encodes the port of the data connection', () => {
+    const steps = exchanges.find((e) => e.id === 'ftp')!.steps;
+    const reply = text(appLayer(steps.find((x) => x.id === 'passive')!.captures[0], 'ftp').bytes);
+    const [, , , , p1, p2] = /\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/.exec(reply)!.slice(1).map(Number);
+    const syn = layer(steps.find((x) => x.id === 'data-syn')!.captures[0], 'tcp')!;
+    expect(u16(syn.bytes, 2)).toBe(p1 * 256 + p2);
   });
 });

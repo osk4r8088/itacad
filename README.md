@@ -20,8 +20,11 @@ src/schema.ts         the data model
 src/headers/*.ts      header definitions: fields, sizes, explanations, RFC sources,
                       plus a builder that encodes real bytes and computes lengths and checksums
 src/headers/stacks.ts common encapsulations, for example Ethernet / IPv4 / TCP
+src/headers/text.ts   messages of text protocols (HTTP/1.1, SMTP, FTP, IMAP), one field per part
 src/layers.ts         OSI and TCP/IP layer descriptions
 src/exchanges/*.ts    one file per protocol exchange
+src/exchanges/conversation.ts  TCP connection helper (consistent seq/ack) and the shared
+                      client, router, Internet, server topology
 src/exchanges/index.ts registry of all exchanges
 src/components/       renderers; they contain no protocol-specific code
 ```
@@ -30,7 +33,7 @@ Field names, sizes and meanings are defined once per header in `src/headers`. An
 
 ## Adding a protocol
 
-1. If the protocol has a header that does not exist yet, add `src/headers/<name>.ts` with a `LayerDef` (fields with their RFC names and sizes, `about` texts, sources) and a builder function. Add a stack helper to `stacks.ts` if the encapsulation is new.
+1. If the protocol has a header that does not exist yet, add `src/headers/<name>.ts` with a `LayerDef` (fields with their RFC names and sizes, `about` texts, sources) and a builder function. Add a stack helper to `stacks.ts` if the encapsulation is new. Text protocols over TCP need no new header code: build their messages with `textMessage` and send them with `TcpConversation`.
 2. Create `src/exchanges/<name>.ts` exporting an `Exchange`: participants with positions, links, initial states and steps. Each step has a sender, receiver, the path through the network, details texts, key fields and one capture per link of interest. For the packet flow table each step also has a send time, a category (colors and legend come from `categories`), a protocol name and an info line in the style of a packet analyzer.
 3. Register it in `src/exchanges/index.ts` and remove its entry from `PLANNED`. Its `group` (Application, Security, Transport, Internet, Link) decides where it appears in the protocol menu and on the overview page.
 4. Run `pnpm test`. The tests check references between participants, links, steps and fields, header lengths, IPv4 and TCP checksums, the Ethernet FCS and protocol-specific invariants.

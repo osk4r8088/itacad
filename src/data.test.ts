@@ -6,6 +6,7 @@ import { innerLengths } from './components/PacketView';
 import { ipv4Fragments } from './exchanges/ipv4';
 import { ntpTiming } from './exchanges/ntp';
 import { WS_ACCEPT, WS_KEY } from './exchanges/websocket';
+import { STATIC_TABLE } from './headers/http2';
 
 const u32 = (b: Uint8Array, o: number) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
 const u16 = (b: Uint8Array, o: number) => (b[o] << 8) | b[o + 1];
@@ -465,5 +466,101 @@ describe('WebSocket', () => {
       const f = layer(s.captures[0], 'ws-frame');
       if (f) expect(f.bytes[1] >> 7, s.id).toBe(s.from === 'client' ? 1 : 0);
     }
+  });
+});
+
+describe('HTTP/2 and HPACK', () => {
+  const ex = exchanges.find((e) => e.id === 'http2')!;
+  it('the static table has 61 entries in RFC 7541 order', () => {
+    expect(STATIC_TABLE.length).toBe(61);
+    expect(STATIC_TABLE[0]).toEqual([':authority', '']);
+    expect(STATIC_TABLE[7]).toEqual([':status', '200']);
+    expect(STATIC_TABLE[57]).toEqual(['user-agent', '']);
+    expect(STATIC_TABLE[60]).toEqual(['www-authenticate', '']);
+  });
+
+  it('frame lengths match and an independent decoder recovers every header block', () => {
+    const tables: Record<string, [string, string][]> = { client: [], server: [] };
+    for (const s of ex.steps) {
+      const f = layer(s.captures[0], 'h2-frame');
+      if (!f) continue;
+      const b = f.bytes;
+      expect((b[0] << 16) | (b[1] << 8) | b[2], `${s.id} length`).toBe(b.length - 9);
+      if (b[3] !== 1) continue;
+      // Decode the HPACK block (indexed and literal-with-incremental-indexing forms only).
+      const dyn = tables[s.from];
+      const at = (i: number) => (i <= 61 ? STATIC_TABLE[i - 1] : dyn[i - 62]);
+      const out: string[] = [];
+      let p = 9;
+      while (p < b.length) {
+        if (b[p] & 0x80) {
+          const [n, v] = at(b[p] & 0x7f);
+          out.push(`${n}: ${v}`);
+          p += 1;
+        } else {
+          expect(b[p] & 0xc0, `${s.id} literal with incremental indexing`).toBe(0x40);
+          const name = at(b[p] & 0x3f)[0];
+          const len = b[p + 1] & 0x7f;
+          const value = new TextDecoder().decode(b.subarray(p + 2, p + 2 + len));
+          dyn.unshift([name, value]);
+          out.push(`${name}: ${value}`);
+          p += 2 + len;
+        }
+      }
+      expect(f.values.payload.display, s.id).toContain(out.join(', '));
+    }
+  });
+});
+
+describe('QUIC packets', () => {
+  const ex = exchanges.find((e) => e.id === 'http3')!;
+  const readVarint = (b: Uint8Array, o: number): [number, number] => {
+    const size = 1 << (b[o] >> 6);
+    let v = b[o] & 0x3f;
+    for (let k = 1; k < size; k++) v = v * 256 + b[o + k];
+    return [v, size];
+  };
+
+  it('long header lengths cover the rest of the datagram, Initial datagrams are at least 1200 octets', () => {
+    for (const s of ex.steps) {
+      const q = layer(s.captures[0], 'quic-long');
+      if (!q) continue;
+      const b = q.bytes;
+      const initial = ((b[0] >> 4) & 0x03) === 0;
+      let p = 5;
+      p += 1 + b[p];
+      p += 1 + b[p];
+      if (initial) {
+        const [tokenLen, size] = readVarint(b, p);
+        p += size + tokenLen;
+      }
+      const [length, size] = readVarint(b, p);
+      expect(p + size + length, `${s.id} Length field`).toBe(b.length);
+      if (initial) expect(appLayer(s.captures[0], 'udp').bytes.length + b.length, `${s.id} UDP datagram size`).toBeGreaterThanOrEqual(8 + 1200);
+    }
+  });
+
+  it('connection IDs are used consistently', () => {
+    const cid = (id: string, field: 'dcid' | 'scid') => {
+      const s = ex.steps.find((x) => x.id === id)!;
+      const l = layer(s.captures[0], 'quic-long') ?? layer(s.captures[0], 'quic-short')!;
+      return l.values[field].display;
+    };
+    expect(cid('server-initial', 'dcid')).toBe(cid('client-initial', 'scid'));
+    expect(cid('client-handshake', 'dcid')).toBe(cid('server-initial', 'scid'));
+    expect(cid('client-request', 'dcid')).toBe(cid('server-initial', 'scid'));
+    expect(cid('server-response', 'dcid')).toBe(cid('client-initial', 'scid'));
+  });
+
+  it('before the client is validated the server sends at most three times what it received', () => {
+    let received = 0;
+    let sent = 0;
+    for (const s of ex.steps) {
+      if (s.id === 'client-handshake') break;
+      const size = appLayer(s.captures[0], 'udp').bytes.length + (layer(s.captures[0], 'quic-long') ?? layer(s.captures[0], 'quic-short')!).bytes.length;
+      if (s.from === 'client') received += size;
+      else sent += size;
+    }
+    expect(sent).toBeLessThanOrEqual(3 * received);
   });
 });

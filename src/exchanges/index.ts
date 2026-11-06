@@ -8,6 +8,8 @@ import { dhcpExchange } from './dhcp';
 import { dnsExchange } from './dns';
 import { ntpExchange } from './ntp';
 import { http1Exchange } from './http1';
+import { http2Exchange } from './http2';
+import { http3Exchange } from './http3';
 import { smtpExchange } from './smtp';
 import { imapExchange } from './imap';
 import { ftpExchange } from './ftp';
@@ -21,6 +23,8 @@ export const exchanges: Exchange[] = [
   dnsExchange,
   ntpExchange,
   http1Exchange,
+  http2Exchange,
+  http3Exchange,
   smtpExchange,
   imapExchange,
   ftpExchange,
@@ -39,8 +43,6 @@ export const GROUPS = ['Application', 'Security', 'Transport', 'Internet', 'Link
 
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
-  { title: 'HTTP/2', group: 'Application' },
-  { title: 'HTTP/3 and QUIC', group: 'Application' },
 ];
 
 export interface NavEntry {

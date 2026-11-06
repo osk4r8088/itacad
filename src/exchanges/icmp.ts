@@ -167,7 +167,7 @@ export const icmpExchange: Exchange = {
       from: 'client',
       to: 'server',
       path: ['client', 'routerA', 'internet', 'routerB', 'server'],
-      label: 'Echo Request seq=1',
+      label: 'Ping request',
       time: 0,
       category: 'ping',
       details: {
@@ -193,7 +193,7 @@ export const icmpExchange: Exchange = {
       from: 'server',
       to: 'client',
       path: ['server', 'routerB', 'internet', 'routerA', 'client'],
-      label: 'Echo Reply seq=1',
+      label: 'Ping reply',
       time: 10,
       category: 'reply',
       details: {
@@ -219,7 +219,7 @@ export const icmpExchange: Exchange = {
       from: 'client',
       to: 'routerA',
       path: ['client', 'routerA'],
-      label: 'Echo Request TTL=1',
+      label: 'Probe, TTL 1',
       time: 1000,
       category: 'probe',
       details: {
@@ -242,7 +242,7 @@ export const icmpExchange: Exchange = {
       from: 'routerA',
       to: 'client',
       path: ['routerA', 'client'],
-      label: 'Time Exceeded',
+      label: 'Expired at hop 1',
       time: 1000.4,
       category: 'error',
       details: {
@@ -269,7 +269,7 @@ export const icmpExchange: Exchange = {
       from: 'client',
       to: 'routerB',
       path: ['client', 'routerA', 'internet', 'routerB'],
-      label: 'Echo Request TTL=8',
+      label: 'Probe, TTL 8',
       time: 1100,
       category: 'probe',
       details: {
@@ -288,7 +288,7 @@ export const icmpExchange: Exchange = {
       from: 'routerB',
       to: 'client',
       path: ['routerB', 'internet', 'routerA', 'client'],
-      label: 'Time Exceeded',
+      label: 'Expired at hop 8',
       time: 1109,
       category: 'error',
       details: {
@@ -312,7 +312,7 @@ export const icmpExchange: Exchange = {
       from: 'client',
       to: 'server',
       path: ['client', 'routerA', 'internet', 'routerB', 'server'],
-      label: 'Echo Request TTL=9',
+      label: 'Probe, TTL 9',
       time: 1200,
       category: 'probe',
       details: {
@@ -330,7 +330,7 @@ export const icmpExchange: Exchange = {
       from: 'server',
       to: 'client',
       path: ['server', 'routerB', 'internet', 'routerA', 'client'],
-      label: 'Echo Reply',
+      label: 'Reply from server',
       time: 1210,
       category: 'reply',
       details: {

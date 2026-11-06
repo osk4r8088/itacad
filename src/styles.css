@@ -477,50 +477,135 @@ main {
 }
 
 /* ---------- network view ---------- */
+.network {
+  --net-line: #c9ccd3;
+  --net-tile: #f3f4f7;
+  --net-icon: #5a5e68;
+}
+@media (prefers-color-scheme: dark) {
+  .network {
+    --net-line: #3d414c;
+    --net-tile: #262931;
+    --net-icon: #a3a8b4;
+  }
+}
+.grid-dot {
+  fill: var(--border);
+  opacity: 0.55;
+}
 .link line {
-  stroke: var(--border);
-  stroke-width: 3;
+  stroke: var(--net-line);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.2s;
 }
 .link.active line {
-  stroke: var(--accent);
+  stroke: color-mix(in srgb, var(--cat) 45%, var(--net-line));
+}
+.link line.flow {
+  stroke: var(--cat);
+  stroke-width: 2.5;
+  stroke-dasharray: 2 8;
+  animation: net-flow 0.7s linear infinite;
+}
+@keyframes net-flow {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+.link-pill {
+  fill: var(--panel);
+  stroke: var(--net-line);
+  stroke-width: 1;
+}
+.link.active .link-pill {
+  stroke: color-mix(in srgb, var(--cat) 55%, var(--net-line));
 }
 .link-label {
-  font-size: 11.5px;
+  font-size: 10.5px;
   fill: var(--muted);
 }
-.node-shape > :first-child {
-  fill: var(--panel);
-  stroke: var(--muted);
-  stroke-width: 1.5;
-}
-.node-shape.active > :first-child {
-  stroke: var(--accent);
-  stroke-width: 2.5;
-  fill: var(--accent-soft);
-}
-.node-glyph {
+.trail {
   fill: none;
-  stroke: var(--muted);
+  stroke: var(--cat);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.35;
+}
+.node .tile {
+  fill: var(--net-tile);
+  stroke: var(--net-line);
   stroke-width: 1.5;
+  transition:
+    fill 0.2s,
+    stroke 0.2s;
+}
+.node .icon {
+  fill: none;
+  stroke: var(--net-icon);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.node .icon .icon-dot {
+  fill: var(--net-icon);
+  stroke: none;
+}
+.node.via .tile {
+  stroke: color-mix(in srgb, var(--cat) 50%, var(--net-line));
+}
+.node.sender .tile,
+.node.receiver .tile,
+.node.busy .tile {
+  fill: color-mix(in srgb, var(--cat) 14%, var(--panel));
+  stroke: var(--cat);
+  stroke-width: 2;
+}
+.node.sender .icon,
+.node.receiver .icon,
+.node.busy .icon {
+  stroke: var(--cat);
+}
+.node.sender .icon .icon-dot,
+.node.receiver .icon .icon-dot {
+  fill: var(--cat);
 }
 .node-label {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   fill: var(--text);
 }
 .node-addr {
-  font-size: 11.5px;
+  font-size: 11px;
   font-family: var(--mono);
   fill: var(--muted);
 }
 .packet rect {
-  fill: var(--accent);
+  fill: var(--cat);
+  stroke: var(--panel);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
 }
-.packet-label {
+.packet-lines {
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+.packet-tag rect {
+  fill: var(--cat);
+}
+.packet-tag text {
   font-size: 11px;
   font-weight: 600;
   font-family: var(--mono);
-  fill: var(--accent);
+  fill: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link line.flow {
+    animation: none;
+  }
 }
 .link-button {
   background: none;

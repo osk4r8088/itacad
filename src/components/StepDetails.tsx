@@ -38,9 +38,9 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
         )}
       </p>
 
-      <h3>What happens</h3>
+      <h3>In this step</h3>
       <Prose text={d.what} />
-      <h3>Why</h3>
+      <h3>Why it works this way</h3>
       <Prose text={d.why} />
 
       {d.keyFields.length > 0 && (

@@ -122,7 +122,7 @@ export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: strin
             {groups.length === 0 && <p className="muted small">No protocol matches.</p>}
           </div>
           <p className="switcher-foot muted">
-            <a href="#/">Overview</a> &middot; Greyed out: planned
+            <a href="#/">Overview</a>
           </p>
         </div>
       )}

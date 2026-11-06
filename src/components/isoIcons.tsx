@@ -58,9 +58,9 @@ const onTop = (z: number, x0: number, x1: number, y0: number, y1: number): P3[] 
 function Laptop() {
   return (
     <>
-      <Box w={28} d={20} h={2} />
+      <Box w={22} d={22} h={2} />
       {/* Screen, hinged at the back edge and tilted slightly backwards. */}
-      <Quad className="face-screen" ps={[[-14, -10, 2], [-14, 10, 2], [-17, 10, 20], [-17, -10, 20]]} />
+      <Quad className="face-screen" ps={[[-11, -11, 2], [-11, 11, 2], [-14, 11, 20], [-14, -11, 20]]} />
     </>
   );
 }
@@ -101,7 +101,7 @@ function Cloud() {
 
 /** Highest point of each icon above the ground centre, in screen pixels (positive = up). */
 export const ICON_TOP: Record<ParticipantKind, number> = {
-  host: 34,
+  host: 33,
   router: 30,
   switch: 18,
   server: 42,
@@ -111,7 +111,7 @@ export const ICON_TOP: Record<ParticipantKind, number> = {
 
 /** Half the screen width of each icon, so link labels can be centred in the free space between two icons. */
 export const ICON_HALF: Record<ParticipantKind, number> = {
-  host: 23,
+  host: 22,
   router: 20,
   switch: 21,
   server: 18,
@@ -121,7 +121,7 @@ export const ICON_HALF: Record<ParticipantKind, number> = {
 
 /** Footprint used for the ground tile under each icon (width along x, depth along y). */
 const FOOTPRINT: Record<ParticipantKind, [number, number]> = {
-  host: [34, 26],
+  host: [30, 30],
   router: [32, 26],
   switch: [40, 20],
   server: [26, 26],

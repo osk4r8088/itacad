@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { exchanges as protocolExchanges } from '../../protocols/exchanges';
-import { urlToPageExchange } from '../../learn/url-to-page/exchange';
+import { lessonExchanges } from '../../learn/exchanges';
 
-const exchanges = [...protocolExchanges, urlToPageExchange];
+const exchanges = [...protocolExchanges, ...lessonExchanges];
 import { nestedBytes } from '../../shared/headers/stacks';
 import { decode } from './decode';
 

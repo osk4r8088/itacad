@@ -2755,3 +2755,20 @@ table.kv th {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Attack scenarios ---- */
+.node.node-attacker .ground {
+  fill: var(--cat-red);
+  opacity: 0.25;
+}
+.node.node-attacker .node-label {
+  fill: var(--cat-red);
+}
+.known .changed dd {
+  color: var(--cat-red);
+}
+.changed-tag {
+  font-family: var(--font);
+  font-weight: 400;
+  font-size: 0.8rem;
+}

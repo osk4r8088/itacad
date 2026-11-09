@@ -102,6 +102,7 @@ function Cloud() {
 /** Highest point of each icon above the ground centre, in screen pixels (positive = up). */
 export const ICON_TOP: Record<ParticipantKind, number> = {
   host: 33,
+  attacker: 33,
   router: 30,
   switch: 18,
   server: 42,
@@ -112,6 +113,7 @@ export const ICON_TOP: Record<ParticipantKind, number> = {
 /** Half the screen width of each icon, so link labels can be centred in the free space between two icons. */
 export const ICON_HALF: Record<ParticipantKind, number> = {
   host: 22,
+  attacker: 22,
   router: 20,
   switch: 21,
   server: 18,
@@ -122,6 +124,7 @@ export const ICON_HALF: Record<ParticipantKind, number> = {
 /** Footprint used for the ground tile under each icon (width along x, depth along y). */
 const FOOTPRINT: Record<ParticipantKind, [number, number]> = {
   host: [30, 30],
+  attacker: [30, 30],
   router: [32, 26],
   switch: [40, 20],
   server: [26, 26],

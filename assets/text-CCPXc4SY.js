@@ -1,0 +1,2 @@
+import{_ as e,g as t}from"./udp-B-9-eaUo.js";var n=e=>e.replace(/\r\n/g,`\\r\\n
+`).replace(/\n$/,``);function r(r){let i=r.parts.map(e=>({id:e.id,name:e.name,bits:`variable`,compact:!0,about:e.about,...e.source?{source:e.source}:{}})),a={id:r.id,name:r.name,short:r.short,osi:r.osi??[7],...r.osiNote?{osiNote:r.osiNote}:{},tcpip:`application`,about:r.about,fields:i,sources:r.sources},o=Object.fromEntries(r.parts.map(t=>[t.id,{raw:e(t.text),display:t.text===``?`(empty)`:n(t.text),...t.note?{note:t.note}:{}}]));return t(a,o,{},r.summary)}export{r as t};

@@ -1993,3 +1993,85 @@ table.kv th {
     min-width: 600px;
   }
 }
+
+/* ---- Ports ---- */
+.ports-input {
+  grid-template-columns: auto 1fr;
+}
+.ports-input .wide {
+  grid-column: 1 / -1;
+}
+.ports-input select {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 16rem;
+}
+.port-card {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.port-card h2 {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+}
+.port-card h2 .small {
+  font-family: var(--font);
+  font-weight: 400;
+}
+.ports-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ports-table th,
+.ports-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.ports-table th {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ports-table td.port {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.ports-table .link-button {
+  padding: 0;
+}
+@media (max-width: 720px) {
+  .ports-input {
+    grid-template-columns: 1fr;
+  }
+  .ports-table thead {
+    display: none;
+  }
+  .ports-table tr {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ports-table td {
+    border: none;
+    padding: 0.1rem 0.5rem 0.1rem 0;
+  }
+  .ports-table td.port {
+    grid-row: span 4;
+  }
+}

@@ -1,4 +1,5 @@
-import { navGroups } from '../exchanges';
+import { navGroups } from '../catalog';
+import { href } from '../../app/router';
 
 /** Overview: all protocols, grouped by layer from top (application) to bottom (link). */
 export function ProtocolIndex() {
@@ -15,7 +16,7 @@ export function ProtocolIndex() {
               {g.entries.map((e) => (
                 <li key={e.title}>
                   {e.id ? (
-                    <a className="card" href={`#/${e.id}/1`}>
+                    <a className="card" href={href.exchange(e.id)}>
                       <strong>{e.title}</strong>
                       <span>{e.summary}</span>
                     </a>

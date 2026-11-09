@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { navGroups } from '../exchanges';
+import { navGroups } from '../catalog';
+import { href } from '../../app/router';
 
 /** Protocol name in the top bar; opens a menu of all protocols grouped by layer. Shortcut: "/". */
 export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: string; currentTitle: string }) {
@@ -106,7 +107,7 @@ export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: strin
                   {g.entries.map((e) => (
                     <li key={e.title}>
                       {e.id ? (
-                        <a href={`#/${e.id}/1`} aria-current={e.id === currentId ? 'page' : undefined} onClick={() => close(false)} title={e.summary}>
+                        <a href={href.exchange(e.id)} aria-current={e.id === currentId ? 'page' : undefined} onClick={() => close(false)} title={e.summary}>
                           {e.title}
                         </a>
                       ) : (
@@ -122,7 +123,7 @@ export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: strin
             {groups.length === 0 && <p className="muted small">No protocol matches.</p>}
           </div>
           <p className="switcher-foot muted">
-            <a href="#/">Overview</a>
+            <a href={href.protocols}>All protocols</a>
           </p>
         </div>
       )}

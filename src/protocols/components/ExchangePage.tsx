@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Exchange } from '../../shared/schema';
-import { replaceHash } from '../../app/router';
+import { href, replaceHash } from '../../app/router';
 import { NetworkView } from './NetworkView';
 import { SequenceView } from './SequenceView';
 import { StepControls } from './StepControls';
@@ -36,7 +36,7 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
   const goTo = useCallback(
     (i: number) => {
       const clamped = Math.min(Math.max(i, 0), count - 1);
-      replaceHash(`#/${exchange.id}/${clamped + 1}`);
+      replaceHash(href.exchange(exchange.id, clamped + 1));
     },
     [count, exchange.id],
   );
@@ -80,8 +80,8 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
     <div className="exchange" style={{ '--seq-fr': seqWeight(exchange) } as React.CSSProperties}>
       <header className="ex-bar">
         <div className="ex-title">
-          <a href="#/" className="site-title">
-            Protocol Explorer
+          <a href={href.home} className="site-title">
+            Netkit
           </a>
           <span className="crumb">
             <ProtocolSwitcher currentId={exchange.id} currentTitle={exchange.title} />

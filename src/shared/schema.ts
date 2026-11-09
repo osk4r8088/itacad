@@ -1,4 +1,4 @@
-// Data model for Protocol Explorer.
+// Data model for protocol exchanges.
 //
 // Header *definitions* (field names, sizes, meaning, sources) live in src/headers
 // and are shared by all exchanges. Exchange files in src/exchanges only supply

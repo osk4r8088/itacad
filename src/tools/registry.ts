@@ -34,9 +34,10 @@ export const TOOLS: HubEntry[] = [
   {
     id: 'ports',
     title: 'Well-known ports',
-    summary: 'Common ports with their protocol and transport.',
-    status: 'planned',
+    summary: 'Common ports with their protocol and transport, and the port ranges.',
+    status: 'ready',
     issue: 6,
+    component: lazy(() => import('./ports/PortsTool')),
   },
   {
     id: 'numbers',

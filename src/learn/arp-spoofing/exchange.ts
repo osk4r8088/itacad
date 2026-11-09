@@ -1,4 +1,5 @@
-import type { Capture, Exchange, Learned, Source, Step, StepDetails } from '../../shared/schema';
+import type { Capture, Exchange, Source } from '../../shared/schema';
+import { buildStep, type Spec } from '../spec';
 import { arp } from '../../shared/headers/arp';
 import { icmpEcho } from '../../shared/headers/icmp';
 import { ethArp, ethIpv4 } from '../../shared/headers/stacks';
@@ -40,24 +41,6 @@ function forgedReply(link: string, victim: { mac: string; ip: string }, claimedI
     eth: { src: ATTACKER.mac, dst: victim.mac },
     arp: arp({ oper: 'reply', sha: ATTACKER.mac, spa: claimedIp, tha: victim.mac, tpa: victim.ip, notes: { sha: 'The attacker\'s own MAC address.', spa: 'An address that belongs to someone else.' } }),
   });
-}
-
-interface Spec {
-  id: string;
-  phase: string;
-  from: string;
-  to: string;
-  path: string[];
-  label: string;
-  time: number;
-  category: string;
-  captures: Capture[];
-  protocol: string;
-  info: string;
-  details: StepDetails;
-  sources: Source[];
-  learned?: Learned[];
-  lost?: boolean;
 }
 
 const RFC826: Source = { rfc: 826 };
@@ -279,24 +262,6 @@ const SPECS: Spec[] = [
   },
 ];
 
-const build = (s: Spec): Step => ({
-  id: s.id,
-  phase: s.phase,
-  from: s.from,
-  to: s.to,
-  path: s.path,
-  label: s.label,
-  details: s.details,
-  captures: s.captures,
-  sources: s.sources,
-  time: s.time,
-  category: s.category,
-  protocol: s.protocol,
-  info: s.info,
-  ...(s.learned ? { learned: s.learned } : {}),
-  ...(s.lost ? { lost: true } : {}),
-});
-
 export const arpSpoofingExchange: Exchange = {
   id: 'arp-spoofing',
   title: 'Attack: ARP spoofing',
@@ -338,5 +303,5 @@ export const arpSpoofingExchange: Exchange = {
     { id: 'effect', label: 'Man in the middle', about: 'Both directions now pass the attacker.', deepDive: 'icmp' },
     { id: 'defense', label: 'Defense', about: 'The switch checks ARP against DHCP bindings and drops the lie.', deepDive: 'dhcp' },
   ],
-  steps: SPECS.map(build),
+  steps: SPECS.map(buildStep),
 };

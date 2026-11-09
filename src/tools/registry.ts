@@ -37,4 +37,18 @@ export const TOOLS: HubEntry[] = [
     status: 'planned',
     issue: 6,
   },
+  {
+    id: 'numbers',
+    title: 'Number converter',
+    summary: 'Decimal, binary, hexadecimal and octal, with bit widths, two\'s complement and byte order.',
+    status: 'planned',
+    issue: 14,
+  },
+  {
+    id: 'passwords',
+    title: 'Password generator and analyzer',
+    summary: 'Random passwords and passphrases with their entropy, and why some passwords are weaker than they look.',
+    status: 'planned',
+    issue: 13,
+  },
 ];

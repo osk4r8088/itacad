@@ -1,0 +1,66 @@
+# Preview: every pull request gets its own copy of the site at <pages url>/pr-<number>/,
+# updated on every push and removed when the pull request is closed or merged.
+# The site uses relative paths and hash routes, so it runs unchanged in a subfolder.
+#
+# Skipped for pull requests from forks and from Dependabot: their runs get a read-only token.
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write # push to gh-pages
+  pull-requests: write # write the preview comment
+
+# A new push to the same pull request replaces a preview that is still building.
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  PR: ${{ github.event.pull_request.number }}
+  URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  publish:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Publish preview
+        run: .github/scripts/publish-pages.sh "pr-$PR" dist "Preview #$PR at ${HEAD_SHA::7}"
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Comment with the link
+        run: |
+          .github/scripts/preview-comment.sh "$PR" "**Preview:** $URL
+
+          Built from ${HEAD_SHA::7}. GitHub Pages needs about a minute to publish it after this comment appears. The preview is removed when the pull request is closed."
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+  remove:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Remove preview
+        run: .github/scripts/publish-pages.sh "pr-$PR" "" "Remove preview #$PR"
+      - name: Update the comment
+        run: .github/scripts/preview-comment.sh "$PR" "Preview removed, the pull request is closed."

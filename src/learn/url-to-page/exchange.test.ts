@@ -28,6 +28,13 @@ describe('From URL to page', () => {
     for (const p of ex.phases!) expect(catalog, p.id).toContain(p.deepDive);
   });
 
+  it('shows the laptop with the address DHCP gave it, in every frame after DHCP', () => {
+    for (const s of ex.steps.filter((x) => x.phase !== 'dhcp')) {
+      const fields = [display(s, 'ipv4', 'src'), display(s, 'ipv4', 'dst'), display(s, 'arp', 'spa'), display(s, 'arp', 'tpa')].filter(Boolean);
+      expect(fields.some((f) => f === '192.0.2.50'), `${s.id}: ${fields.join(', ')}`).toBe(true);
+    }
+  });
+
   it('learns every fact once', () => {
     const labels = ex.steps.flatMap((s) => s.learned ?? []).map((l) => l.label);
     expect(new Set(labels).size).toBe(labels.length);

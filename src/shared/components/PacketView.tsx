@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Capture, Exchange, LayerInstance, OsiLayer, Step } from '../schema';
 import { OSI_LAYERS, TCPIP_LAYERS, TCPIP_ORDER } from '../layers';
 import { HeaderDiagram } from './HeaderDiagram';
@@ -136,8 +137,8 @@ function LayerStack({ layers, selected, onSelect }: { layers: LayerInstance[]; s
   );
 }
 
-export function PacketView({ exchange, step, capture, onLink, selection, onSelect }: Props) {
-  const layers = capture.layers;
+/** Encapsulation bar, layer stack and header diagram of one frame. Used by the exchanges and the decoder. */
+export function CaptureView({ layers, selection, onSelect, children }: { layers: LayerInstance[]; selection: Selection; onSelect: (s: Selection) => void; children?: ReactNode }) {
   const inner = innerLengths(layers);
   const idx = Math.max(
     0,
@@ -145,11 +146,28 @@ export function PacketView({ exchange, step, capture, onLink, selection, onSelec
   );
   const layer = layers[idx];
   const field = selection.field && layer.def.id === selection.layer ? selection.field : undefined;
-  const linkLabel = (id: string) => exchange.links.find((l) => l.id === id)?.label ?? id;
 
   return (
     <div className="packet-view">
       <div className="packet-left">
+        {children}
+        <EncapsulationBar layers={layers} selected={layer.def.id} onSelect={onSelect} />
+        <LayerStack layers={layers} selected={layer.def.id} onSelect={onSelect} />
+      </div>
+
+      <div className="packet-right">
+        <h3 className="diagram-title">{layer.def.name}</h3>
+        <HeaderDiagram inst={layer} payloadOctets={inner[idx]} payloadName={layers[idx + 1]?.def.name} selected={field} onSelect={(f) => onSelect({ layer: layer.def.id, field: f })} />
+        {field ? <FieldInfo inst={layer} fieldId={field} onClose={() => onSelect({ layer: layer.def.id })} /> : <LayerInfo layer={layer} />}
+      </div>
+    </div>
+  );
+}
+
+export function PacketView({ exchange, step, capture, onLink, selection, onSelect }: Props) {
+  const linkLabel = (id: string) => exchange.links.find((l) => l.id === id)?.label ?? id;
+  return (
+    <CaptureView layers={capture.layers} selection={selection} onSelect={onSelect}>
       {step.captures.length > 1 && (
         <div className="capture-tabs" role="tablist" aria-label="Link where the frame is captured">
           <span className="muted small">Captured on:</span>
@@ -168,16 +186,6 @@ export function PacketView({ exchange, step, capture, onLink, selection, onSelec
         </div>
       )}
       {capture.note && <p className="muted small">{capture.note}</p>}
-
-      <EncapsulationBar layers={layers} selected={layer.def.id} onSelect={onSelect} />
-      <LayerStack layers={layers} selected={layer.def.id} onSelect={onSelect} />
-      </div>
-
-      <div className="packet-right">
-      <h3 className="diagram-title">{layer.def.name}</h3>
-      <HeaderDiagram inst={layer} payloadOctets={inner[idx]} payloadName={layers[idx + 1]?.def.name} selected={field} onSelect={(f) => onSelect({ layer: layer.def.id, field: f })} />
-      {field ? <FieldInfo inst={layer} fieldId={field} onClose={() => onSelect({ layer: layer.def.id })} /> : <LayerInfo layer={layer} />}
-      </div>
-    </div>
+    </CaptureView>
   );
 }

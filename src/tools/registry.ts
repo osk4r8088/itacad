@@ -19,8 +19,9 @@ export const TOOLS: HubEntry[] = [
     id: 'decoder',
     title: 'Header decoder',
     summary: 'Paste the bytes of a frame and see every header field, layer by layer.',
-    status: 'planned',
+    status: 'ready',
     issue: 4,
+    component: lazy(() => import('./decoder/DecoderTool')),
   },
   {
     id: 'tcp-states',

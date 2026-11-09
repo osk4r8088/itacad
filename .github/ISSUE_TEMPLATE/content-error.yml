@@ -1,0 +1,24 @@
+name: Content error
+description: A field, value or explanation does not match the RFC
+labels: ["bug", "content"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      description: Protocol and step, for example the route `#/tcp/3`
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is shown
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: What is correct
+      description: Include the RFC and section that supports it
+    validations:
+      required: true

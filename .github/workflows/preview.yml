@@ -41,7 +41,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - name: Publish preview
-        run: .github/scripts/publish-pages.sh "pr-$PR" dist "Preview #$PR at ${HEAD_SHA::7}"
+        run: |
+          .github/scripts/publish-pages.sh "pr-$PR" dist "Preview #$PR at ${HEAD_SHA::7}"
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       - name: Comment with the link
@@ -61,6 +62,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Remove preview
-        run: .github/scripts/publish-pages.sh "pr-$PR" "" "Remove preview #$PR"
+        run: |
+          .github/scripts/publish-pages.sh "pr-$PR" "" "Remove preview #$PR"
       - name: Update the comment
-        run: .github/scripts/preview-comment.sh "$PR" "Preview removed, the pull request is closed."
+        run: |
+          .github/scripts/preview-comment.sh "$PR" "Preview removed, the pull request is closed."

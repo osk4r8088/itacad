@@ -1,0 +1,116 @@
+import type { Quiz } from './schema';
+
+// Every answer follows the TCP exchange and the RFCs it cites; the step link shows the frame.
+export const tcpQuiz: Quiz = {
+  id: 'tcp',
+  questions: [
+    {
+      id: 'syn-sent',
+      prompt: 'The client has sent its SYN and waits for an answer. Which state is it in?',
+      options: ['LISTEN', 'SYN-RECEIVED', 'SYN-SENT', 'ESTABLISHED'],
+      answer: 2,
+      explanation: 'A client that has sent a SYN is in SYN-SENT. LISTEN is the server waiting for connections, and SYN-RECEIVED is the server after it answered a SYN.',
+      step: 'syn',
+      source: { rfc: 9293, section: '3.3.2' },
+    },
+    {
+      id: 'synack-ack',
+      prompt: 'The client\'s SYN carries the sequence number ISN. Which acknowledgment number does the server\'s SYN-ACK carry?',
+      options: ['ISN + 1', 'ISN', '0, because the client has sent no data yet', 'ISN + 1460, one maximum segment'],
+      answer: 0,
+      explanation: 'The SYN carries no data but consumes one sequence number. The acknowledgment number names the next sequence number the server expects, so it is ISN + 1.',
+      step: 'synack',
+      source: { rfc: 9293, section: '3.4' },
+    },
+    {
+      id: 'three-steps',
+      prompt: 'Why does the handshake need three segments and not two?',
+      options: [
+        'The third segment carries the first application data.',
+        'Routers on the path need three packets to learn the route.',
+        'The window size may only be announced in the third segment.',
+        'Both initial sequence numbers must be acknowledged; without the third segment the server has no proof that its ISN arrived.',
+      ],
+      answer: 3,
+      explanation:
+        'Each side sends its ISN and needs it acknowledged: four messages, of which the middle two are combined. With only two, an old duplicate SYN could open a connection the client knows nothing about.',
+      step: 'ack',
+      source: { rfc: 9293, section: '3.5' },
+    },
+    {
+      id: 'window-scale',
+      prompt: 'Both sides agreed on window scale 7. The client\'s ACK carries Window = 502. How many octets may the server send before it has to wait?',
+      options: ['502', '64256', '65535', '3514'],
+      answer: 1,
+      explanation: 'After the handshake the Window field is scaled: 502 times 2^7 = 64256 octets. Only segments with SYN carry an unscaled window.',
+      step: 'ack',
+      source: { rfc: 7323, section: '2.3' },
+    },
+    {
+      id: 'ack-after-data',
+      prompt: 'The HTTP request carries 37 octets, starting at relative sequence number 1. Which acknowledgment number does the server send back?',
+      options: ['37', '1', '38', '39'],
+      answer: 2,
+      explanation: 'The request covers sequence numbers 1 to 37, so the next octet the server expects is 38. That is the acknowledgment number in the response.',
+      step: 'response',
+      source: { rfc: 9293, section: '3.4' },
+    },
+    {
+      id: 'cumulative',
+      prompt: 'What does a single acknowledgment number confirm?',
+      options: [
+        'Every octet before that number, however many segments carried them.',
+        'Only the most recent segment.',
+        'Only the segment whose sequence number is the same.',
+        'Nothing yet: data is confirmed when the connection closes.',
+      ],
+      answer: 0,
+      explanation: 'Acknowledgments are cumulative. One number confirms the whole stream up to it, so a lost ACK is repaired by any later one.',
+      step: 'ack-response',
+      source: { rfc: 9293, section: '3.4' },
+    },
+    {
+      id: 'fin-ack',
+      prompt: 'The client\'s FIN has relative Seq = 38 and carries no data. Which acknowledgment number does the server\'s reply carry?',
+      options: ['38', '39', '71', '0'],
+      answer: 1,
+      explanation: 'FIN, like SYN, consumes one sequence number. That is what makes it possible to acknowledge it: the server answers with 38 + 1 = 39.',
+      step: 'ack-fin-client',
+      source: { rfc: 9293, section: '3.4' },
+    },
+    {
+      id: 'close-wait',
+      prompt: 'The server receives the client\'s FIN, but its own application has not closed yet. Which state is the server in?',
+      options: ['FIN-WAIT-1', 'TIME-WAIT', 'LAST-ACK', 'CLOSE-WAIT'],
+      answer: 3,
+      explanation:
+        'CLOSE-WAIT: the peer has closed its direction, and TCP waits for the local application to close too. The server may still send data in this state; only when it sends its own FIN does it move to LAST-ACK.',
+      step: 'fin-client',
+      source: { rfc: 9293, section: '3.6' },
+    },
+    {
+      id: 'time-wait',
+      prompt: 'Which side of the connection goes through TIME-WAIT?',
+      options: ['Always the server.', 'The side that closed first.', 'The side that sent the last FIN.', 'Both sides, one after the other.'],
+      answer: 1,
+      explanation:
+        'Only the side that sent the first FIN ends in TIME-WAIT, here the client. It waits 2 x MSL so it can repeat its last ACK if that is lost, and so that delayed segments of this connection die out first.',
+      step: 'ack-fin-server',
+      source: { rfc: 9293, section: '3.6' },
+    },
+    {
+      id: 'syn-retry',
+      prompt: 'A SYN gets no answer at all. What does the client do?',
+      options: [
+        'It sends an RST and gives up.',
+        'It retransmits the SYN after an initial timeout of one second and doubles the timeout with each try.',
+        'It sends the SYN again immediately, as fast as possible.',
+        'It waits for the server to send a SYN instead.',
+      ],
+      answer: 1,
+      explanation: 'RFC 6298 sets the initial retransmission timeout to one second and doubles it after each timeout. After a number of retries (on Linux about two minutes) the attempt fails.',
+      step: 'syn',
+      source: { rfc: 6298, section: '2' },
+    },
+  ],
+};

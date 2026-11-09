@@ -12,6 +12,7 @@ import { LESSONS } from '../learn/registry';
 // The exchange page and the exchange data load only when a protocol is opened.
 const ExchangeRoute = lazy(() => import('../protocols/ExchangeRoute'));
 const LessonExchange = lazy(() => import('../learn/LessonExchange'));
+const QuizPage = lazy(() => import('../quizzes/QuizPage'));
 
 function titleOf(route: Route): string | undefined {
   switch (route.page) {
@@ -33,7 +34,7 @@ function titleOf(route: Route): string | undefined {
 function sectionOf(route: Route): Section | undefined {
   if (route.page === 'protocols' || route.page === 'exchange') return 'protocols';
   if (route.page === 'tools' || route.page === 'tool') return 'tools';
-  if (route.page === 'learn' || route.page === 'lesson') return 'learn';
+  if (route.page === 'learn' || route.page === 'lesson' || route.page === 'quiz') return 'learn';
   return undefined;
 }
 
@@ -45,7 +46,7 @@ export function App() {
   }, [route]);
 
   useEffect(() => {
-    if (route.page === 'exchange') return; // ExchangeRoute sets the title once the data is loaded
+    if (route.page === 'exchange' || route.page === 'quiz') return; // ExchangeRoute and QuizPage set the title once the data is loaded
     if (route.page === 'lesson' && LESSONS.find((l) => l.id === route.id)?.exchange) return; // so does LessonExchange
     const title = titleOf(route);
     document.title = title ? `${title} | Netkit` : 'Netkit';
@@ -89,6 +90,11 @@ export function App() {
           </div>
         )}
         {route.page === 'tool' && <HubEntryPage id={route.id} entry={TOOLS.find((t) => t.id === route.id)} back={{ label: 'All tools', href: href.tools }} />}
+        {route.page === 'quiz' && (
+          <Suspense fallback={<p className="notice muted">Loading quiz...</p>}>
+            <QuizPage id={route.id} />
+          </Suspense>
+        )}
         {route.page === 'lesson' && <HubEntryPage id={route.id} entry={LESSONS.find((l) => l.id === route.id)} back={{ label: 'All lessons', href: href.learn }} />}
       </main>
     </>

@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import type { HubEntry } from '../shared/hub';
 
 /** Learning content that goes beyond a single protocol. Works like the tool registry. */
@@ -52,8 +53,9 @@ export const LESSONS: HubEntry[] = [
   {
     id: 'quizzes',
     title: 'Quizzes',
-    summary: 'Check your understanding of each protocol.',
-    status: 'planned',
+    summary: 'Check your understanding of a protocol, with every answer explained and linked to its step.',
+    status: 'ready',
     issue: 7,
+    component: lazy(() => import('../quizzes/QuizIndex')),
   },
 ];

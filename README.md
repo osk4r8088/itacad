@@ -57,7 +57,8 @@ Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webv
 - **Attack: SYN flood:** SYNs from forged addresses fill a server's queue of half-open connections until a real client is turned away; SYN cookies pack the connection state into the sequence number.
 - **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
-- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
+- **Quizzes:** multiple-choice questions per protocol; every answer is explained and links to the step that shows it. TCP so far, more follow ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)). A protocol page with a quiz links to it in its header.
+- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)).
 
 ### Correct by construction
 
@@ -129,6 +130,12 @@ src/learn/
   spec.ts                 flat step format shared by the lessons
   exchanges.ts            all lesson exchanges, for the tests
   LessonExchange.tsx      shows a lesson exchange on the exchange page
+src/quizzes/
+  schema.ts               question format
+  catalog.ts              quizzes by exchange id, loaded on demand
+  all.ts                  all quizzes, for the tests
+  tcp.ts                  one file per protocol
+  QuizIndex.tsx, QuizPage.tsx
 ```
 
 Each protocol, tool and lesson is loaded only when it is opened.
@@ -146,6 +153,14 @@ Each protocol, tool and lesson is loaded only when it is opened.
 2. In `src/tools/registry.ts`, give the entry a `purpose` (`use` for everyday tools, `understand` for models), set it to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. The start page, the tools page and the route `#/tools/<id>` pick it up.
 
 Lessons work the same way in `src/learn/`. A lesson can also be an exchange: give its registry entry an `exchange` loader instead of a component, and it opens on the exchange page at `#/learn/<id>/<step>`. Exchanges that chain protocols set `phases` (with a `deepDive` exchange each), a `phase` on every step, and `learned` facts where the client learns something; the page then shows the phase bar and the "known so far" panel. A fact can be learned again with a new value (a poisoned cache entry), which the panel marks as changed. Add every lesson exchange to `src/learn/exchanges.ts` so the tests cover it. `src/learn/url-to-page/` is the example; it reuses the frames of the protocol exchanges, so the bytes always match.
+
+## Adding a quiz
+
+1. Create `src/quizzes/<exchange id>.ts` exporting a `Quiz` (see `src/quizzes/schema.ts`): for each question a prompt, three or four options, the index of the right one, an explanation, the id of the step that shows it, and the source.
+2. Add it to `QUIZZES` in `src/quizzes/catalog.ts` and to `src/quizzes/all.ts`.
+3. `pnpm test` checks the format, that every step id exists in the exchange, and that the right answers are not all in the same position.
+
+Answers follow the exchange and its RFCs; a question that needs a fact the exchange does not show should cite its own source.
 
 ## Conventions
 
@@ -167,6 +182,7 @@ Hash routes work on any static host:
 | `#/tools`, `#/tools/<id>` | tool overview, one tool |
 | `#/learn`, `#/learn/<id>` | lessons |
 | `#/learn/url-to-page/7` | step 7 of a lesson that is an exchange |
+| `#/learn/quizzes/tcp` | the quiz of one protocol |
 
 Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts`.
 

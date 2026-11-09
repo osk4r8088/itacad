@@ -1,0 +1,23 @@
+name: Feature
+description: A new protocol, tool or learning content
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [Protocol, Tool, Learning content, Site]
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should a learner be able to understand or do afterwards
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and sources
+      description: Steps, fields or views involved, and the RFCs to follow

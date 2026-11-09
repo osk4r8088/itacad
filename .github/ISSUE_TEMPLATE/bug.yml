@@ -1,0 +1,16 @@
+name: Bug
+description: Something in the site does not work as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: Steps to reproduce, and what you expected instead
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser and device
+      placeholder: Firefox 140, desktop

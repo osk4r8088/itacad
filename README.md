@@ -33,7 +33,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Header decoder: paste a frame as hex and see every field of Ethernet, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
 | TCP state machine | planned, [#5](https://github.com/osk4r8088/netkit-webvisualizer/issues/5) |
 | Well-known ports | planned, [#6](https://github.com/osk4r8088/netkit-webvisualizer/issues/6) |
-| Number converter: decimal, binary, hexadecimal, two's complement, byte order | planned, [#14](https://github.com/osk4r8088/netkit-webvisualizer/issues/14) |
+| Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Password generator and strength analyzer | planned, [#13](https://github.com/osk4r8088/netkit-webvisualizer/issues/13) |
 
 ### Learn (planned)
@@ -93,6 +93,7 @@ src/tools/
   registry.ts             all tools, ready and planned
   subnet/                 subnet calculator
   decoder/                header decoder
+  numbers/                number converter
 src/learn/registry.ts     all lessons
 ```
 

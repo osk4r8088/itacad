@@ -85,7 +85,8 @@ pnpm build      # type check and static build into dist/
 1. Pick or open an issue.
 2. Create a branch, commit, and open a pull request that says `Closes #<issue>`.
 3. CI runs typecheck, tests and build on the pull request. `main` is protected, so merging requires a green CI.
-4. Squash and merge. The merge deploys the site to GitHub Pages, and the issue closes.
+4. A preview of the pull request is published at `https://osk4r8088.github.io/netkit-webvisualizer/pr-<number>/`, and a comment on the pull request links to it.
+5. Squash and merge. The merge deploys the site to GitHub Pages, removes the preview, and closes the issue.
 
 Dependabot opens pull requests for dependency and action updates.
 
@@ -177,4 +178,9 @@ Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links wit
 
 ## Deploy
 
-Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/pages.yml`). The output in `dist/` is plain static files with relative paths, so it also runs from any other static host or subfolder.
+GitHub Pages serves the `gh-pages` branch (Settings > Pages > Source: "Deploy from a branch", `gh-pages`, `/ (root)`). Nobody edits that branch by hand; two workflows write to it through `.github/scripts/publish-pages.sh`:
+
+- `.github/workflows/deploy.yml`: every push to `main` builds the site and replaces the top level of the branch.
+- `.github/workflows/preview.yml`: every pull request from this repository gets its build in `pr-<number>/`, updated on each push and removed when the pull request closes. Pull requests from forks and from Dependabot get no preview, because their runs only have a read-only token; CI still attaches the build as an artifact (`dist`) to every run.
+
+The output in `dist/` is plain static files with relative paths, so it also runs from any other static host or subfolder.

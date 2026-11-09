@@ -1,0 +1,36 @@
+# Deploy: every push to main publishes the site to the gh-pages branch, which GitHub Pages serves.
+# Pull request previews live in pr-<number>/ folders on the same branch (see preview.yml) and are kept.
+# One-time setup: Settings > Pages > Build and deployment > Source: "Deploy from a branch",
+# branch gh-pages, folder / (root).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write # push to gh-pages
+
+# Never run two deployments at once, but let a running one finish.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+      - name: Publish to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/publish-pages.sh root dist "Deploy ${GITHUB_SHA::7}"

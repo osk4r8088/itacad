@@ -36,7 +36,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 | DNS record explorer: 15 record types with their fields and wire format, an example zone with mail, DNSSEC and reverse DNS, common mistakes | ready |
-| RAID visualizer: data and parity layout of RAID levels, disk failures and rebuilds | planned, [#20](https://github.com/osk4r8088/netkit-webvisualizer/issues/20) |
+| RAID visualizer: layouts of RAID 0, 1, 5, 6 and 10, failing disks, parity and Reed-Solomon reconstruction bit by bit, rebuild risk | ready |
 
 ### Learn
 
@@ -101,6 +101,7 @@ src/tools/
   ports/                  well-known ports
   passwords/              password generator and analyzer
   dns-records/            DNS record explorer
+  raid/                   RAID visualizer
 src/learn/
   registry.ts             all lessons
   url-to-page/            the chained exchange "From URL to page"

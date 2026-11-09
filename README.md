@@ -13,6 +13,19 @@ pnpm test       # data checks (references, lengths, checksums, FCS, sequence num
 pnpm build      # type check and static build into dist/
 ```
 
+### In the browser (no local install needed)
+
+- **Codespaces:** on GitHub, Code > Codespaces > Create codespace on a branch. The dev container (`.devcontainer/`) installs Node, pnpm and the dependencies. Run `pnpm dev`; port 5173 opens as a preview.
+- **Quick edits:** press `.` on any repo page to open github.dev, a browser editor without a terminal. Good for texts in `src/exchanges/`.
+
+### GitHub automation
+
+- `.github/workflows/ci.yml` runs typecheck, tests and build on every push and pull request. The built `dist/` is attached to each run as an artifact.
+- `.github/workflows/pages.yml` publishes `main` to GitHub Pages: `https://osk4r8088.github.io/networkprotocol-webvisualizer/`.
+- `.github/dependabot.yml` opens pull requests for dependency and action updates.
+
+Workflow: create a branch, commit, open a pull request, wait for CI to be green, merge. Merging deploys.
+
 ## How the data is organized
 
 ```

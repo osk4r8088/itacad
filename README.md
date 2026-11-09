@@ -54,7 +54,10 @@ Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webv
 
 - **From URL to page:** a laptop joins a network and opens https://www.example.com, frame by frame in 25 steps: DHCP, ARP for the resolver, DNS, ARP for the gateway, TCP, TLS 1.3 and HTTP/2. A phase bar, a "known so far" panel and links to each protocol page show how the protocols hand over to each other.
 - **Attack: ARP spoofing:** an attacker in the LAN poisons the ARP caches of a laptop and its gateway, the traffic runs through the attacker (with the TTL as a trace), and a switch with Dynamic ARP Inspection stops it. The frames show how the attack works; no tooling.
-- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)), more attack scenarios: SYN flood, DNS cache poisoning, rogue DHCP ([#8](https://github.com/osk4r8088/netkit-webvisualizer/issues/8)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
+- **Attack: SYN flood:** SYNs from forged addresses fill a server's queue of half-open connections until a real client is turned away; SYN cookies pack the connection state into the sequence number.
+- **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
+- **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
+- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
 
 ### Correct by construction
 
@@ -120,6 +123,10 @@ src/learn/
   registry.ts             all lessons
   url-to-page/            the chained exchange "From URL to page"
   arp-spoofing/           attack scenario: ARP spoofing and Dynamic ARP Inspection
+  syn-flood/              attack scenario: SYN flood and SYN cookies
+  dns-poisoning/          attack scenario: DNS cache poisoning, port randomization, DNSSEC
+  rogue-dhcp/             attack scenario: rogue DHCP server and DHCP snooping
+  spec.ts                 flat step format shared by the lessons
   exchanges.ts            all lesson exchanges, for the tests
   LessonExchange.tsx      shows a lesson exchange on the exchange page
 ```

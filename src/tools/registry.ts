@@ -27,8 +27,9 @@ export const TOOLS: HubEntry[] = [
     id: 'tcp-states',
     title: 'TCP state machine',
     summary: 'The TCP connection states and the segments that move between them.',
-    status: 'planned',
+    status: 'ready',
     issue: 5,
+    component: lazy(() => import('./tcp-states/TcpStatesTool')),
   },
   {
     id: 'ports',

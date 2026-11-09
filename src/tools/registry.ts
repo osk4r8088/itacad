@@ -67,7 +67,8 @@ export const TOOLS: HubEntry[] = [
     id: 'raid',
     title: 'RAID visualizer',
     summary: 'How RAID 0, 1, 5, 6 and 10 spread data and parity, and what happens when disks fail.',
-    status: 'planned',
+    status: 'ready',
     issue: 20,
+    component: lazy(() => import('./raid/RaidTool')),
   },
 ];

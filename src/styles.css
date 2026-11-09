@@ -2543,3 +2543,215 @@ table.kv th {
     padding-left: 1rem;
   }
 }
+
+/* ---- RAID ---- */
+.raid-tool {
+  max-width: 1100px;
+}
+.raid-input {
+  grid-template-columns: 1fr auto;
+}
+.raid-input .wide {
+  grid-column: 1 / -1;
+}
+.raid-input select,
+.raid-ure select {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.raid-about {
+  margin-top: 1rem;
+}
+.raid-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.75rem 0 0;
+}
+.raid-facts > div {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.raid-facts dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.raid-facts dd {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+}
+.raid-facts .state-optimal {
+  color: var(--cat-green);
+}
+.raid-facts .state-degraded {
+  color: var(--cat-yellow);
+}
+.raid-facts .state-failed {
+  color: var(--cat-red);
+}
+.raid-grid-wrap {
+  overflow-x: auto;
+}
+.raid-grid {
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+.raid-grid th[scope='row'] {
+  text-align: left;
+  padding-right: 0.5rem;
+  white-space: nowrap;
+}
+.raid-grid th[scope='row'] .link-button {
+  padding: 0;
+  color: var(--muted);
+}
+.raid-grid tr.selected th[scope='row'] .link-button {
+  color: var(--text);
+  font-weight: 600;
+}
+.disk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 4.5rem;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+  font-weight: 600;
+}
+.disk .small {
+  font-weight: 400;
+  color: var(--cat-green);
+}
+.disk.failed {
+  border-color: var(--cat-red);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.disk.failed .small {
+  color: var(--cat-red);
+}
+.block {
+  min-width: 4.5rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.block strong,
+.block span {
+  display: block;
+}
+.block.kind-data {
+  background: var(--k-link);
+}
+.block.kind-p {
+  background: var(--k-transport);
+}
+.block.kind-q {
+  background: var(--k-application);
+}
+.raid-grid tr.selected .block {
+  border-color: var(--accent);
+}
+.block.rebuilt {
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(127, 127, 127, 0.18) 6px 12px);
+  outline: 2px dashed var(--cat-yellow);
+  outline-offset: -2px;
+}
+.block.lost {
+  background: var(--warn-bg);
+  color: var(--cat-red);
+  outline: 2px solid var(--cat-red);
+  outline-offset: -2px;
+}
+.key-block {
+  display: inline-block;
+  width: 1rem;
+  height: 0.8rem;
+  margin: 0 0.25rem -0.1rem 0.6rem;
+  border-radius: 3px;
+}
+.key-block:first-child {
+  margin-left: 0;
+}
+.key-block.kind-data {
+  background: var(--k-link);
+}
+.key-block.kind-p {
+  background: var(--k-transport);
+}
+.key-block.rebuilt {
+  outline: 2px dashed var(--cat-yellow);
+  outline-offset: -2px;
+}
+.key-block.lost {
+  outline: 2px solid var(--cat-red);
+  outline-offset: -2px;
+  background: var(--warn-bg);
+}
+.raid-math {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.raid-bits {
+  border-collapse: collapse;
+}
+.raid-bits th,
+.raid-bits td {
+  padding: 0.3rem 0.7rem 0.3rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.raid-bits thead th {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.raid-bits tr.parity th,
+.raid-bits tr.parity td {
+  border-top: 2px solid var(--text);
+}
+.raid-bits tr.parity + tr.parity th,
+.raid-bits tr.parity + tr.parity td {
+  border-top: none;
+}
+.raid-bits tr.rebuilt td {
+  color: var(--cat-yellow);
+  font-weight: 600;
+}
+.raid-bits tr.lost td {
+  color: var(--cat-red);
+}
+.raid-ure {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 28rem;
+  margin-bottom: 0.6rem;
+}
+.raid-ure label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .raid-math {
+    grid-template-columns: 1fr;
+  }
+  .raid-input {
+    grid-template-columns: 1fr;
+  }
+}

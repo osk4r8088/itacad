@@ -11,6 +11,8 @@ export interface HubEntry {
   summary: string;
   /** Planned entries are shown greyed out and link to their issue. */
   status: 'ready' | 'planned';
+  /** For tools: a practical utility for real tasks, or an interactive model to understand something. */
+  purpose?: 'use' | 'understand';
   /** GitHub issue that tracks the entry. */
   issue?: number;
   /** Loaded when the entry is opened. A ready entry has either a component or an exchange. */

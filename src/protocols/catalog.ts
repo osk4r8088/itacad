@@ -147,7 +147,12 @@ export const CATALOG: CatalogEntry[] = [
 ];
 
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
-export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [];
+export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
+  { title: 'IPv6, NDP and SLAAC', group: 'Internet' },
+  { title: 'NAT and PAT', group: 'Internet' },
+  { title: 'VLAN (802.1Q)', group: 'Link' },
+  { title: 'Spanning Tree', group: 'Link' },
+];
 
 export interface NavEntry {
   title: string;

@@ -146,6 +146,27 @@ export interface Step {
   info: string;
   /** The message is lost on the way and never reaches the receiver. */
   lost?: boolean;
+
+  // ---- exchanges that chain several protocols
+  /** Id of a phase from Exchange.phases. */
+  phase?: string;
+  /** What the sender or receiver knows after this step, shown in a "known so far" panel. */
+  learned?: Learned[];
+}
+
+export interface Learned {
+  /** Stable name across the exchange, for example "Server IP". */
+  label: string;
+  value: string;
+}
+
+/** A section of a long exchange, for example "DNS" in "From URL to page". */
+export interface Phase {
+  id: string;
+  label: string;
+  about: string;
+  /** Id of the exchange that shows this protocol in detail. */
+  deepDive?: string;
 }
 
 export type CategoryColor = 'green' | 'yellow' | 'purple' | 'gray' | 'blue' | 'red';
@@ -173,4 +194,6 @@ export interface Exchange {
   /** Legend of the packet flow table. */
   categories: Category[];
   steps: Step[];
+  /** Sections of an exchange that chains protocols. Every step then names its phase. */
+  phases?: Phase[];
 }

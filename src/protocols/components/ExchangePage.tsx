@@ -11,6 +11,7 @@ import { Prose } from '../../shared/components/Prose';
 import { FlowTable } from './FlowTable';
 import { ProtocolSwitcher } from './ProtocolSwitcher';
 import { PhaseBar } from './PhaseBar';
+import { hasQuiz } from '../../quizzes/catalog';
 
 /** Relative width of the sequence column in the dashboard: more lifelines need more room. */
 function seqWeight(exchange: Exchange): string {
@@ -105,6 +106,11 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
               <SourceList sources={exchange.sources} />
             </div>
           </details>
+          {hasQuiz(exchange.id) && (
+            <a className="quiz-link" href={href.quiz(exchange.id)}>
+              Quiz
+            </a>
+          )}
         </div>
         <StepControls
         index={index}

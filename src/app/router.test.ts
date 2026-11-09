@@ -14,6 +14,8 @@ describe('parseRoute', () => {
     ['#/learn', { page: 'learn' }],
     ['#/learn/attacks', { page: 'lesson', id: 'attacks', step: 1 }],
     ['#/learn/url-to-page/7', { page: 'lesson', id: 'url-to-page', step: 7 }],
+    ['#/learn/quizzes', { page: 'lesson', id: 'quizzes', step: 1 }],
+    ['#/learn/quizzes/tcp', { page: 'quiz', id: 'tcp' }],
     ['#/tcp/3', { page: 'redirect', to: '#/protocols/tcp/3' }],
     ['#/dns', { page: 'redirect', to: '#/protocols/dns/1' }],
   ])('%s', (hash, route) => {
@@ -23,5 +25,6 @@ describe('parseRoute', () => {
   it('round-trips the link helpers', () => {
     expect(parseRoute(href.exchange('tls', 4))).toEqual({ page: 'exchange', id: 'tls', step: 4 });
     expect(parseRoute(href.tool('decoder'))).toEqual({ page: 'tool', id: 'decoder' });
+    expect(parseRoute(href.quiz('dns'))).toEqual({ page: 'quiz', id: 'dns' });
   });
 });

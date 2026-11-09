@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
  *   #/protocols/tcp/3      step 3 of the TCP exchange
  *   #/tools, #/tools/<id>  tool overview, one tool
  *   #/learn, #/learn/<id>  learning content; lessons that are exchanges take a step: #/learn/<id>/<step>
+ *   #/learn/quizzes/tcp    the quiz of one protocol
  * Links of the old form #/tcp/3 redirect to #/protocols/tcp/3.
  */
 export type Route =
@@ -17,6 +18,7 @@ export type Route =
   | { page: 'tool'; id: string }
   | { page: 'learn' }
   | { page: 'lesson'; id: string; step: number }
+  | { page: 'quiz'; id: string }
   | { page: 'redirect'; to: string };
 
 export const href = {
@@ -27,6 +29,8 @@ export const href = {
   tool: (id: string) => `#/tools/${id}`,
   learn: '#/learn',
   lesson: (id: string, step?: number) => (step ? `#/learn/${id}/${step}` : `#/learn/${id}`),
+  quizzes: '#/learn/quizzes',
+  quiz: (id: string) => `#/learn/quizzes/${id}`,
 };
 
 function stepOf(value: string | undefined): number {
@@ -44,6 +48,7 @@ export function parseRoute(hash: string): Route {
     case 'tools':
       return id ? { page: 'tool', id } : { page: 'tools' };
     case 'learn':
+      if (id === 'quizzes' && rest) return { page: 'quiz', id: rest };
       return id ? { page: 'lesson', id, step: stepOf(rest) } : { page: 'learn' };
     default:
       // Old links: #/tcp/3 meant step 3 of TCP.

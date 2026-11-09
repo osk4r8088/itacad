@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { Exchange } from '../../shared/schema';
 import { href, replaceHash } from '../../app/router';
 import { NetworkView } from './NetworkView';
@@ -10,6 +10,7 @@ import { SourceList } from '../../shared/components/SourceList';
 import { Prose } from '../../shared/components/Prose';
 import { FlowTable } from './FlowTable';
 import { ProtocolSwitcher } from './ProtocolSwitcher';
+import { PhaseBar } from './PhaseBar';
 
 /** Relative width of the sequence column in the dashboard: more lifelines need more room. */
 function seqWeight(exchange: Exchange): string {
@@ -24,7 +25,16 @@ function defaultSelection(exchange: Exchange, index: number): Selection {
   return first ? { layer: first.layer, field: first.field } : { layer: exchange.steps[index].captures[0].layers.at(-1)!.def.id };
 }
 
-export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; stepNumber: number }) {
+interface Props {
+  exchange: Exchange;
+  stepNumber: number;
+  /** Link of a step; protocol pages use #/protocols/<id>/<n>, lessons their own route. */
+  stepHref?: (step: number) => string;
+  /** Replaces the protocol menu in the top bar, for example with the lesson title. */
+  crumb?: ReactNode;
+}
+
+export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
   const count = exchange.steps.length;
   const index = Math.min(Math.max(stepNumber, 1), count) - 1;
   const step = exchange.steps[index];
@@ -36,9 +46,9 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
   const goTo = useCallback(
     (i: number) => {
       const clamped = Math.min(Math.max(i, 0), count - 1);
-      replaceHash(href.exchange(exchange.id, clamped + 1));
+      replaceHash(stepHref ? stepHref(clamped + 1) : href.exchange(exchange.id, clamped + 1));
     },
-    [count, exchange.id],
+    [count, stepHref, exchange.id],
   );
 
   // New step: select its first key field.
@@ -84,7 +94,7 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
             Netkit
           </a>
           <span className="crumb">
-            <ProtocolSwitcher currentId={exchange.id} currentTitle={exchange.title} />
+            {crumb ?? <ProtocolSwitcher currentId={exchange.id} currentTitle={exchange.title} />}
           </span>
           <details className="about">
             <summary>About this exchange</summary>
@@ -111,6 +121,8 @@ export function ExchangePage({ exchange, stepNumber }: { exchange: Exchange; ste
         }}
         />
       </header>
+
+      {exchange.phases && <PhaseBar exchange={exchange} index={index} onGo={(i) => (setPlaying(false), goTo(i))} />}
 
       <div className="row-top">
         <section className="panel area-network" aria-label="Network view">

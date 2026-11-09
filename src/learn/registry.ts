@@ -5,9 +5,10 @@ export const LESSONS: HubEntry[] = [
   {
     id: 'url-to-page',
     title: 'From URL to page',
-    summary: 'Typing a URL and pressing Enter: DHCP, ARP, DNS, TCP, TLS and HTTP in one chain.',
-    status: 'planned',
+    summary: 'A laptop joins a network and opens a web page: DHCP, ARP, DNS, TCP, TLS and HTTP in one chain, frame by frame.',
+    status: 'ready',
     issue: 2,
+    exchange: () => import('./url-to-page/exchange').then((m) => m.urlToPageExchange),
   },
   {
     id: 'attacks',

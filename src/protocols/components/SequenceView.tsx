@@ -44,6 +44,20 @@ export function SequenceView({ exchange, index, onSelect }: Props) {
             <path d="M0 0 L10 5 L0 10 z" className="arrowhead current" />
           </marker>
         </defs>
+        {(exchange.phases ?? []).map((ph, n) => {
+          const rows = exchange.steps.map((st, i) => (st.phase === ph.id ? i : -1)).filter((i) => i >= 0);
+          if (rows.length === 0) return null;
+          const y1 = top + rows[0] * ROW - ROW / 2 - 6;
+          const y2 = top + rows[rows.length - 1] * ROW + ROW / 2 - 6;
+          return (
+            <g key={ph.id} className={`phase-band${n % 2 ? ' odd' : ''}`}>
+              <rect x={0} y={y1} width={width} height={y2 - y1} />
+              <text x={width - 6} y={y1 + 12} textAnchor="end">
+                {ph.label}
+              </text>
+            </g>
+          );
+        })}
         {lifelines.map((p) => (
           <g key={p.id} className="lifeline">
             <text x={xOf.get(p.id)} y={18} textAnchor="middle" className="lifeline-label">

@@ -34,7 +34,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | TCP state machine: the RFC 9293 state diagram, walked through event by event, with scenarios and links into the TCP exchange | ready |
 | Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
-| Password generator and strength analyzer | planned, [#13](https://github.com/osk4r8088/netkit-webvisualizer/issues/13) |
+| Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 
 ### Learn (planned)
 
@@ -96,6 +96,7 @@ src/tools/
   numbers/                number converter
   tcp-states/             TCP state machine
   ports/                  well-known ports
+  passwords/              password generator and analyzer
 src/learn/registry.ts     all lessons
 ```
 
@@ -136,6 +137,12 @@ Hash routes work on any static host:
 | `#/learn`, `#/learn/<id>` | lessons |
 
 Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts`.
+
+## Third-party content
+
+- [zxcvbn-ts](https://github.com/zxcvbn-ts/zxcvbn) (MIT) for the password strength estimate, loaded only on the password page.
+- [EFF Large Wordlist for Passphrases](https://www.eff.org/dice) (CC BY 3.0 US) for generated passphrases, see `src/tools/passwords/WORDLIST.md`.
+- Inter and JetBrains Mono fonts (SIL Open Font License), self-hosted.
 
 ## Deploy
 

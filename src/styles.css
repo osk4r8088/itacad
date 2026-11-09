@@ -2075,3 +2075,183 @@ table.kv th {
     grid-row: span 4;
   }
 }
+
+/* ---- Passwords ---- */
+.passwords-tool {
+  max-width: 1200px;
+}
+.pw-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.pw-panel {
+  margin-top: 0 !important;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.pw-panel h2,
+.pw-panel h3 {
+  margin: 0;
+}
+.pw-panel h3 {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pw-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.pw-panel .field > label,
+.pw-panel legend {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.pw-panel input[type='range'] {
+  accent-color: var(--accent);
+}
+.pw-panel select,
+.pw-input input {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.pw-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+.checks-list {
+  border: none;
+  margin: 0;
+  padding: 0;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.3rem 1rem !important;
+}
+.checks-list label {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.checks-list legend {
+  width: 100%;
+  margin-bottom: 0.2rem;
+}
+.pw-secret {
+  display: block;
+  padding: 0.8rem;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.pw-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.pw-actions button,
+.pw-input button {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  cursor: pointer;
+}
+.pw-input {
+  display: flex;
+  gap: 0.5rem;
+}
+.pw-input input {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.05rem;
+}
+.pw-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.25rem 0 0.5rem;
+}
+.pw-bar {
+  display: flex;
+  gap: 3px;
+}
+.pw-bar span {
+  width: 2.2rem;
+  height: 0.55rem;
+  border-radius: 3px;
+  background: var(--border);
+}
+.score-0 .pw-bar .on,
+.score-1 .pw-bar .on {
+  background: var(--cat-red);
+}
+.score-2 .pw-bar .on {
+  background: var(--cat-yellow);
+}
+.score-3 .pw-bar .on,
+.score-4 .pw-bar .on {
+  background: var(--cat-green);
+}
+.pw-warning {
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid var(--focus);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  margin: 0;
+}
+.pw-parts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.pw-parts li {
+  display: grid;
+  grid-template-columns: minmax(5rem, auto) 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.pw-parts .token {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  white-space: pre;
+}
+.pw-parts .pattern-bruteforce .token {
+  background: var(--k-transport);
+}
+.pw-panel table.kv th {
+  width: 11rem;
+}
+@media (max-width: 900px) {
+  .pw-layout,
+  .pw-options {
+    grid-template-columns: 1fr;
+  }
+}
+.pw-panel [aria-live] h3 {
+  margin: 1rem 0 0.4rem;
+}

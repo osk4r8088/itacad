@@ -51,7 +51,8 @@ export const TOOLS: HubEntry[] = [
     id: 'passwords',
     title: 'Password generator and analyzer',
     summary: 'Random passwords and passphrases with their entropy, and why some passwords are weaker than they look.',
-    status: 'planned',
+    status: 'ready',
     issue: 13,
+    component: lazy(() => import('./passwords/PasswordsTool')),
   },
 ];

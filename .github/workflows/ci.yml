@@ -36,6 +36,13 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+      # Everything except the main bundle loads on demand. Keep the first page load small.
+      - name: Check main bundle size
+        run: |
+          size=$(stat -c %s dist/assets/index-*.js)
+          echo "Main bundle: $((size / 1024)) kB (limit 300 kB)"
+          test "$size" -le $((300 * 1024))
+
       # Keep the built site for 7 days so it can be downloaded from the run page.
       - uses: actions/upload-artifact@v7
         with:

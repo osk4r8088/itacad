@@ -1419,3 +1419,153 @@ main {
 a.card.planned:hover {
   border-color: var(--muted);
 }
+
+/* ---- Tools ---- */
+.tool {
+  max-width: 920px;
+}
+.tool section {
+  margin-top: 1.5rem;
+}
+.tool-input {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) minmax(12rem, 1fr);
+  gap: 0.75rem 1.5rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.tool-input .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.tool-input label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.tool-input input:not([type='range']) {
+  font-size: 1.05rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.tool-input input[aria-invalid='true'] {
+  border-color: var(--focus);
+}
+.tool-input input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.tool-input .examples {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+}
+.tool-input .examples .link-button {
+  margin-right: 0.9rem;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.bit-table {
+  border-collapse: collapse;
+}
+.bit-table th,
+.bit-table td {
+  padding: 0.3rem 0.75rem 0.3rem 0;
+  text-align: left;
+  white-space: nowrap;
+}
+.bit-table th {
+  font-weight: 400;
+  color: var(--muted);
+}
+.bits .octet {
+  display: inline-flex;
+  margin-right: 0.5rem;
+}
+.bit {
+  display: inline-block;
+  width: 1.05em;
+  text-align: center;
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+.bit.net {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+.bit.host {
+  color: var(--muted);
+}
+.bit.edge {
+  box-shadow: inset 2px 0 0 var(--focus);
+}
+.legend .bit {
+  margin: 0 0.3rem 0 0.75rem;
+  border: 1px solid var(--border);
+}
+.legend .bit:first-child {
+  margin-left: 0;
+}
+table.kv {
+  border-collapse: collapse;
+  width: 100%;
+}
+table.kv th,
+table.kv td {
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+table.kv th {
+  width: 12rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.tool .prose {
+  margin-top: 1.5rem;
+  max-width: 70ch;
+}
+@media (max-width: 640px) {
+  .tool-input {
+    grid-template-columns: 1fr;
+  }
+  table.kv th {
+    width: auto;
+  }
+}
+@media (max-width: 640px) {
+  .bit-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .bit-table th,
+  .bit-table td {
+    padding: 0;
+  }
+  .bit-table td.bits {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding-top: 0.2rem;
+  }
+  .bit-table td.mono {
+    font-size: 0.85rem;
+  }
+  .bits .octet {
+    margin-right: 0.3rem;
+  }
+  .bits .bit {
+    width: 0.66rem;
+    font-size: 0.8rem;
+  }
+}

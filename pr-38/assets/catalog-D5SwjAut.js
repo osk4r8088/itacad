@@ -1,1 +1,0 @@
-import{o as e}from"./index-CVLTv0Yd.js";var t={tcp:()=>e(()=>import(`./tcp-CywZ1Ns3.js`).then(e=>e.tcpQuiz),[],import.meta.url)},n=e=>e in t;export{n,t};

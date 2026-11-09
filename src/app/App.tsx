@@ -3,6 +3,7 @@ import { href, replaceHash, useHashRoute, type Route } from './router';
 import { SiteHeader, type Section } from './SiteHeader';
 import { Home } from './Home';
 import { HubCards } from './HubCards';
+import { ToolGroups } from './ToolGroups';
 import { HubEntryPage } from './HubEntryPage';
 import { ProtocolIndex } from '../protocols/components/ProtocolIndex';
 import { TOOLS } from '../tools/registry';
@@ -78,7 +79,7 @@ export function App() {
         {route.page === 'tools' && (
           <div className="index">
             <h1>Tools</h1>
-            <HubCards entries={TOOLS} link={href.tool} />
+            <ToolGroups />
           </div>
         )}
         {route.page === 'learn' && (

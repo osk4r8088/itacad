@@ -3,6 +3,13 @@ import type { HubEntry } from '../shared/hub';
 /** Learning content that goes beyond a single protocol. Works like the tool registry. */
 export const LESSONS: HubEntry[] = [
   {
+    id: 'layers',
+    title: 'OSI and TCP/IP overview',
+    summary: 'Every layer with its job, addresses, devices, and the protocols and tools of this site that belong to it.',
+    status: 'planned',
+    issue: 34,
+  },
+  {
     id: 'url-to-page',
     title: 'From URL to page',
     summary: 'A laptop joins a network and opens a web page: DHCP, ARP, DNS, TCP, TLS and HTTP in one chain, frame by frame.',

@@ -2772,3 +2772,15 @@ table.kv th {
   font-weight: 400;
   font-size: 0.8rem;
 }
+
+/* ---- Tool groups ---- */
+.tool-group + .tool-group {
+  margin-top: 1.25rem;
+}
+.tool-group-title {
+  font-size: 0.95rem;
+  margin: 0 0 0.15rem;
+}
+.tool-group > p {
+  margin: 0 0 0.6rem;
+}

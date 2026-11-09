@@ -1,7 +1,7 @@
 import { CATALOG } from '../protocols/catalog';
-import { TOOLS } from '../tools/registry';
 import { LESSONS } from '../learn/registry';
 import { HubCards } from './HubCards';
+import { ToolGroups } from './ToolGroups';
 import { href } from './router';
 
 /** Start page: one block per section, rendered from the catalog and the registries. */
@@ -35,7 +35,7 @@ export function Home() {
           <h2 id="h-tools">Tools</h2>
           <a href={href.tools}>All tools</a>
         </div>
-        <HubCards entries={TOOLS} link={href.tool} />
+        <ToolGroups headingLevel="h3" />
       </section>
 
       <section className="hub-section" aria-labelledby="h-learn">

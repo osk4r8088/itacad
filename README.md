@@ -25,16 +25,28 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Internet | IPv4, ICMP |
 | Link | ARP |
 
+Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webvisualizer/issues/27)), NAT and PAT ([#28](https://github.com/osk4r8088/netkit-webvisualizer/issues/28)), VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webvisualizer/issues/29)), Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
+
 ### Tools
+
+**Everyday tools:** for real tasks.
 
 | Tool | Status |
 |---|---|
 | Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
 | Header decoder: paste a frame as hex and see every field of Ethernet, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
-| TCP state machine: the RFC 9293 state diagram, walked through event by event, with scenarios and links into the TCP exchange | ready |
 | Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
+| VLSM subnet planner | planned, [#31](https://github.com/osk4r8088/netkit-webvisualizer/issues/31) |
+| IPv6 address tool | planned, [#32](https://github.com/osk4r8088/netkit-webvisualizer/issues/32) |
+| Bandwidth calculator | planned, [#33](https://github.com/osk4r8088/netkit-webvisualizer/issues/33) |
+
+**Explore and understand:** interactive models of how something works.
+
+| Tool | Status |
+|---|---|
+| TCP state machine: the RFC 9293 state diagram, walked through event by event, with scenarios and links into the TCP exchange | ready |
 | DNS record explorer: 15 record types with their fields and wire format, an example zone with mail, DNSSEC and reverse DNS, common mistakes | ready |
 | RAID visualizer: layouts of RAID 0, 1, 5, 6 and 10, failing disks, parity and Reed-Solomon reconstruction bit by bit, rebuild risk | ready |
 
@@ -42,7 +54,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 
 - **From URL to page:** a laptop joins a network and opens https://www.example.com, frame by frame in 25 steps: DHCP, ARP for the resolver, DNS, ARP for the gateway, TCP, TLS 1.3 and HTTP/2. A phase bar, a "known so far" panel and links to each protocol page show how the protocols hand over to each other.
 - **Attack: ARP spoofing:** an attacker in the LAN poisons the ARP caches of a laptop and its gateway, the traffic runs through the attacker (with the TTL as a trace), and a switch with Dynamic ARP Inspection stops it. The frames show how the attack works; no tooling.
-- Planned: more attack scenarios: SYN flood, DNS cache poisoning, rogue DHCP ([#8](https://github.com/osk4r8088/netkit-webvisualizer/issues/8)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
+- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)), more attack scenarios: SYN flood, DNS cache poisoning, rogue DHCP ([#8](https://github.com/osk4r8088/netkit-webvisualizer/issues/8)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
 
 ### Correct by construction
 
@@ -123,7 +135,7 @@ Each protocol, tool and lesson is loaded only when it is opened.
 ## Adding a tool or lesson
 
 1. Create `src/tools/<id>/` with the logic as plain functions, its tests, and a component with a default export.
-2. In `src/tools/registry.ts`, set the entry to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. The start page, the tools page and the route `#/tools/<id>` pick it up.
+2. In `src/tools/registry.ts`, give the entry a `purpose` (`use` for everyday tools, `understand` for models), set it to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. The start page, the tools page and the route `#/tools/<id>` pick it up.
 
 Lessons work the same way in `src/learn/`. A lesson can also be an exchange: give its registry entry an `exchange` loader instead of a component, and it opens on the exchange page at `#/learn/<id>/<step>`. Exchanges that chain protocols set `phases` (with a `deepDive` exchange each), a `phase` on every step, and `learned` facts where the client learns something; the page then shows the phase bar and the "known so far" panel. A fact can be learned again with a new value (a poisoned cache entry), which the panel marks as changed. Add every lesson exchange to `src/learn/exchanges.ts` so the tests cover it. `src/learn/url-to-page/` is the example; it reuses the frames of the protocol exchanges, so the bytes always match.
 

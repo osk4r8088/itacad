@@ -62,12 +62,9 @@ Conventions:
 
 Hash routes work on any static host: `#/` is the overview, `#/tcp/3` is step 3 of the TCP exchange.
 
-## Publish
+## Deploy
 
-```bash
-scripts/publish.sh            # test, build, upload to core:/var/www/protocols
-scripts/publish.sh offline    # move to /var/www/.off/protocols
-scripts/publish.sh online     # move back
-```
+Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/pages.yml`):
+https://osk4r8088.github.io/networkprotocol-webvisualizer/
 
-The site is then at `https://protocols-dev.home.example.com`. Requires `ssh user@server` with a key (Git Bash on Windows works).
+The output in `dist/` is plain static files with relative paths, so it also runs from any other static host or subfolder.

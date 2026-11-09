@@ -33,22 +33,15 @@ Ethernet frames appear in every exchange as the bottom layer. Later possible: an
 - **Usable:** keyboard navigation through steps (arrow keys), works on a phone (views stack vertically), respects reduced-motion settings, good contrast in light and dark mode.
 - **Language:** ask me whether the UI and explanations are German or English. Protocol field names stay in their original form.
 
-## Where it runs (self-hosted)
+## Where it runs
 
-- Static site at `https://<project>-dev.home.example.com`, behind my login proxy. Caddy serves `/var/www/<project>` on the server; extensionless URLs resolve via `try_files`. Use a client-side router that works with static hosting (hash routes or one HTML file per route).
-- Project name suggestion: `protocols`; ask me.
-- Add a publish script:
-  ```bash
-  P=<project>
-  ssh user@server "mkdir -p /var/www/$P && find /var/www/$P -mindepth 1 -delete"
-  tar -C dist -cf - . | ssh user@server "tar -C /var/www/$P -xf -"
-  # offline: mv to /var/www/.off/$P, online: move back
-  ```
-  `ssh user@server` works with my key from the PC (Git Bash on Windows).
+- Static site on GitHub Pages, deployed by GitHub Actions on every push to `main`. CI (typecheck, tests, build) runs on every push and pull request.
+- Use a client-side router that works with static hosting (hash routes).
+- This repository is public: no personal data, private hostnames, IP addresses or infrastructure details in code, docs or commit messages.
 
 ## How I want to work
 
 - Start with: data schema for one exchange, component structure, a rough layout sketch in words or ASCII. Wait for my OK.
 - Then TCP end to end, then review, then the remaining protocols in small batches. Commit after each step.
-- A short `README.md`: how to add a protocol, how to publish.
+- A short `README.md`: how to add a protocol, how to develop and deploy.
 - Style: no emojis in code or UI, no em dashes in text, clean structure.

@@ -35,7 +35,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
-| DNS record explorer: record types, their fields and how they work together | planned, [#21](https://github.com/osk4r8088/netkit-webvisualizer/issues/21) |
+| DNS record explorer: 15 record types with their fields and wire format, an example zone with mail, DNSSEC and reverse DNS, common mistakes | ready |
 | RAID visualizer: data and parity layout of RAID levels, disk failures and rebuilds | planned, [#20](https://github.com/osk4r8088/netkit-webvisualizer/issues/20) |
 
 ### Learn
@@ -100,6 +100,7 @@ src/tools/
   tcp-states/             TCP state machine
   ports/                  well-known ports
   passwords/              password generator and analyzer
+  dns-records/            DNS record explorer
 src/learn/
   registry.ts             all lessons
   url-to-page/            the chained exchange "From URL to page"

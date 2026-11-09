@@ -59,8 +59,9 @@ export const TOOLS: HubEntry[] = [
     id: 'dns-records',
     title: 'DNS record explorer',
     summary: 'Which record types exist, what they are for, and how records work together in a zone.',
-    status: 'planned',
+    status: 'ready',
     issue: 21,
+    component: lazy(() => import('./dns-records/DnsRecordsTool')),
   },
   {
     id: 'raid',

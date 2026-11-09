@@ -1,0 +1,16 @@
+# Dependabot opens pull requests when dependencies or actions have updates.
+# CI runs on each of those pull requests, so a green check means the update is safe to merge.
+version: 2
+updates:
+  - package-ecosystem: npm # also covers pnpm-lock.yaml
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      all-npm:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

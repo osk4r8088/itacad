@@ -10,6 +10,7 @@ import { LESSONS } from '../learn/registry';
 
 // The exchange page and the exchange data load only when a protocol is opened.
 const ExchangeRoute = lazy(() => import('../protocols/ExchangeRoute'));
+const LessonExchange = lazy(() => import('../learn/LessonExchange'));
 
 function titleOf(route: Route): string | undefined {
   switch (route.page) {
@@ -44,11 +45,21 @@ export function App() {
 
   useEffect(() => {
     if (route.page === 'exchange') return; // ExchangeRoute sets the title once the data is loaded
+    if (route.page === 'lesson' && LESSONS.find((l) => l.id === route.id)?.exchange) return; // so does LessonExchange
     const title = titleOf(route);
     document.title = title ? `${title} | Netkit` : 'Netkit';
   }, [route]);
 
   if (route.page === 'redirect') return null;
+
+  // Lessons that are exchanges use the exchange page with their own route.
+  const lesson = route.page === 'lesson' ? LESSONS.find((l) => l.id === route.id) : undefined;
+  if (route.page === 'lesson' && lesson?.status === 'ready' && lesson.exchange)
+    return (
+      <Suspense fallback={<p className="notice muted">Loading...</p>}>
+        <LessonExchange entry={lesson} step={route.step} />
+      </Suspense>
+    );
 
   // Exchange pages render their own toolbar with the step controls.
   if (route.page === 'exchange')

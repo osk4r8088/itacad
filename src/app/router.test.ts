@@ -12,7 +12,8 @@ describe('parseRoute', () => {
     ['#/tools', { page: 'tools' }],
     ['#/tools/subnet', { page: 'tool', id: 'subnet' }],
     ['#/learn', { page: 'learn' }],
-    ['#/learn/attacks', { page: 'lesson', id: 'attacks' }],
+    ['#/learn/attacks', { page: 'lesson', id: 'attacks', step: 1 }],
+    ['#/learn/url-to-page/7', { page: 'lesson', id: 'url-to-page', step: 7 }],
     ['#/tcp/3', { page: 'redirect', to: '#/protocols/tcp/3' }],
     ['#/dns', { page: 'redirect', to: '#/protocols/dns/1' }],
   ])('%s', (hash, route) => {

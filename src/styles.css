@@ -2255,3 +2255,120 @@ table.kv th {
 .pw-panel [aria-live] h3 {
   margin: 1rem 0 0.4rem;
 }
+
+/* ---- Exchanges that chain protocols (lessons) ---- */
+.phase-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  flex-shrink: 0;
+}
+.phase-bar ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.phase-bar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem 0.25rem 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.phase-bar .num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.phase-bar .done button {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.phase-bar .done .num {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.phase-bar .current button {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.phase-bar .current .num {
+  background: #fff;
+  color: var(--accent);
+}
+.phase-about {
+  margin: 0;
+  color: var(--muted);
+}
+.lesson-crumb {
+  font-size: 0.95rem;
+}
+.lesson-crumb a {
+  color: var(--muted);
+}
+.known {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+.known h3 {
+  margin: 0 0 0.35rem;
+}
+.known dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.75rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.known dl > div {
+  display: contents;
+}
+.known dt {
+  color: var(--muted);
+}
+.known dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.known .new dt,
+.known .new dd {
+  color: var(--accent);
+  font-weight: 600;
+}
+.known .unknown dd {
+  color: var(--muted);
+  font-family: var(--font);
+  font-style: italic;
+}
+.phase-band rect {
+  fill: var(--text);
+  opacity: 0.025;
+}
+.phase-band.odd rect {
+  opacity: 0.065;
+}
+.phase-band text {
+  fill: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

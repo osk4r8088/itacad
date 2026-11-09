@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { exchanges } from './exchanges';
+import { exchanges as protocolExchanges } from './exchanges';
+import { urlToPageExchange } from '../learn/url-to-page/exchange';
+
+// The lesson exchanges follow the same rules as the protocol exchanges.
+const exchanges = [...protocolExchanges, urlToPageExchange];
 import type { Capture, LayerInstance } from '../shared/schema';
 import { concat, crc32, internetChecksum } from '../shared/lib/encode';
 import { innerLengths } from '../shared/components/PacketView';

@@ -10,6 +10,25 @@ function osiLayers(step: Step): string[] {
   return ([1, 2, 3, 4, 5, 6, 7] as OsiLayer[]).filter((o) => present.has(o)).map((o) => `${o} ${OSI_LAYERS[o].name}`);
 }
 
+/** For exchanges that chain protocols: every fact learned so far, the new ones marked, the rest still unknown. */
+function KnownSoFar({ exchange, index }: { exchange: Exchange; index: number }) {
+  const all = exchange.steps.flatMap((s, i) => (s.learned ?? []).map((l) => ({ ...l, at: i })));
+  if (all.length === 0) return null;
+  return (
+    <div className="known">
+      <h3>Known so far</h3>
+      <dl>
+        {all.map((l) => (
+          <div key={l.label} className={l.at === index ? 'new' : l.at > index ? 'unknown' : ''}>
+            <dt>{l.label}</dt>
+            <dd className="mono">{l.at <= index ? l.value : 'not yet known'}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 interface Props {
   exchange: Exchange;
   step: Step;
@@ -45,6 +64,7 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
         )}
       </p>
       <p className="muted osi-line">OSI layers: {osiLayers(step).join(', ')}</p>
+      <KnownSoFar exchange={exchange} index={index} />
 
       <h3>In this step</h3>
       <Prose text={d.what} />

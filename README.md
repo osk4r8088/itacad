@@ -31,7 +31,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 |---|---|
 | Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
 | Header decoder: paste a frame as hex and see every field of Ethernet, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
-| TCP state machine | planned, [#5](https://github.com/osk4r8088/netkit-webvisualizer/issues/5) |
+| TCP state machine: the RFC 9293 state diagram, walked through event by event, with scenarios and links into the TCP exchange | ready |
 | Well-known ports | planned, [#6](https://github.com/osk4r8088/netkit-webvisualizer/issues/6) |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Password generator and strength analyzer | planned, [#13](https://github.com/osk4r8088/netkit-webvisualizer/issues/13) |
@@ -94,6 +94,7 @@ src/tools/
   subnet/                 subnet calculator
   decoder/                header decoder
   numbers/                number converter
+  tcp-states/             TCP state machine
 src/learn/registry.ts     all lessons
 ```
 

@@ -1797,3 +1797,199 @@ table.kv th {
     font-size: 0.5rem;
   }
 }
+
+/* ---- TCP state machine ---- */
+.tcp-states-tool {
+  max-width: 1300px;
+}
+.tcp-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.tcp-diagram {
+  width: 100%;
+  height: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.tcp-diagram .node rect {
+  fill: var(--panel);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.tcp-diagram .node text {
+  fill: var(--text);
+  font-weight: 600;
+  font-size: 12px;
+}
+.tcp-diagram .node.visited rect {
+  fill: var(--accent-soft);
+}
+.tcp-diagram .node.current rect {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+.tcp-diagram .node.current text {
+  fill: #fff;
+}
+.tcp-diagram .edge path {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  opacity: 0.55;
+}
+.tcp-diagram .edge text {
+  fill: var(--muted);
+}
+.tcp-diagram .edge .action {
+  font-style: italic;
+}
+.tcp-diagram .edge.extra path {
+  stroke-dasharray: 5 4;
+}
+.tcp-diagram .edge.option path {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  opacity: 1;
+}
+.tcp-diagram .edge.option {
+  cursor: pointer;
+}
+.tcp-diagram .edge.option text {
+  fill: var(--accent);
+  font-weight: 600;
+}
+.tcp-diagram .edge.last path {
+  stroke: var(--focus);
+  stroke-width: 2.4;
+  opacity: 1;
+}
+.tcp-diagram .edge.last text {
+  fill: var(--focus);
+  font-weight: 600;
+}
+.tcp-diagram .arrowhead.plain {
+  fill: var(--muted);
+}
+.tcp-diagram .arrowhead.option {
+  fill: var(--accent);
+}
+.tcp-diagram .arrowhead.last {
+  fill: var(--focus);
+}
+.legend .key {
+  display: inline-block;
+  width: 1.4rem;
+  height: 0;
+  margin: 0 0.3rem 0.2rem 0.6rem;
+  vertical-align: middle;
+  border-top: 2.5px solid var(--muted);
+}
+.legend .key:first-child {
+  margin-left: 0;
+}
+.legend .key.option {
+  border-top-color: var(--accent);
+}
+.legend .key.last {
+  border-top-color: var(--focus);
+}
+.legend .key.extra {
+  border-top-style: dashed;
+}
+.tcp-panel section {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+.tcp-current {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.tcp-current h2 {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mono);
+  font-size: 1.3rem;
+}
+.tcp-current h2 .small {
+  font-family: var(--font);
+  font-weight: 400;
+}
+.tcp-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.tcp-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.6rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+.tcp-option:hover {
+  background: var(--accent-soft);
+}
+.tcp-option .kind {
+  grid-row: span 2;
+  align-self: center;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  width: 6.5rem;
+}
+.tcp-option .to {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.tcp-options p {
+  margin: 0.25rem 0 0;
+}
+.tcp-path {
+  padding-left: 1.4rem;
+  margin: 0 0 0.6rem;
+}
+.tcp-path .link-button {
+  font-family: var(--mono);
+  padding: 0;
+}
+.tcp-path li::marker {
+  color: var(--muted);
+}
+.tcp-states-tool button.card {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.tcp-states-tool button.card.selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+@media (max-width: 960px) {
+  .tcp-layout {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .tcp-diagram-wrap {
+    overflow-x: auto;
+  }
+  .tcp-diagram {
+    min-width: 600px;
+  }
+}

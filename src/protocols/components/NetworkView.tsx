@@ -44,7 +44,7 @@ const textWidth = (s: string, px: number) => s.length * px * 0.6;
 type Role = 'sender' | 'receiver' | 'via' | '';
 
 function Node({ p, at, role, busy }: { p: Participant; at: Point; role: Role; busy: boolean }) {
-  const cls = `node${role ? ` ${role}` : ''}${busy ? ' busy' : ''}`;
+  const cls = `node${role ? ` ${role}` : ''}${busy ? ' busy' : ''}${p.kind === 'attacker' ? ' node-attacker' : ''}`;
   return (
     <g transform={`translate(${at.x} ${at.y})`} className={cls}>
       <title>{[p.label, p.addr?.ipv4, p.addr?.mac, p.note].filter(Boolean).join('\n')}</title>

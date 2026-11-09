@@ -12,16 +12,27 @@ function osiLayers(step: Step): string[] {
 
 /** For exchanges that chain protocols: every fact learned so far, the new ones marked, the rest still unknown. */
 function KnownSoFar({ exchange, index }: { exchange: Exchange; index: number }) {
-  const all = exchange.steps.flatMap((s, i) => (s.learned ?? []).map((l) => ({ ...l, at: i })));
-  if (all.length === 0) return null;
+  // A label can be learned again later with a new value (for example a poisoned ARP cache entry): show the latest.
+  const facts = new Map<string, { value?: string; at: number; changes: number }>();
+  exchange.steps.forEach((s, i) => {
+    for (const l of s.learned ?? []) {
+      const f = facts.get(l.label) ?? { at: i, changes: -1 };
+      if (i <= index) facts.set(l.label, { value: l.value, at: i, changes: f.changes + 1 });
+      else if (!facts.has(l.label)) facts.set(l.label, { at: i, changes: -1 });
+    }
+  });
+  if (facts.size === 0) return null;
   return (
     <div className="known">
       <h3>Known so far</h3>
       <dl>
-        {all.map((l) => (
-          <div key={l.label} className={l.at === index ? 'new' : l.at > index ? 'unknown' : ''}>
-            <dt>{l.label}</dt>
-            <dd className="mono">{l.at <= index ? l.value : 'not yet known'}</dd>
+        {[...facts].map(([label, f]) => (
+          <div key={label} className={f.value === undefined ? 'unknown' : f.at === index ? (f.changes > 0 ? 'new changed' : 'new') : ''}>
+            <dt>{label}</dt>
+            <dd className="mono">
+              {f.value ?? 'not yet known'}
+              {f.value !== undefined && f.at === index && f.changes > 0 && <span className="changed-tag"> (changed)</span>}
+            </dd>
           </div>
         ))}
       </dl>

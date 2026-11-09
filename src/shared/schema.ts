@@ -81,7 +81,7 @@ export interface Capture {
   layers: LayerInstance[];
 }
 
-export type ParticipantKind = 'host' | 'server' | 'router' | 'switch' | 'resolver' | 'internet';
+export type ParticipantKind = 'host' | 'server' | 'router' | 'switch' | 'resolver' | 'internet' | 'attacker';
 
 export interface Participant {
   id: string;

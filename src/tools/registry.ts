@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import type { HubEntry } from '../shared/hub';
 
 /**
@@ -10,8 +11,9 @@ export const TOOLS: HubEntry[] = [
     id: 'subnet',
     title: 'Subnet calculator',
     summary: 'Network, broadcast, host range and mask of an IPv4 prefix, bit by bit.',
-    status: 'planned',
+    status: 'ready',
     issue: 3,
+    component: lazy(() => import('./subnet/SubnetTool')),
   },
   {
     id: 'decoder',

@@ -55,4 +55,18 @@ export const TOOLS: HubEntry[] = [
     issue: 13,
     component: lazy(() => import('./passwords/PasswordsTool')),
   },
+  {
+    id: 'dns-records',
+    title: 'DNS record explorer',
+    summary: 'Which record types exist, what they are for, and how records work together in a zone.',
+    status: 'planned',
+    issue: 21,
+  },
+  {
+    id: 'raid',
+    title: 'RAID visualizer',
+    summary: 'How RAID 0, 1, 5, 6 and 10 spread data and parity, and what happens when disks fail.',
+    status: 'planned',
+    issue: 20,
+  },
 ];

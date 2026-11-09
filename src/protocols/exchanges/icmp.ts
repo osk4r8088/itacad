@@ -6,7 +6,7 @@ import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 // Addresses: IPv4 RFC 5737, MAC RFC 7042.
 // Client LAN 192.0.2.0/24, server LAN 203.0.113.64/26. Router uplinks use addresses of their own
 // documentation ranges: Router A 198.51.100.2, Router B 203.0.113.2.
-const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.10' };
+const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
 const R_A = { mac: '00:00:5e:00:53:01', ip: '192.0.2.1', uplink: '198.51.100.2' };
 const R_B = { mac: '00:00:5e:00:53:21', ip: '203.0.113.65', uplink: '203.0.113.2' };
 const SERVER = { mac: '00:00:5e:00:53:50', ip: '203.0.113.80' };

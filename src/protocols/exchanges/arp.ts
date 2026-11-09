@@ -5,7 +5,7 @@ import { ethArp, ethIpv4 } from '../../shared/headers/stacks';
 import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 
 // Addresses: IPv4 RFC 5737, MAC RFC 7042.
-const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.10' };
+const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
 const HOST_B = { mac: '00:00:5e:00:53:0b', ip: '192.0.2.11' };
 const ROUTER = { mac: '00:00:5e:00:53:01', ip: '192.0.2.1' };
 const REMOTE = '203.0.113.80';
@@ -88,7 +88,7 @@ export const arpExchange: Exchange = {
       info: request.summary!,
       details: {
         what:
-          'The destination 203.0.113.80 is not on the local network, so the routing table says: send it to the default gateway 192.0.2.1. The client has no MAC address for 192.0.2.1 yet, holds the packet back and broadcasts an ARP request: "Who has 192.0.2.1? Tell 192.0.2.10". The switch floods the broadcast to every port, so the router and Host B both receive it.',
+          'The destination 203.0.113.80 is not on the local network, so the routing table says: send it to the default gateway 192.0.2.1. The client has no MAC address for 192.0.2.1 yet, holds the packet back and broadcasts an ARP request: "Who has 192.0.2.1? Tell 192.0.2.50". The switch floods the broadcast to every port, so the router and Host B both receive it.',
         why:
           'The client cannot address a frame to a MAC address it does not know. The broadcast address reaches every interface on the link, and only the owner of the IP address will answer.',
         keyFields: [
@@ -129,7 +129,7 @@ export const arpExchange: Exchange = {
       info: reply.summary!,
       details: {
         what:
-          'The router recognizes its own address in the request. It stores the client mapping (192.0.2.10 is at 00:00:5e:00:53:0a) from the sender fields, because it will most likely need it for the answer traffic. Then it sends a reply directly to the client, not as a broadcast. The client stores 192.0.2.1 is at 00:00:5e:00:53:01 in its cache.',
+          'The router recognizes its own address in the request. It stores the client mapping (192.0.2.50 is at 00:00:5e:00:53:0a) from the sender fields, because it will most likely need it for the answer traffic. Then it sends a reply directly to the client, not as a broadcast. The client stores 192.0.2.1 is at 00:00:5e:00:53:01 in its cache.',
         why: 'Only the client asked, so a unicast reply is enough. Learning the sender mapping from the request saves the router its own ARP request later.',
         keyFields: [
           { layer: 'arp', field: 'oper' },

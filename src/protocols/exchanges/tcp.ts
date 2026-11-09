@@ -6,7 +6,7 @@ import { textPayload } from '../../shared/headers/payload';
 // ---- scenario constants
 // Addresses come from documentation ranges: IPv4 RFC 5737, MAC RFC 7042, domain RFC 2606.
 
-const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.10', port: 49812 };
+const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50', port: 49812 };
 const ROUTER_A = { mac: '00:00:5e:00:53:01' };
 const ROUTER_B = { mac: '00:00:5e:00:53:21' };
 const SERVER = { mac: '00:00:5e:00:53:50', ip: '203.0.113.80', port: 80 };

@@ -41,8 +41,9 @@ export const TOOLS: HubEntry[] = [
     id: 'numbers',
     title: 'Number converter',
     summary: 'Decimal, binary, hexadecimal and octal, with bit widths, two\'s complement and byte order.',
-    status: 'planned',
+    status: 'ready',
     issue: 14,
+    component: lazy(() => import('./numbers/NumbersTool')),
   },
   {
     id: 'passwords',

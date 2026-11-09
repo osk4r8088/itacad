@@ -1,83 +1,124 @@
 # Netkit
 
-An interactive learning site for computer networks, in three sections:
+An interactive learning site for computer networks. It shows what really happens on the wire, down to every bit of every header, and offers tools to work with addresses and packets yourself.
 
-- **Protocols:** for each protocol an example exchange in a network view, a sequence diagram, step-by-step explanations and the full packet of every step, layer by layer, with the OSI and TCP/IP models side by side.
-- **Tools:** helpers such as a subnet calculator and a header decoder, built on the same header definitions.
-- **Learn:** content across protocols, such as the end-to-end path from URL to page.
+**Live:** https://osk4r8088.github.io/netkit-webvisualizer/
 
-Live: https://osk4r8088.github.io/netkit-webvisualizer/
+Static site, Vite + React + TypeScript. Everything runs in the browser: no server, no tracking, no requests at runtime.
 
-Static site, Vite + React + TypeScript, no requests at runtime.
+## What is inside
+
+### Protocols
+
+17 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
+
+- **Network view:** the participants and an animated packet for every message.
+- **Packet flow and sequence diagram:** the whole exchange at a glance, in the style of a packet analyzer.
+- **Step details:** what happens, why it works this way, typical values, what can go wrong.
+- **Packet view:** the frame layer by layer in the OSI and TCP/IP models, with every header field, its value, size, position and meaning.
+
+| Group | Protocols |
+|---|---|
+| Application | DHCP, DNS, NTP, HTTP/1.1, HTTP/2, HTTP/3 and QUIC, SMTP, IMAP, FTP, WebSocket |
+| Security | TLS 1.3, SSH |
+| Transport | TCP, UDP |
+| Internet | IPv4, ICMP |
+| Link | ARP |
+
+### Tools
+
+| Tool | Status |
+|---|---|
+| Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
+| Header decoder: paste a frame as hex and see every field of Ethernet, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
+| TCP state machine | planned, [#5](https://github.com/osk4r8088/netkit-webvisualizer/issues/5) |
+| Well-known ports | planned, [#6](https://github.com/osk4r8088/netkit-webvisualizer/issues/6) |
+| Number converter: decimal, binary, hexadecimal, two's complement, byte order | planned, [#14](https://github.com/osk4r8088/netkit-webvisualizer/issues/14) |
+| Password generator and strength analyzer | planned, [#13](https://github.com/osk4r8088/netkit-webvisualizer/issues/13) |
+
+### Learn (planned)
+
+From URL to page ([#2](https://github.com/osk4r8088/netkit-webvisualizer/issues/2)), attack scenarios ([#8](https://github.com/osk4r8088/netkit-webvisualizer/issues/8)), quizzes ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)).
+
+### Correct by construction
+
+- Every field name, size and meaning follows the RFCs (IEEE 802.3 for Ethernet), and every page lists its sources.
+- Bytes on the protocol pages are encoded by builders, so lengths, checksums and the Ethernet FCS are computed, not typed in.
+- The tests check references, lengths, checksums and sequence numbers of every exchange. They also decode every frame of every exchange with the header decoder and compare the result field by field.
+- Values that are not verified against a source are marked on the site.
 
 ## Develop
 
 ```bash
 pnpm install
 pnpm dev        # local dev server
-pnpm test       # data checks (references, lengths, checksums, FCS, sequence numbers)
+pnpm test       # all tests
 pnpm build      # type check and static build into dist/
 ```
 
-### In the browser (no local install needed)
+### In the browser, no local install needed
 
-- **Codespaces:** on GitHub, Code > Codespaces > Create codespace on a branch. The dev container (`.devcontainer/`) installs Node, pnpm and the dependencies. Run `pnpm dev`; port 5173 opens as a preview.
-- **Quick edits:** press `.` on any repo page to open github.dev, a browser editor without a terminal. Good for texts in `src/protocols/exchanges/`.
+- **Codespaces:** Code > Codespaces > Create codespace on a branch. The dev container installs Node, pnpm and the dependencies. Run `pnpm dev`; port 5173 opens as a preview.
+- **Quick edits:** press `.` on any repo page to open github.dev, an editor without a terminal. Good for texts in `src/protocols/exchanges/`.
 
-### GitHub automation
+### Workflow
 
-- `.github/workflows/ci.yml` runs typecheck, tests and build on every push and pull request. The built `dist/` is attached to each run as an artifact.
-- `.github/workflows/pages.yml` publishes `main` to GitHub Pages: `https://osk4r8088.github.io/netkit-webvisualizer/`.
-- `.github/dependabot.yml` opens pull requests for dependency and action updates.
+1. Pick or open an issue.
+2. Create a branch, commit, and open a pull request that says `Closes #<issue>`.
+3. CI runs typecheck, tests and build on the pull request. `main` is protected, so merging requires a green CI.
+4. Squash and merge. The merge deploys the site to GitHub Pages, and the issue closes.
 
-Workflow: create a branch, commit, open a pull request, wait for CI to be green, merge. Merging deploys.
+Dependabot opens pull requests for dependency and action updates.
 
 ## How the code is organized
 
 ```
 src/app/                  shell: router, site header, start page, section pages
-src/shared/               used by every section
+src/shared/               used by every section; never imports from a section
   schema.ts               the data model
   headers/*.ts            header definitions: fields, sizes, explanations, RFC sources,
-                          plus a builder that encodes real bytes and computes lengths and checksums
+                          plus builders that encode real bytes and compute lengths and checksums
   headers/stacks.ts       common encapsulations, for example Ethernet / IPv4 / TCP
-  headers/text.ts         messages of text protocols (HTTP/1.1, SMTP, FTP, IMAP), one field per part
+  headers/text.ts         messages of text protocols (HTTP/1.1, SMTP, FTP, IMAP)
   layers.ts               OSI and TCP/IP layer descriptions
-  components/             packet view, header diagram, field info, prose, source list
+  components/             packet view (CaptureView), header diagram, field info, sources
   hub.ts                  entry type for the tool and lesson registries
 src/protocols/
-  catalog.ts              list of all exchanges with title, summary, group; loads each on demand
+  catalog.ts              all exchanges with title, summary and group; loads each on demand
   exchanges/*.ts          one file per protocol exchange
-  exchanges/conversation.ts  TCP connection helper (consistent seq/ack) and the shared
-                          client, router, Internet, server topology
+  exchanges/conversation.ts  TCP connection helper and the shared client, router, server topology
   exchanges/index.ts      all exchanges loaded at once, for the tests
-  components/             exchange page renderers; no protocol-specific code
-src/tools/registry.ts     all tools, one folder per tool
+  components/             exchange page; no protocol-specific code
+src/tools/
+  registry.ts             all tools, ready and planned
+  subnet/                 subnet calculator
+  decoder/                header decoder
 src/learn/registry.ts     all lessons
 ```
 
-Code in `shared/` never imports from a section. Field names, sizes and meanings are defined once per header in `src/shared/headers`. An exchange only supplies participants, steps, texts and field values; the builders encode the actual bytes, so checksums, lengths and the Ethernet FCS shown on the site are computed, not typed in.
+Each protocol, tool and lesson is loaded only when it is opened.
 
 ## Adding a protocol
 
 1. If the protocol has a header that does not exist yet, add `src/shared/headers/<name>.ts` with a `LayerDef` (fields with their RFC names and sizes, `about` texts, sources) and a builder function. Add a stack helper to `stacks.ts` if the encapsulation is new. Text protocols over TCP need no new header code: build their messages with `textMessage` and send them with `TcpConversation`.
-2. Create `src/protocols/exchanges/<name>.ts` exporting an `Exchange`: participants with positions, links, initial states and steps. Each step has a sender, receiver, the path through the network, details texts, key fields and one capture per link of interest. For the packet flow table each step also has a send time, a category (colors and legend come from `categories`), a protocol name and an info line in the style of a packet analyzer.
-3. Add it to `src/protocols/exchanges/index.ts` and to `src/protocols/catalog.ts` (id, title, summary, group, loader; `featured` puts it on the start page), and remove its entry from `PLANNED`. Its `group` (Application, Security, Transport, Internet, Link) decides where it appears in the protocol menu and on the overview page.
-4. Run `pnpm test`. The tests check that the catalog matches the exchange files, references between participants, links, steps and fields, header lengths, IPv4 and TCP checksums, the Ethernet FCS and protocol-specific invariants.
+2. Create `src/protocols/exchanges/<name>.ts` exporting an `Exchange`: participants with positions, links, initial states and steps. Each step has a sender, receiver, the path through the network, details texts, key fields and one capture per link of interest. For the packet flow table each step also has a send time, a category, a protocol name and an info line in the style of a packet analyzer.
+3. Add it to `src/protocols/exchanges/index.ts` and to `src/protocols/catalog.ts` (id, title, summary, group, loader; `featured` puts it on the start page). Its `group` (Application, Security, Transport, Internet, Link) decides where it appears in the menu.
+4. Run `pnpm test`.
 
 ## Adding a tool or lesson
 
-1. Create `src/tools/<id>/` with the logic, its tests and a component with a default export. Keep logic in plain functions so it can be tested without the UI.
+1. Create `src/tools/<id>/` with the logic as plain functions, its tests, and a component with a default export.
 2. In `src/tools/registry.ts`, set the entry to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. The start page, the tools page and the route `#/tools/<id>` pick it up.
 
 Lessons work the same way in `src/learn/`.
 
-Conventions:
+## Conventions
 
-- Every factual statement follows the RFCs (or IEEE for Ethernet). Each exchange lists its sources; steps and fields cite sections.
-- Where a value or statement is not verified, set `unverified` on the field (via the `unverified` annotation of a builder). The site marks it and `pnpm test` lists it.
+- Every factual statement follows the RFCs (or IEEE for Ethernet), with sources on the page; steps and fields cite sections.
+- Where a value or statement is not verified, set `unverified` on the field. The site marks it and `pnpm test` lists it.
 - Example addresses come from documentation ranges: IPv4 RFC 5737, IPv6 RFC 3849, MAC RFC 7042, domains RFC 2606.
 - English texts, no emojis, no em dashes.
+- The repository is public: no personal data, private hostnames or infrastructure details.
 
 ## Routes
 
@@ -91,11 +132,8 @@ Hash routes work on any static host:
 | `#/tools`, `#/tools/<id>` | tool overview, one tool |
 | `#/learn`, `#/learn/<id>` | lessons |
 
-Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts` instead of writing hashes by hand.
+Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts`.
 
 ## Deploy
 
-Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/pages.yml`):
-https://osk4r8088.github.io/netkit-webvisualizer/
-
-The output in `dist/` is plain static files with relative paths, so it also runs from any other static host or subfolder.
+Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/pages.yml`). The output in `dist/` is plain static files with relative paths, so it also runs from any other static host or subfolder.

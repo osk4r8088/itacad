@@ -19,8 +19,9 @@ export const TOOLS: HubEntry[] = [
     id: 'decoder',
     title: 'Header decoder',
     summary: 'Paste the bytes of a frame and see every header field, layer by layer.',
-    status: 'planned',
+    status: 'ready',
     issue: 4,
+    component: lazy(() => import('./decoder/DecoderTool')),
   },
   {
     id: 'tcp-states',
@@ -35,5 +36,19 @@ export const TOOLS: HubEntry[] = [
     summary: 'Common ports with their protocol and transport.',
     status: 'planned',
     issue: 6,
+  },
+  {
+    id: 'numbers',
+    title: 'Number converter',
+    summary: 'Decimal, binary, hexadecimal and octal, with bit widths, two\'s complement and byte order.',
+    status: 'planned',
+    issue: 14,
+  },
+  {
+    id: 'passwords',
+    title: 'Password generator and analyzer',
+    summary: 'Random passwords and passphrases with their entropy, and why some passwords are weaker than they look.',
+    status: 'planned',
+    issue: 13,
   },
 ];

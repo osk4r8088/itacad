@@ -120,6 +120,7 @@ export const PLACEMENTS: Record<string, Placement> = {
   udp: { osi: [4] },
   ipv4: { osi: [3] },
   icmp: { osi: [3], note: icmpEchoDef.osiNote },
+  ipv6: { osi: [3] },
   nat: { osi: [3, 4], note: 'NAT is not a protocol with its own header. The router rewrites fields of other layers: IP addresses at layer 3 and, for PAT, TCP and UDP ports at layer 4, plus the checksums that cover them.' },
   arp: { osi: [2], note: arpDef.osiNote },
 };

@@ -62,7 +62,7 @@ export const ethernetDef: LayerDef = {
       name: 'Destination Address',
       bits: 48,
       about:
-        'MAC address of the next interface on this link, not of the final destination. For a host on another network this is the MAC address of the default gateway, learned with ARP. The address ff:ff:ff:ff:ff:ff is the broadcast address: every interface on the link accepts the frame, and switches forward it on all ports.',
+        'MAC address of the next interface on this link, not of the final destination. For a host on another network this is the MAC address of the default gateway, learned with ARP (IPv4) or Neighbor Discovery (IPv6). The address ff:ff:ff:ff:ff:ff is the broadcast address: every interface on the link accepts the frame, and switches forward it on all ports. Addresses starting with 33:33 are IPv6 multicast groups.',
       source: { spec: 'IEEE 802.3-2022', section: '3.2.4' },
     },
     {
@@ -120,7 +120,7 @@ export function ethernet(p: EthernetParams, payload: Uint8Array): LayerInstance 
   return buildStruct(
     ethernetDef,
     {
-      dst: { raw: parseMac(p.dst), display: /^ff([:-]ff){5}$/i.test(p.dst) ? `${p.dst} (broadcast)` : p.dst },
+      dst: { raw: parseMac(p.dst), display: /^ff([:-]ff){5}$/i.test(p.dst) ? `${p.dst} (broadcast)` : parseMac(p.dst)[0] & 1 ? `${p.dst} (multicast)` : p.dst },
       src: { raw: parseMac(p.src), display: p.src },
       type: { raw: p.type, display: `0x${p.type.toString(16).padStart(4, '0')} (${ETHERTYPES[p.type] ?? 'unknown'})` },
       pad: { raw: pad, display: padLen ? `${padLen} zero octets` : 'none (payload is at least 46 octets)' },

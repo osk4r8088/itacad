@@ -22,10 +22,10 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Application | DHCP, DNS, NTP, HTTP/1.1, HTTP/2, HTTP/3 and QUIC, SMTP, IMAP, FTP, WebSocket |
 | Security | TLS 1.3, SSH |
 | Transport | TCP, UDP |
-| Internet | IPv4, ICMP, NAT and PAT |
+| Internet | IPv4, IPv6 with NDP and SLAAC, ICMP, NAT and PAT |
 | Link | ARP |
 
-Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webvisualizer/issues/27)), VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webvisualizer/issues/29)), Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
+Planned: VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webvisualizer/issues/29)), Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
 
 ### Tools
 

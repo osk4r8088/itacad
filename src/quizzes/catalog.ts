@@ -20,6 +20,7 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   websocket: () => import('./websocket').then((m) => m.websocketQuiz),
   ssh: () => import('./ssh').then((m) => m.sshQuiz),
   nat: () => import('./nat').then((m) => m.natQuiz),
+  ipv6: () => import('./ipv6').then((m) => m.ipv6Quiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

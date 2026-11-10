@@ -4,6 +4,8 @@ import { ethernet, physical, type EthernetParams } from './ethernet';
 import { ipv4, type Ipv4Params } from './ipv4';
 import { tcp, type TcpParams } from './tcp';
 import { udp, type UdpParams } from './udp';
+import { ipv6, type Ipv6Params } from './ipv6';
+import { icmpv6, type Icmpv6Message } from './icmpv6';
 
 /** Bytes of a layer including everything inside it. */
 function wire(layer: LayerInstance, inner: Uint8Array): Uint8Array {
@@ -83,4 +85,20 @@ export interface EthIpv4UdpParams {
 export function ethIpv4Udp(p: EthIpv4UdpParams): Capture {
   const u = udp(p.udp, { srcIp: p.ip.src, dstIp: p.ip.dst }, p.app.bytes);
   return ethIpv4({ link: p.link, note: p.note, eth: p.eth, ip: { ...p.ip, protocol: 17 }, inner: [u, p.app] });
+}
+
+export interface EthIpv6Icmpv6Params {
+  link: string;
+  note?: string;
+  eth: Omit<EthernetParams, 'type'>;
+  ip: Omit<Ipv6Params, 'nextHeader'>;
+  icmp: Icmpv6Message;
+}
+
+/** Ethernet II / IPv6 / ICMPv6, with payload length, ICMPv6 checksum and FCS computed. */
+export function ethIpv6Icmpv6(p: EthIpv6Icmpv6Params): Capture {
+  const msg = icmpv6(p.icmp, { src: p.ip.src, dst: p.ip.dst });
+  const ip = ipv6({ ...p.ip, nextHeader: 58 }, msg.bytes);
+  const eth = ethernet({ ...p.eth, type: 0x86dd }, wire(ip, msg.bytes));
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, ip, msg] };
 }

@@ -57,8 +57,8 @@ Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webv
 - **Attack: SYN flood:** SYNs from forged addresses fill a server's queue of half-open connections until a real client is turned away; SYN cookies pack the connection state into the sequence number.
 - **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
+- **OSI and TCP/IP:** both models side by side. Each layer shows its job, unit of data, addresses, devices, the protocols and tools of this site that belong to it, and typical problems with Linux commands to diagnose them. Picking a protocol shows where it sits (with notes for borderline cases like TLS, QUIC, ICMP and ARP), and one real HTTP request grows from 37 to 115 octets on its way down.
 - **Quizzes:** multiple-choice questions for every protocol; each answer is explained and links to the step that shows it. A protocol page links to its quiz in its header.
-- Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)).
 
 ### Correct by construction
 
@@ -122,6 +122,7 @@ src/tools/
   raid/                   RAID visualizer
 src/learn/
   registry.ts             all lessons
+  layers/                 OSI and TCP/IP overview: layer facts in data.ts, the page in LayersPage.tsx
   url-to-page/            the chained exchange "From URL to page"
   arp-spoofing/           attack scenario: ARP spoofing and Dynamic ARP Inspection
   syn-flood/              attack scenario: SYN flood and SYN cookies

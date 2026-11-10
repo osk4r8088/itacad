@@ -130,6 +130,13 @@ export const CATALOG: CatalogEntry[] = [
     load: () => import('./exchanges/ipv4').then((m) => m.ipv4Exchange),
   },
   {
+    id: 'ipv6',
+    title: 'IPv6, NDP and SLAAC',
+    summary: 'A host joins an IPv6 network: link-local address, duplicate check, router advertisement, its own global address, and Neighbor Discovery instead of ARP.',
+    group: 'Internet',
+    load: () => import('./exchanges/ipv6').then((m) => m.ipv6Exchange),
+  },
+  {
     id: 'nat',
     title: 'NAT and PAT',
     summary: 'Two laptops share one public address: rewritten addresses and ports, a translation table, a dropped packet from outside, port forwarding.',
@@ -155,7 +162,6 @@ export const CATALOG: CatalogEntry[] = [
 
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
-  { title: 'IPv6, NDP and SLAAC', group: 'Internet' },
   { title: 'VLAN (802.1Q)', group: 'Link' },
   { title: 'Spanning Tree', group: 'Link' },
 ];

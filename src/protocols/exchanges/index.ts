@@ -17,6 +17,7 @@ import { websocketExchange } from './websocket';
 import { tlsExchange } from './tls';
 import { sshExchange } from './ssh';
 import { natExchange } from './nat';
+import { ipv6Exchange } from './ipv6';
 
 /** All exchanges, loaded eagerly. Used by the tests; the site loads exchanges through catalog.ts. */
 export const exchanges: Exchange[] = [
@@ -38,4 +39,5 @@ export const exchanges: Exchange[] = [
   icmpExchange,
   arpExchange,
   natExchange,
+  ipv6Exchange,
 ];

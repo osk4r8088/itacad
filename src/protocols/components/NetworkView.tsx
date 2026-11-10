@@ -47,7 +47,7 @@ function Node({ p, at, role, busy }: { p: Participant; at: Point; role: Role; bu
   const cls = `node${role ? ` ${role}` : ''}${busy ? ' busy' : ''}${p.kind === 'attacker' ? ' node-attacker' : ''}`;
   return (
     <g transform={`translate(${at.x} ${at.y})`} className={cls}>
-      <title>{[p.label, p.addr?.ipv4, p.addr?.mac, p.note].filter(Boolean).join('\n')}</title>
+      <title>{[p.label, p.addr?.ipv4, p.addr?.ipv6, p.addr?.mac, p.note].filter(Boolean).join('\n')}</title>
       <GroundTile kind={p.kind} />
       <g className="icon">
         <IsoIcon kind={p.kind} />
@@ -55,10 +55,10 @@ function Node({ p, at, role, busy }: { p: Participant; at: Point; role: Role; bu
       <text y={LABEL_Y} textAnchor="middle" className="node-label">
         {p.label}
       </text>
-      {/* IP address under the node; the MAC address is in the tooltip and in the packet view per link. */}
-      {p.addr?.ipv4 && (
+      {/* IP address under the node (IPv4 if it has one); the MAC address is in the tooltip and in the packet view per link. */}
+      {(p.addr?.ipv4 ?? p.addr?.ipv6) && (
         <text y={LABEL_Y + 15} textAnchor="middle" className="node-addr">
-          {p.addr.ipv4}
+          {p.addr?.ipv4 ?? p.addr?.ipv6}
         </text>
       )}
     </g>

@@ -125,6 +125,18 @@ describe.each(exchanges.map((e) => [e.id, e] as const))('exchange %s', (_id, ex)
             expect(internetChecksum(wire(c.layers, i)), `${s.id} ICMP checksum`).toBe(0);
             if (l.values.original) expect(c.layers[i - 1].bytes.length + wire(c.layers, i).length, `${s.id} ICMP error at most 576 octets`).toBeLessThanOrEqual(576);
           }
+          if (l.def.id === 'ipv6') {
+            expect(l.bytes.length, `${s.id} IPv6 header is 40 octets`).toBe(40);
+            expect(u16(l.bytes, 4), `${s.id} IPv6 Payload Length`).toBe(inner[i]);
+          }
+          if (l.def.id.startsWith('icmpv6-')) {
+            const ip = c.layers[i - 1];
+            expect(ip.def.id).toBe('ipv6');
+            expect(ip.bytes[6], `${s.id} Next Header 58`).toBe(58);
+            const msg = wire(c.layers, i);
+            const pseudo = concat(ip.bytes.subarray(8, 40), Uint8Array.of(msg.length >>> 24, (msg.length >> 16) & 0xff, (msg.length >> 8) & 0xff, msg.length & 0xff, 0, 0, 0, 58));
+            expect(internetChecksum(concat(pseudo, msg)), `${s.id} ICMPv6 checksum`).toBe(0);
+          }
           if (l.def.id === 'ethernet') {
             const frame = wire(c.layers, i);
             expect(frame.length, `${s.id} minimum frame size`).toBeGreaterThanOrEqual(64);

@@ -130,6 +130,13 @@ export const CATALOG: CatalogEntry[] = [
     load: () => import('./exchanges/ipv4').then((m) => m.ipv4Exchange),
   },
   {
+    id: 'nat',
+    title: 'NAT and PAT',
+    summary: 'Two laptops share one public address: rewritten addresses and ports, a translation table, a dropped packet from outside, port forwarding.',
+    group: 'Internet',
+    load: () => import('./exchanges/nat').then((m) => m.natExchange),
+  },
+  {
     id: 'icmp',
     title: 'ICMP',
     summary: 'Ping and traceroute: Echo Request and Reply, and Time Exceeded from the routers on the way.',
@@ -149,7 +156,6 @@ export const CATALOG: CatalogEntry[] = [
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
   { title: 'IPv6, NDP and SLAAC', group: 'Internet' },
-  { title: 'NAT and PAT', group: 'Internet' },
   { title: 'VLAN (802.1Q)', group: 'Link' },
   { title: 'Spanning Tree', group: 'Link' },
 ];

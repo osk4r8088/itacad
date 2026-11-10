@@ -19,6 +19,7 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   ftp: () => import('./ftp').then((m) => m.ftpQuiz),
   websocket: () => import('./websocket').then((m) => m.websocketQuiz),
   ssh: () => import('./ssh').then((m) => m.sshQuiz),
+  nat: () => import('./nat').then((m) => m.natQuiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

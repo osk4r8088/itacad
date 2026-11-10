@@ -15,6 +15,7 @@ import { imapQuiz } from './imap';
 import { ftpQuiz } from './ftp';
 import { websocketQuiz } from './websocket';
 import { sshQuiz } from './ssh';
+import { natQuiz } from './nat';
 
 /** All quizzes, loaded at once. Used by the tests; the site loads each through the catalog. */
-export const allQuizzes = [tcpQuiz, dnsQuiz, dhcpQuiz, arpQuiz, icmpQuiz, tlsQuiz, udpQuiz, ipv4Quiz, http1Quiz, http2Quiz, http3Quiz, ntpQuiz, smtpQuiz, imapQuiz, ftpQuiz, websocketQuiz, sshQuiz];
+export const allQuizzes = [tcpQuiz, dnsQuiz, dhcpQuiz, arpQuiz, icmpQuiz, tlsQuiz, udpQuiz, ipv4Quiz, http1Quiz, http2Quiz, http3Quiz, ntpQuiz, smtpQuiz, imapQuiz, ftpQuiz, websocketQuiz, sshQuiz, natQuiz];

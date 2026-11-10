@@ -1,0 +1,81 @@
+import type { Quiz } from './schema';
+
+export const ntpQuiz: Quiz = {
+  id: 'ntp',
+  questions: [
+    {
+      id: 'port',
+      prompt: 'Which transport and port does an NTP server use?',
+      options: ['TCP port 123', 'UDP port 123', 'UDP port 53', 'TCP port 37'],
+      answer: 1,
+      explanation: 'NTP runs over UDP, port 123 on the server. Clients should send from a random source port, which makes forged responses harder (RFC 9109).',
+      step: 'request',
+      source: { rfc: 5905, section: '7.3' },
+    },
+    {
+      id: 'timestamps',
+      prompt: 'Which four timestamps does the client use?',
+      options: [
+        'Request sent (client), request received (server), response sent (server), response received (client)',
+        'Four readings of the server clock',
+        'The reference time and three samples',
+        'Two from the client and two from a stratum 1 server',
+      ],
+      answer: 0,
+      explanation: 'T1 and T4 come from the client clock, T2 and T3 from the server clock. The server copies T1 into the Origin Timestamp, so the client need not remember it.',
+      step: 'response',
+      source: { rfc: 5905, section: '8' },
+    },
+    {
+      id: 'delay',
+      prompt: 'How does the client compute the round-trip delay?',
+      options: ['T4 - T1', '(T4 - T1) / 2', 'T3 - T2', '(T4 - T1) - (T3 - T2)'],
+      answer: 3,
+      explanation: 'The whole round trip by the client clock, minus the time the server spent between receiving and answering. Here 24.30 ms.',
+      step: 'response',
+      source: { rfc: 5905, section: '8' },
+    },
+    {
+      id: 'offset',
+      prompt: 'The client clock is 348 ms fast. Why does that not spoil the measurement?',
+      options: [
+        'The server corrects T1 before answering.',
+        'NTP ignores T1.',
+        'The error appears in T1 and T4 alike and cancels out in offset = ((T2 - T1) + (T3 - T4)) / 2.',
+        'It does spoil it; the client must be set by hand first.',
+      ],
+      answer: 2,
+      explanation: 'As long as the client clock runs at a steady rate during the round trip, its error cancels. The result here is -348.95 ms, close to the true -348.00 ms.',
+      step: 'response',
+      source: { rfc: 5905, section: '8' },
+    },
+    {
+      id: 'asymmetry',
+      prompt: 'The computed offset is 0.95 ms off the true value. Where does that error come from?',
+      options: [
+        'From different delays in the two directions: NTP assumes both halves of the round trip are equal.',
+        'From rounding the 64-bit timestamps.',
+        'From the server being stratum 2.',
+        'From the random source port.',
+      ],
+      answer: 0,
+      explanation: 'The request took 11.2 ms and the response 13.1 ms; half the difference is the error. It can never exceed half the round-trip delay.',
+      step: 'response',
+      source: { rfc: 5905, section: '8' },
+    },
+    {
+      id: 'slew',
+      prompt: 'How do NTP clients usually correct a small offset?',
+      options: [
+        'They set the clock in one jump.',
+        'They slew it: run the clock slightly faster or slower until the offset is gone, so time never jumps backwards.',
+        'They wait for the next reboot.',
+        'They ask the user.',
+      ],
+      answer: 1,
+      explanation: 'Only offsets above the step threshold, 128 ms in RFC 5905, are corrected in one step, as this one of 349 ms would be.',
+      step: 'response',
+      source: { rfc: 5905 },
+    },
+  ],
+};

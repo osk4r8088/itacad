@@ -42,3 +42,9 @@ describe.each(allQuizzes.map((q) => [q.id, q] as const))('quiz %s', (_id, quiz) 
     for (const q of quiz.questions) for (const t of [q.prompt, q.explanation, ...q.options]) expect(t, q.id).not.toContain('—');
   });
 });
+
+describe('quiz coverage', () => {
+  it('every protocol exchange has a quiz', () => {
+    expect(CATALOG.map((e) => e.id).filter((id) => !(id in QUIZZES))).toEqual([]);
+  });
+});

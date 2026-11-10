@@ -57,7 +57,7 @@ Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webv
 - **Attack: SYN flood:** SYNs from forged addresses fill a server's queue of half-open connections until a real client is turned away; SYN cookies pack the connection state into the sequence number.
 - **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
-- **Quizzes:** multiple-choice questions per protocol; every answer is explained and links to the step that shows it. TCP, UDP, IPv4, ICMP, ARP, DHCP, DNS, TLS and HTTP/1.1 to HTTP/3 so far, more follow ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)). A protocol page with a quiz links to it in its header.
+- **Quizzes:** multiple-choice questions for every protocol; each answer is explained and links to the step that shows it. A protocol page links to its quiz in its header.
 - Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)).
 
 ### Correct by construction
@@ -158,7 +158,7 @@ Lessons work the same way in `src/learn/`. A lesson can also be an exchange: giv
 
 1. Create `src/quizzes/<exchange id>.ts` exporting a `Quiz` (see `src/quizzes/schema.ts`): for each question a prompt, three or four options, the index of the right one, an explanation, the id of the step that shows it, and the source.
 2. Add it to `QUIZZES` in `src/quizzes/catalog.ts` and to `src/quizzes/all.ts`.
-3. `pnpm test` checks the format, that every step id exists in the exchange, and that the right answers are not all in the same position.
+3. `pnpm test` checks the format, that every step id exists in the exchange, and that the right answers are not all in the same position. It also fails if a protocol has no quiz, so a new protocol needs one.
 
 Answers follow the exchange and its RFCs; a question that needs a fact the exchange does not show should cite its own source.
 

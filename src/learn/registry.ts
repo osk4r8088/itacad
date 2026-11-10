@@ -7,8 +7,9 @@ export const LESSONS: HubEntry[] = [
     id: 'layers',
     title: 'OSI and TCP/IP overview',
     summary: 'Every layer with its job, addresses, devices, and the protocols and tools of this site that belong to it.',
-    status: 'planned',
+    status: 'ready',
     issue: 34,
+    component: lazy(() => import('./layers/LayersPage')),
   },
   {
     id: 'url-to-page',

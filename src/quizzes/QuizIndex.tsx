@@ -1,6 +1,5 @@
 import { CATALOG, GROUPS } from '../protocols/catalog';
 import { href } from '../app/router';
-import { ISSUES_URL } from '../shared/hub';
 import { hasQuiz } from './catalog';
 
 /** The "Quizzes" lesson: every protocol that has a quiz, in the groups of the protocol overview. */
@@ -29,9 +28,6 @@ export default function QuizIndex() {
           </section>
         );
       })}
-      <p className="muted">
-        More protocols follow, see <a href={`${ISSUES_URL}/7`}>issue #7</a>.
-      </p>
     </div>
   );
 }

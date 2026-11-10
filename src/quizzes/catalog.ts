@@ -13,6 +13,12 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   http1: () => import('./http1').then((m) => m.http1Quiz),
   http2: () => import('./http2').then((m) => m.http2Quiz),
   http3: () => import('./http3').then((m) => m.http3Quiz),
+  ntp: () => import('./ntp').then((m) => m.ntpQuiz),
+  smtp: () => import('./smtp').then((m) => m.smtpQuiz),
+  imap: () => import('./imap').then((m) => m.imapQuiz),
+  ftp: () => import('./ftp').then((m) => m.ftpQuiz),
+  websocket: () => import('./websocket').then((m) => m.websocketQuiz),
+  ssh: () => import('./ssh').then((m) => m.sshQuiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

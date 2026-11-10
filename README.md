@@ -57,7 +57,7 @@ Planned: IPv6 with NDP and SLAAC ([#27](https://github.com/osk4r8088/netkit-webv
 - **Attack: SYN flood:** SYNs from forged addresses fill a server's queue of half-open connections until a real client is turned away; SYN cookies pack the connection state into the sequence number.
 - **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
-- **Quizzes:** multiple-choice questions per protocol; every answer is explained and links to the step that shows it. TCP, DNS, DHCP, ARP, ICMP and TLS so far, more follow ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)). A protocol page with a quiz links to it in its header.
+- **Quizzes:** multiple-choice questions per protocol; every answer is explained and links to the step that shows it. TCP, UDP, IPv4, ICMP, ARP, DHCP, DNS, TLS and HTTP/1.1 to HTTP/3 so far, more follow ([#7](https://github.com/osk4r8088/netkit-webvisualizer/issues/7)). A protocol page with a quiz links to it in its header.
 - Planned: OSI and TCP/IP overview ([#34](https://github.com/osk4r8088/netkit-webvisualizer/issues/34)).
 
 ### Correct by construction

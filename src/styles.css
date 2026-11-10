@@ -2342,7 +2342,7 @@ table.kv th {
 }
 .known dl {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
   gap: 0.15rem 0.75rem;
   margin: 0;
   font-size: 0.85rem;

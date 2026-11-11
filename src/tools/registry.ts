@@ -92,8 +92,9 @@ export const TOOLS: HubEntry[] = [
     purpose: 'use',
     title: 'IPv6 address tool',
     summary: 'Compress and expand IPv6 addresses, prefixes, address types and EUI-64.',
-    status: 'planned',
+    status: 'ready',
     issue: 32,
+    component: lazy(() => import('./ipv6/Ipv6Tool')),
   },
   {
     id: 'bandwidth',

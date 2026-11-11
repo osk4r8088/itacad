@@ -262,7 +262,10 @@ class Decoder {
     if (type < 0x0600) {
       typeDisplay = `${hex(type, 4)} (a length: IEEE 802.3 frame with LLC header)`;
       this.issue('info', 'This is an IEEE 802.3 frame with an LLC header, not Ethernet II. The decoder stops here.');
-      this.data(body, 'LLC frame, not decoded');
+      // The field gives the length of the LLC data; anything after it is padding.
+      used = Math.min(type, body.length);
+      if (type > body.length) this.issue('warning', `The length field says ${type} octets, but only ${body.length} follow.`);
+      this.data(body.subarray(0, used), 'LLC frame, not decoded');
     } else used = this.byType(type, body);
 
     const pad = body.subarray(used);

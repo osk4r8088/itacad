@@ -23,9 +23,8 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Security | TLS 1.3, SSH |
 | Transport | TCP, UDP |
 | Internet | IPv4, IPv6 with NDP and SLAAC, ICMP, NAT and PAT |
-| Link | ARP, VLAN (802.1Q) |
+| Link | ARP, VLAN (802.1Q), Spanning Tree |
 
-Planned: Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
 
 ### Tools
 

@@ -114,3 +114,10 @@ export function ethIpv6Icmpv6(p: EthIpv6Icmpv6Params): Capture {
   const ip = ipv6({ ...p.ip, nextHeader: 58 }, msg.bytes);
   return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), ...frame(p.eth, 0x86dd, wire(ip, msg.bytes)), ip, msg] };
 }
+
+/** IEEE 802.3 frame with a length field, LLC header and a BPDU (Spanning Tree). */
+export function ethLlc(p: { link: string; note?: string; eth: Omit<EthernetParams, 'type'>; llc: LayerInstance; payload: LayerInstance }): Capture {
+  const data = concat(p.llc.bytes, p.payload.bytes);
+  const eth = ethernet({ ...p.eth, type: data.length }, data);
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, p.llc, p.payload] };
+}

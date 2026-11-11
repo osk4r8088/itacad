@@ -124,7 +124,7 @@ export function ethernet(p: EthernetParams, payload: Uint8Array): LayerInstance 
     {
       dst: { raw: parseMac(p.dst), display: /^ff([:-]ff){5}$/i.test(p.dst) ? `${p.dst} (broadcast)` : parseMac(p.dst)[0] & 1 ? `${p.dst} (multicast)` : p.dst },
       src: { raw: parseMac(p.src), display: p.src },
-      type: { raw: p.type, display: `0x${p.type.toString(16).padStart(4, '0')} (${ETHERTYPES[p.type] ?? 'unknown'})` },
+      type: { raw: p.type, display: `0x${p.type.toString(16).padStart(4, '0')} (${p.type < 0x0600 ? 'a length: IEEE 802.3 frame with LLC header' : (ETHERTYPES[p.type] ?? 'unknown')})` },
       pad: { raw: pad, display: padLen ? `${padLen} zero octets` : 'none (payload is at least 46 octets)' },
       fcs: { raw: fcs, display: hexBytes(fcs) },
     },

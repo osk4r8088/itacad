@@ -1,4 +1,6 @@
 import type { Exchange } from '../shared/schema';
+import type { Level } from '../shared/levels';
+import type { EntryRef } from '../shared/refs';
 
 /**
  * Lightweight list of all exchanges. The overview, the protocol menu and the start page
@@ -10,7 +12,10 @@ export interface CatalogEntry {
   title: string;
   summary: string;
   group: string;
-  /** Shown on the start page. */
+  /** How much a reader needs to know first. */
+  level: Level;
+  /** Entries to read first, shown in the About panel of the exchange. */
+  prereqs?: EntryRef[];
   load: () => Promise<Exchange>;
 }
 
@@ -23,6 +28,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'DHCP',
     summary: 'A new client gets an IPv4 address, gateway and DNS resolver: Discover, Offer, Request, Ack.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'udp' }, { protocol: 'arp' }],
     load: () => import('./exchanges/dhcp').then((m) => m.dhcpExchange),
   },
   {
@@ -30,6 +37,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'DNS',
     summary: 'A recursive resolver with an empty cache walks from the root to the answer for www.example.com.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'udp' }],
     load: () => import('./exchanges/dns').then((m) => m.dnsExchange),
   },
   {
@@ -37,6 +46,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'NTP',
     summary: 'One request, one response, four timestamps: how a client measures its clock offset and the round-trip delay.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'udp' }],
     load: () => import('./exchanges/ntp').then((m) => m.ntpExchange),
   },
   {
@@ -44,6 +55,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'HTTP/1.1',
     summary: 'A page, a missing favicon and a reload with a conditional request, all on one persistent connection.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'tcp' }, { protocol: 'dns' }],
     load: () => import('./exchanges/http1').then((m) => m.http1Exchange),
   },
   {
@@ -51,6 +64,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'HTTP/2',
     summary: 'Two requests in parallel on one connection: binary frames, streams, HPACK header compression, answers out of order.',
     group: 'Application',
+    level: 3,
+    prereqs: [{ protocol: 'http1' }, { protocol: 'tls' }],
     load: () => import('./exchanges/http2').then((m) => m.http2Exchange),
   },
   {
@@ -58,6 +73,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'HTTP/3 and QUIC',
     summary: 'QUIC over UDP sets up transport and TLS 1.3 in one round trip; HTTP/3 then runs on QUIC streams.',
     group: 'Application',
+    level: 3,
+    prereqs: [{ protocol: 'http2' }, { protocol: 'udp' }],
     load: () => import('./exchanges/http3').then((m) => m.http3Exchange),
   },
   {
@@ -65,6 +82,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'SMTP',
     summary: 'One mail server hands a message to another: greeting, EHLO, envelope, data, quit.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'tcp' }, { protocol: 'dns' }],
     load: () => import('./exchanges/smtp').then((m) => m.smtpExchange),
   },
   {
@@ -72,6 +91,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'IMAP',
     summary: 'Bob reads the mail Alice sent: login, select the inbox, fetch the message, log out.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'tcp' }],
     load: () => import('./exchanges/imap').then((m) => m.imapExchange),
   },
   {
@@ -79,6 +100,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'FTP',
     summary: 'Login, passive mode and a file download over a second connection.',
     group: 'Application',
+    level: 2,
+    prereqs: [{ protocol: 'tcp' }],
     load: () => import('./exchanges/ftp').then((m) => m.ftpExchange),
   },
   {
@@ -86,6 +109,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'WebSocket',
     summary: 'An HTTP upgrade turns the connection into a two-way message channel: masked client frames, server push, ping and close.',
     group: 'Application',
+    level: 3,
+    prereqs: [{ protocol: 'http1' }],
     load: () => import('./exchanges/websocket').then((m) => m.websocketExchange),
   },
   {
@@ -93,6 +118,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'TLS 1.3',
     summary: 'The full handshake in one round trip: hellos with key shares, the encrypted server flight, Finished, and the first encrypted data.',
     group: 'Security',
+    level: 3,
+    prereqs: [{ protocol: 'tcp' }],
     load: () => import('./exchanges/tls').then((m) => m.tlsExchange),
   },
   {
@@ -100,6 +127,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'SSH',
     summary: 'Version strings, algorithm negotiation, curve25519 key exchange with host key signature, and the switch to encryption.',
     group: 'Security',
+    level: 3,
+    prereqs: [{ protocol: 'tcp' }],
     load: () => import('./exchanges/ssh').then((m) => m.sshExchange),
   },
   {
@@ -107,6 +136,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'TCP',
     summary: 'Three-way handshake, one request and response, four-way close.',
     group: 'Transport',
+    level: 2,
+    prereqs: [{ entry: 'layers' }, { protocol: 'ipv4' }],
     load: () => import('./exchanges/tcp').then((m) => m.tcpExchange),
   },
   {
@@ -114,6 +145,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'UDP',
     summary: 'Syslog datagrams: one delivered, one lost without anybody noticing, one to a closed port.',
     group: 'Transport',
+    level: 2,
+    prereqs: [{ entry: 'layers' }, { protocol: 'ipv4' }],
     load: () => import('./exchanges/udp').then((m) => m.udpExchange),
   },
   {
@@ -121,6 +154,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'IPv4',
     summary: 'A packet crosses a router: TTL, MAC rewrite, fragmentation and Path MTU Discovery.',
     group: 'Internet',
+    level: 2,
+    prereqs: [{ entry: 'layers' }],
     load: () => import('./exchanges/ipv4').then((m) => m.ipv4Exchange),
   },
   {
@@ -128,6 +163,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'IPv6, NDP and SLAAC',
     summary: 'A host joins an IPv6 network: link-local address, duplicate check, router advertisement, its own global address, and Neighbor Discovery instead of ARP.',
     group: 'Internet',
+    level: 3,
+    prereqs: [{ protocol: 'ipv4' }, { protocol: 'icmp' }],
     load: () => import('./exchanges/ipv6').then((m) => m.ipv6Exchange),
   },
   {
@@ -135,6 +172,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'NAT and PAT',
     summary: 'Two laptops share one public address: rewritten addresses and ports, a translation table, a dropped packet from outside, port forwarding.',
     group: 'Internet',
+    level: 2,
+    prereqs: [{ protocol: 'ipv4' }, { protocol: 'tcp' }],
     load: () => import('./exchanges/nat').then((m) => m.natExchange),
   },
   {
@@ -142,6 +181,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'ICMP',
     summary: 'Ping and traceroute: Echo Request and Reply, and Time Exceeded from the routers on the way.',
     group: 'Internet',
+    level: 2,
+    prereqs: [{ protocol: 'ipv4' }],
     load: () => import('./exchanges/icmp').then((m) => m.icmpExchange),
   },
   {
@@ -149,6 +190,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'VLAN (802.1Q)',
     summary: 'Two VLANs on two switches: access ports, a tagged trunk, the native VLAN, and a router on a stick between the VLANs.',
     group: 'Link',
+    level: 2,
+    prereqs: [{ topic: 'network-devices' }],
     load: () => import('./exchanges/vlan').then((m) => m.vlanExchange),
   },
   {
@@ -156,6 +199,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Spanning Tree',
     summary: 'Three switches in a triangle: a broadcast storm without STP, the root election, a blocked port, and recovery after a link failure.',
     group: 'Link',
+    level: 3,
+    prereqs: [{ protocol: 'vlan' }],
     load: () => import('./exchanges/stp').then((m) => m.stpExchange),
   },
   {
@@ -163,6 +208,8 @@ export const CATALOG: CatalogEntry[] = [
     title: 'ARP',
     summary: 'Resolving the MAC address of the default gateway before the first packet can leave.',
     group: 'Link',
+    level: 2,
+    prereqs: [{ topic: 'nic' }, { entry: 'layers' }],
     load: () => import('./exchanges/arp').then((m) => m.arpExchange),
   },
 ];
@@ -176,6 +223,7 @@ export interface NavEntry {
   summary?: string;
   /** Set for exchanges that exist. */
   id?: string;
+  level?: Level;
 }
 
 /** Navigation entries per group, built exchanges first, then planned ones not built yet. */
@@ -186,7 +234,7 @@ export function navGroups(): { group: string; entries: NavEntry[] }[] {
     .map((group) => ({
       group,
       entries: [
-        ...CATALOG.filter((e) => e.group === group).map((e) => ({ id: e.id, title: e.title, summary: e.summary })),
+        ...CATALOG.filter((e) => e.group === group).map((e) => ({ id: e.id, title: e.title, summary: e.summary, level: e.level })),
         ...PLANNED.filter((p) => p.group === group && !built.has(p.title)).map((p) => ({ title: p.title })),
       ],
     }))

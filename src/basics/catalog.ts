@@ -1,4 +1,5 @@
 import type { Level } from '../shared/levels';
+import type { EntryRef } from '../shared/refs';
 import type { Topic } from './schema';
 
 export interface Category {
@@ -18,6 +19,8 @@ export interface TopicEntry {
   title: string;
   summary: string;
   level: Level;
+  /** Entries to read first, shown as links at the top of the topic. */
+  prereqs?: EntryRef[];
   status: 'ready' | 'planned';
   load?: () => Promise<Topic>;
 }
@@ -56,6 +59,7 @@ export const TOPICS: TopicEntry[] = [
     title: 'RAM and the memory hierarchy',
     summary: 'Registers, caches, RAM and disks: why fast memory is small, and how much a cache miss costs.',
     level: 1,
+    prereqs: [{ topic: 'cpu' }],
     status: 'ready',
     load: () => import('./topics/hardware/memory').then((m) => m.memory),
   },
@@ -65,6 +69,7 @@ export const TOPICS: TopicEntry[] = [
     title: 'Storage: HDD, SSD, NVMe',
     summary: 'Spinning disks and flash, SATA and NVMe, and why M.2 says nothing about speed.',
     level: 1,
+    prereqs: [{ topic: 'memory' }],
     status: 'ready',
     load: () => import('./topics/hardware/storage').then((m) => m.storage),
   },
@@ -74,6 +79,7 @@ export const TOPICS: TopicEntry[] = [
     title: 'Network interface card',
     summary: 'Where a computer meets the network: MAC address, link speed, and the offloads that confuse packet captures.',
     level: 2,
+    prereqs: [{ topic: 'network-devices' }, { entry: 'layers' }],
     status: 'ready',
     load: () => import('./topics/hardware/nic').then((m) => m.nic),
   },

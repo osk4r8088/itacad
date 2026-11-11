@@ -3621,3 +3621,44 @@ table.compare tbody th {
   color: var(--muted);
   font-weight: 400;
 }
+
+/* ---------- levels ---------- */
+.level-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 1rem;
+}
+.level-filter .chip {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--border);
+}
+.level-filter .chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.start-here .level-filter {
+  margin: 0.25rem 0 0.5rem;
+}
+.start-here p {
+  margin: 0 0 0.5rem;
+}
+.read-first {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+.read-first-bar {
+  margin: 0 0 0.75rem;
+}
+.ex-title .level {
+  margin-left: 0.25rem;
+}
+@media (max-width: 700px) {
+  .ex-title > .level {
+    display: none;
+  }
+}

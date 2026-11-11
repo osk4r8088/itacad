@@ -101,7 +101,8 @@ Dependabot opens pull requests for dependency and action updates.
 ## How the code is organized
 
 ```
-src/app/                  shell: router, site header, start page, section pages
+src/app/                  shell: router, site header, start page, section pages;
+                          entries.ts resolves references, levels and start page paths
 src/shared/               used by every section; never imports from a section
   schema.ts               the data model
   headers/*.ts            header definitions: fields, sizes, explanations, RFC sources,
@@ -146,7 +147,6 @@ src/basics/
   catalog.ts              categories and topics (metadata; topics load on demand)
   topics/<category>/      one file per topic
   figures/                diagrams and interactive pieces that topics refer to by id
-  links.ts                resolves related links to protocols, tools, lessons and topics
   BasicsPages.tsx         overview, category, topic and glossary pages
 src/quizzes/
   schema.ts               question format
@@ -172,10 +172,14 @@ Each protocol, tool and lesson is loaded only when it is opened.
 
 Lessons work the same way in `src/learn/`. A lesson can also be an exchange: give its registry entry an `exchange` loader instead of a component, and it opens on the exchange page at `#/learn/<id>/<step>`. Exchanges that chain protocols set `phases` (with a `deepDive` exchange each), a `phase` on every step, and `learned` facts where the client learns something; the page then shows the phase bar and the "known so far" panel. A fact can be learned again with a new value (a poisoned cache entry), which the panel marks as changed. Add every lesson exchange to `src/learn/exchanges.ts` so the tests cover it. `src/learn/url-to-page/` is the example; it reuses the frames of the protocol exchanges, so the bytes always match.
 
+## Levels and prerequisites
+
+Every topic, protocol, tool and lesson has a `level` (1 Foundations, 2 Practitioner, 3 Deep dive; see `src/shared/levels.ts`) and optional `prereqs`, references to other entries shown as "Read first" links. Cards show the level, and overview pages filter by it. The start page suggests a path per level, defined in `PATHS` in `src/app/entries.ts`. `pnpm test` checks that prerequisites exist, are never at a higher level than the entry, and form no cycles, and that the paths link only to ready pages. Nothing is stored about the reader.
+
 ## Adding a Basics & Concepts topic
 
 1. Create `src/basics/topics/<category>/<id>.ts` exporting a `Topic` (see `src/basics/schema.ts`). Sections are made of blocks: text, list, comparison table, note, or a figure by id.
-2. Add the topic to `TOPICS` in `src/basics/catalog.ts` with its level and a loader, or flip a planned entry to ready.
+2. Add the topic to `TOPICS` in `src/basics/catalog.ts` with its level, prerequisites and a loader, or flip a planned entry to ready.
 3. An interactive piece is a small component in `src/basics/figures/`, registered in `figures/index.ts`; topics refer to it by id.
 4. `pnpm test` checks that every part of the template is there, that related links and figures resolve, that quiz answers are valid, that glossary terms are unique, and that no source is Wikipedia.
 

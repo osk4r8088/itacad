@@ -13,6 +13,10 @@ import { ProtocolSwitcher } from './ProtocolSwitcher';
 import { PhaseBar } from './PhaseBar';
 import { SITE_NAME } from '../../shared/hub';
 import { hasQuiz } from '../../quizzes/catalog';
+import { ReadFirst } from '../../app/ReadFirst';
+import { resolveRef } from '../../app/entries';
+import { LevelBadge } from '../../shared/components/LevelBadge';
+import type { EntryRef } from '../../shared/refs';
 
 /** Relative width of the sequence column in the dashboard: more lifelines need more room. */
 function seqWeight(exchange: Exchange): string {
@@ -34,9 +38,11 @@ interface Props {
   stepHref?: (step: number) => string;
   /** Replaces the protocol menu in the top bar, for example with the lesson title. */
   crumb?: ReactNode;
+  /** The entry this exchange belongs to, for its level and Read first links; a protocol by default. */
+  entry?: EntryRef;
 }
 
-export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
+export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry }: Props) {
   const count = exchange.steps.length;
   const index = Math.min(Math.max(stepNumber, 1), count) - 1;
   const step = exchange.steps[index];
@@ -87,6 +93,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
   }, [playing, index, count, goTo]);
 
   const capture = step.captures.find((c) => c.link === link) ?? step.captures[0];
+  const level = resolveRef(entry ?? { protocol: exchange.id })?.level;
 
   return (
     <div className="exchange" style={{ '--seq-fr': seqWeight(exchange) } as React.CSSProperties}>
@@ -101,6 +108,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
           <details className="about">
             <summary>About this exchange</summary>
             <div className="about-pop">
+              <ReadFirst entry={entry ?? { protocol: exchange.id }} />
               <p className="scenario">{exchange.scenario}</p>
               <Prose text={exchange.intro} />
               <h2>Sources</h2>
@@ -112,6 +120,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
               Quiz
             </a>
           )}
+          {level && <LevelBadge level={level} />}
         </div>
         <StepControls
         index={index}

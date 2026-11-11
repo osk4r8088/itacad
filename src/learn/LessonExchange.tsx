@@ -39,6 +39,7 @@ export default function LessonExchange({ entry, step }: { entry: HubEntry; step:
         exchange={exchange}
         stepNumber={step}
         stepHref={stepHref}
+        entry={{ entry: entry.id }}
         crumb={
           <span className="lesson-crumb">
             <a href={href.learn}>Learn</a> / <strong>{entry.title}</strong>

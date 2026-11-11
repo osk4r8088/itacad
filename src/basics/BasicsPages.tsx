@@ -1,11 +1,14 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { href } from '../app/router';
 import { ISSUES_URL, pageTitle } from '../shared/hub';
-import { LEVELS, levelLabel, type Level } from '../shared/levels';
+import { LEVELS, type Level } from '../shared/levels';
+import { LevelBadge } from '../shared/components/LevelBadge';
+import { LevelFilter } from '../shared/components/LevelFilter';
+import { ReadFirst } from '../app/ReadFirst';
 import { SourceList } from '../shared/components/SourceList';
 import { CATEGORIES, categoryOf, findTopic, readyTopics, topicsOf, type TopicEntry } from './catalog';
 import { FIGURES } from './figures';
-import { resolveRef } from './links';
+import { resolveRef } from '../app/entries';
 import type { Block, Command, Topic, TopicQuestion } from './schema';
 
 export type BasicsRoute = { page: 'basics' } | { page: 'category'; id: string } | { page: 'topic'; category: string; id: string } | { page: 'glossary' };
@@ -28,14 +31,6 @@ function useTitle(title: string | undefined) {
   useEffect(() => {
     document.title = pageTitle(title);
   }, [title]);
-}
-
-function LevelBadge({ level }: { level: Level }) {
-  return (
-    <span className={`level level-${level}`} title={LEVELS[level].about}>
-      {levelLabel(level)}
-    </span>
-  );
 }
 
 function Figure({ id }: { id: string }) {
@@ -112,6 +107,7 @@ function BasicsHome() {
 
 function CategoryPage({ id }: { id: string }) {
   const category = categoryOf(id);
+  const [level, setLevel] = useState<Level | null>(null);
   useTitle(category?.title ?? 'Basics & Concepts');
   if (!category)
     return (
@@ -119,7 +115,7 @@ function CategoryPage({ id }: { id: string }) {
         There is no category "{id}". <a href={href.basics}>All categories</a>.
       </p>
     );
-  const topics = topicsOf(id);
+  const topics = topicsOf(id).filter((t) => level === null || t.level === level);
   return (
     <div className="index basics">
       <p className="back">
@@ -133,6 +129,7 @@ function CategoryPage({ id }: { id: string }) {
           <figcaption>{category.figure.caption}</figcaption>
         </figure>
       )}
+      <LevelFilter value={level} onChange={setLevel} />
       <ul className="cards">
         {topics.map((t) => (
           <li key={t.id}>
@@ -215,9 +212,7 @@ function TopicView({ topic: t }: { topic: Topic }) {
         <a href={href.basics}>Basics & Concepts</a> / <a href={href.category(category.id)}>{category.title}</a>
       </p>
       <h1>{t.title}</h1>
-      <p>
-        <LevelBadge level={t.level} />
-      </p>
+      <ReadFirst entry={{ topic: t.id }} />
       <p className="lead topic-definition">{t.definition}</p>
       <p className="topic-why">
         <strong>Why it matters:</strong> {t.why}

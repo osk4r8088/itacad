@@ -10,6 +10,7 @@ import { SourceList } from '../../shared/components/SourceList';
 import { Prose } from '../../shared/components/Prose';
 import { FlowTable } from './FlowTable';
 import { ProtocolSwitcher } from './ProtocolSwitcher';
+import { SearchButton } from '../../search/SearchButton';
 import { PhaseBar } from './PhaseBar';
 import { SITE_NAME } from '../../shared/hub';
 import { hasQuiz } from '../../quizzes/catalog';
@@ -26,7 +27,10 @@ function seqWeight(exchange: Exchange): string {
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function defaultSelection(exchange: Exchange, index: number): Selection {
+/** The selection a link asks for if this step has that header and field, otherwise the first key field of the step. */
+function defaultSelection(exchange: Exchange, index: number, wanted?: Selection): Selection {
+  const layer = wanted && exchange.steps[index].captures[0].layers.find((l) => l.def.id === wanted.layer);
+  if (layer) return wanted.field && wanted.field in layer.values ? wanted : { layer: wanted.layer };
   const first = exchange.steps[index].details.keyFields[0];
   return first ? { layer: first.layer, field: first.field } : { layer: exchange.steps[index].captures[0].layers.at(-1)!.def.id };
 }
@@ -40,15 +44,17 @@ interface Props {
   crumb?: ReactNode;
   /** The entry this exchange belongs to, for its level and Read first links; a protocol by default. */
   entry?: EntryRef;
+  /** A header or field named in the link, selected in the packet view. */
+  select?: Selection;
 }
 
-export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry }: Props) {
+export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry, select }: Props) {
   const count = exchange.steps.length;
   const index = Math.min(Math.max(stepNumber, 1), count) - 1;
   const step = exchange.steps[index];
 
   const [link, setLink] = useState<string | null>(null);
-  const [selection, setSelection] = useState<Selection>(() => defaultSelection(exchange, index));
+  const [selection, setSelection] = useState<Selection>(() => defaultSelection(exchange, index, select));
   const [playing, setPlaying] = useState(false);
 
   const goTo = useCallback(
@@ -59,17 +65,20 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry }: P
     [count, stepHref, exchange.id],
   );
 
-  // New step: select its first key field.
+  // New step: select its first key field, or what the link names.
+  const wantedLayer = select?.layer;
+  const wantedField = select?.field;
   useEffect(() => {
-    setSelection(defaultSelection(exchange, index));
-  }, [exchange, index]);
+    setSelection(defaultSelection(exchange, index, wantedLayer ? { layer: wantedLayer, field: wantedField } : undefined));
+    if (wantedLayer) document.getElementById('packet')?.scrollIntoView({ block: 'nearest' });
+  }, [exchange, index, wantedLayer, wantedField]);
 
   // Keyboard: arrow keys step, Home and End jump.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
       const t = e.target;
-      if (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"], .switcher-menu')) return;
+      if (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"], .switcher-menu, dialog')) return;
       const map: Record<string, number> = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: count - 1 };
       if (e.key in map) {
         e.preventDefault();
@@ -121,6 +130,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry }: P
             </a>
           )}
           {level && <LevelBadge level={level} />}
+          <SearchButton />
         </div>
         <StepControls
         index={index}

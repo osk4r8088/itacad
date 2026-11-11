@@ -23,9 +23,9 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 | Security | TLS 1.3, SSH |
 | Transport | TCP, UDP |
 | Internet | IPv4, IPv6 with NDP and SLAAC, ICMP, NAT and PAT |
-| Link | ARP |
+| Link | ARP, VLAN (802.1Q) |
 
-Planned: VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webvisualizer/issues/29)), Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
+Planned: Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/issues/30)).
 
 ### Tools
 
@@ -34,7 +34,7 @@ Planned: VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webv
 | Tool | Status |
 |---|---|
 | Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
-| Header decoder: paste a frame as hex and see every field of Ethernet, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
+| Header decoder: paste a frame as hex and see every field of Ethernet, 802.1Q, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
 | Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |

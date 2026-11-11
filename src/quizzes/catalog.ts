@@ -21,6 +21,7 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   ssh: () => import('./ssh').then((m) => m.sshQuiz),
   nat: () => import('./nat').then((m) => m.natQuiz),
   ipv6: () => import('./ipv6').then((m) => m.ipv6Quiz),
+  vlan: () => import('./vlan').then((m) => m.vlanQuiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

@@ -6,7 +6,7 @@ const exchanges = [...protocolExchanges, ...lessonExchanges];
 import { nestedBytes } from '../../shared/headers/stacks';
 import { decode } from './decode';
 
-const DECODED = new Set(['ethernet', 'ipv4', 'tcp', 'udp', 'arp', 'icmp-echo', 'icmp-time-exceeded', 'icmp-dest-unreachable', 'icmp-frag-needed']);
+const DECODED = new Set(['ethernet', 'vlan', 'ipv4', 'tcp', 'udp', 'arp', 'icmp-echo', 'icmp-time-exceeded', 'icmp-dest-unreachable', 'icmp-frag-needed']);
 
 const frames = exchanges.flatMap((ex) =>
   ex.steps.flatMap((step) =>

@@ -40,7 +40,7 @@ Planned: Spanning Tree ([#30](https://github.com/osk4r8088/netkit-webvisualizer/
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 | VLSM subnet planner: one block split into subnets for a list of networks, largest first on aligned boundaries, with a block map, bit view, wasted and free space | ready |
 | IPv6 address tool: recommended text form (RFC 5952), prefix and range, address type from the IANA special-purpose registry, multicast scope, EUI-64, solicited-node group, reverse DNS name | ready |
-| Bandwidth calculator | planned, [#33](https://github.com/osk4r8088/netkit-webvisualizer/issues/33) |
+| Bandwidth calculator: bits and bytes with decimal and binary prefixes, transfer time with Ethernet, IP and TCP overhead, bandwidth-delay product and the window needed | ready |
 
 **Explore and understand:** interactive models of how something works.
 
@@ -121,6 +121,7 @@ src/tools/
   dns-records/            DNS record explorer
   ipv6/                   IPv6 address tool
   vlsm/                   VLSM subnet planner (reuses the subnet logic)
+  bandwidth/              bandwidth calculator
   raid/                   RAID visualizer
 src/learn/
   registry.ts             all lessons

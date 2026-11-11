@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES, TOPICS, readyTopics } from './catalog';
 import { FIGURES } from './figures';
-import { resolveRef } from './links';
+import { resolveRef } from '../app/entries';
 import { LATENCIES, humanDuration, techDuration } from './figures/latency-data';
 import { sourceUrl } from '../shared/lib/sources';
 import type { Topic } from './schema';

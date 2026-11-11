@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { ISSUES_URL, type HubEntry } from '../shared/hub';
+import { ReadFirst } from './ReadFirst';
 
 /** Shows one tool or lesson: loads its component, or explains that it is planned. */
 export function HubEntryPage({ entry, id, back }: { entry: HubEntry | undefined; id: string; back: { label: string; href: string } }) {
@@ -29,8 +30,11 @@ export function HubEntryPage({ entry, id, back }: { entry: HubEntry | undefined;
 
   const Component = entry.component;
   return (
-    <Suspense fallback={<p className="notice muted">Loading {entry.title}...</p>}>
-      <Component />
-    </Suspense>
+    <>
+      <ReadFirst entry={{ entry: entry.id }} className="read-first read-first-bar" />
+      <Suspense fallback={<p className="notice muted">Loading {entry.title}...</p>}>
+        <Component />
+      </Suspense>
+    </>
   );
 }

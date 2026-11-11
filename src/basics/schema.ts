@@ -1,5 +1,6 @@
 import type { Source } from '../shared/schema';
 import type { Level } from '../shared/levels';
+import type { EntryRef } from '../shared/refs';
 
 /**
  * One topic of Basics & Concepts. Every topic follows the same template, so the
@@ -68,7 +69,7 @@ export interface Term {
 }
 
 /** A link to other content of the site. Tests check that every reference resolves. */
-export type RelatedRef = { topic: string } | { protocol: string; step?: number } | { entry: string };
+export type RelatedRef = EntryRef;
 
 export interface TopicQuestion {
   id: string;

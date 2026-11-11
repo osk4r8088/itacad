@@ -1,5 +1,7 @@
 import type { ComponentType, LazyExoticComponent } from 'react';
 import type { Exchange } from './schema';
+import type { Level } from './levels';
+import type { EntryRef } from './refs';
 
 /**
  * One entry of a section (tools, learning content). The start page and the section
@@ -15,6 +17,10 @@ export interface HubEntry {
   purpose?: 'use' | 'understand';
   /** GitHub issue that tracks the entry. */
   issue?: number;
+  /** How much a reader needs to know first. */
+  level: Level;
+  /** Entries to read first, shown as links at the top of the page. */
+  prereqs?: EntryRef[];
   /** Loaded when the entry is opened. A ready entry has either a component or an exchange. */
   component?: LazyExoticComponent<ComponentType>;
   /** A lesson that is a step-by-step exchange, shown on the exchange page with its own route. */

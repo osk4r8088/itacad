@@ -96,12 +96,3 @@ export const SECTIONS: SiteSection[] = [
     highlights: () => ['layers', 'url-to-page', 'arp-spoofing'].map(lesson),
   },
 ];
-
-/** First steps for someone new to the site, shown above the section tiles. */
-export const START_HERE: { title: string; why: string; href: string }[] = [
-  { title: 'Inside a computer', why: 'New to IT? Start with the parts of a computer and the boxes of a network.', href: href.category('hardware') },
-  { title: 'OSI and TCP/IP overview', why: 'The map: every layer, what it does, and what on this site belongs to it.', href: href.lesson('layers') },
-  { title: 'From URL to page', why: 'Everything at once: a laptop joins a network and loads a page, frame by frame.', href: href.lesson('url-to-page', 1) },
-  { title: 'TCP', why: 'The classic: handshake, data and close, with every header field explained.', href: href.exchange('tcp') },
-  { title: 'Subnet calculator', why: 'Hands-on: see network and host bits move as you change the prefix.', href: href.tool('subnet') },
-];

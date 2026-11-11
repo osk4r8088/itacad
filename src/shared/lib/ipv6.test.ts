@@ -10,10 +10,12 @@ describe('IPv6 text form (RFC 5952)', () => {
     ['FE80::0200:5EFF:FE00:530A', 'fe80::200:5eff:fe00:530a'],
     ['::', '::'],
     ['ff02:0:0:0:0:0:0:2', 'ff02::2'],
+    ['::ffff:192.0.2.33', '::ffff:c000:221'],
+    ['64:ff9b::198.51.100.7', '64:ff9b::c633:6407'],
   ])('%s', (input, expected) => expect(canonicalIpv6(input)).toBe(expected));
 
   it('rejects invalid forms', () => {
-    for (const bad of ['1::2::3', '1:2:3:4:5:6:7', '1:2:3:4:5:6:7:8:9', 'g::1', '12345::1']) expect(() => canonicalIpv6(bad), bad).toThrow();
+    for (const bad of ['1::2::3', '1:2:3:4:5:6:7', '1:2:3:4:5:6:7:8:9', 'g::1', '12345::1', '::ffff:192.0.2.256', '::ffff:192.0.02.1', '1:2:3:4:5:6:7:1.2.3.4']) expect(() => canonicalIpv6(bad), bad).toThrow();
   });
 });
 

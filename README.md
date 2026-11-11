@@ -39,7 +39,7 @@ Planned: VLAN tagging and trunks ([#29](https://github.com/osk4r8088/netkit-webv
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 | VLSM subnet planner | planned, [#31](https://github.com/osk4r8088/netkit-webvisualizer/issues/31) |
-| IPv6 address tool | planned, [#32](https://github.com/osk4r8088/netkit-webvisualizer/issues/32) |
+| IPv6 address tool: recommended text form (RFC 5952), prefix and range, address type from the IANA special-purpose registry, multicast scope, EUI-64, solicited-node group, reverse DNS name | ready |
 | Bandwidth calculator | planned, [#33](https://github.com/osk4r8088/netkit-webvisualizer/issues/33) |
 
 **Explore and understand:** interactive models of how something works.
@@ -119,6 +119,7 @@ src/tools/
   ports/                  well-known ports
   passwords/              password generator and analyzer
   dns-records/            DNS record explorer
+  ipv6/                   IPv6 address tool
   raid/                   RAID visualizer
 src/learn/
   registry.ts             all lessons

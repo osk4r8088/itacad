@@ -1,18 +1,25 @@
 // IPv6 address helpers: parsing, the canonical text form, and the addresses derived from others.
 
-/** Parses any valid textual form (RFC 4291 section 2.2, without an embedded IPv4 part) into 16 octets. */
-export function parseIpv6(text: string): Uint8Array {
+/** Parses any valid textual form (RFC 4291 section 2.2), including a trailing IPv4 part such as ::ffff:192.0.2.33, into 16 octets. */
+export function parseIpv6(input: string): Uint8Array {
+  let text = input;
+  const v4 = /^(.*:)(\d+\.\d+\.\d+\.\d+)$/.exec(input);
+  if (v4) {
+    const o = v4[2].split('.').map(Number);
+    if (o.some((n, i) => n > 255 || !/^(0|[1-9]\d{0,2})$/.test(v4[2].split('.')[i]))) throw new Error(`bad IPv6 ${input}`);
+    text = `${v4[1]}${((o[0] << 8) | o[1]).toString(16)}:${((o[2] << 8) | o[3]).toString(16)}`;
+  }
   const parts = text.split('::');
-  if (parts.length > 2) throw new Error(`bad IPv6 ${text}`);
+  if (parts.length > 2) throw new Error(`bad IPv6 ${input}`);
   const groups = (s: string) => (s === '' ? [] : s.split(':'));
   const head = groups(parts[0]);
   const tail = parts.length === 2 ? groups(parts[1]) : [];
   const fill = 8 - head.length - tail.length;
-  if ((parts.length === 2 && fill < 1) || (parts.length === 1 && fill !== 0)) throw new Error(`bad IPv6 ${text}`);
+  if ((parts.length === 2 && fill < 1) || (parts.length === 1 && fill !== 0)) throw new Error(`bad IPv6 ${input}`);
   const all = [...head, ...Array(parts.length === 2 ? fill : 0).fill('0'), ...tail];
   const out = new Uint8Array(16);
   all.forEach((g, i) => {
-    if (!/^[0-9a-f]{1,4}$/i.test(g)) throw new Error(`bad IPv6 ${text}`);
+    if (!/^[0-9a-f]{1,4}$/i.test(g)) throw new Error(`bad IPv6 ${input}`);
     const n = parseInt(g, 16);
     out[i * 2] = n >> 8;
     out[i * 2 + 1] = n & 0xff;

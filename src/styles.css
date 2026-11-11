@@ -3063,3 +3063,30 @@ table.kv th {
     grid-template-columns: 5.5rem minmax(0, 1fr) 4.5rem;
   }
 }
+
+/* ---------- IPv6 tool ---------- */
+.v6-bits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+}
+.v6-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.v6-wrap {
+  overflow-wrap: anywhere;
+}
+.v6-group .octet {
+  display: inline-flex;
+}
+.ipv6-tool table.kv {
+  table-layout: fixed;
+}
+.ipv6-tool table.kv th {
+  width: 34%;
+}
+.ipv6-tool table.kv td {
+  overflow-wrap: anywhere;
+}

@@ -2,8 +2,9 @@ import { CATALOG } from '../protocols/catalog';
 import { LESSONS } from '../learn/registry';
 import { SECTION_INFO, TOOLS, entryHref, toolsFor } from '../tools/registry';
 import { href } from './router';
+import { CATEGORIES, findTopic, readyTopics } from '../basics/catalog';
 
-export type Section = 'protocols' | 'tools' | 'explore' | 'learn';
+export type Section = 'basics' | 'protocols' | 'tools' | 'explore' | 'learn';
 
 export interface Highlight {
   title: string;
@@ -31,6 +32,10 @@ const protocol = (id: string): Highlight => {
   return { title: e.title, href: href.exchange(id) };
 };
 const tool = (id: string): Highlight => ({ title: TOOLS.find((t) => t.id === id)!.title, href: entryHref(id) });
+const topic = (id: string): Highlight => {
+  const t = findTopic(id)!;
+  return { title: t.title, href: href.topic(t.category, t.id) };
+};
 const lesson = (id: string): Highlight => {
   const e = LESSONS.find((l) => l.id === id)!;
   return { title: e.title, href: e.exchange ? href.lesson(id, 1) : href.lesson(id) };
@@ -38,6 +43,18 @@ const lesson = (id: string): Highlight => {
 
 /** The sections of the site, in header order. The start page shows one tile per section. */
 export const SECTIONS: SiteSection[] = [
+  {
+    id: 'basics',
+    label: 'Basics',
+    title: 'Basics & Concepts',
+    about: `The building blocks of IT, starting from zero: ${CATEGORIES.slice(0, 4)
+      .map((c) => c.title.toLowerCase())
+      .join(', ')} and more.`,
+    href: href.basics,
+    count: () => readyTopics().length,
+    unit: 'topics',
+    highlights: () => ['cpu', 'memory', 'network-devices'].map(topic),
+  },
   {
     id: 'protocols',
     label: 'Protocols',
@@ -82,6 +99,7 @@ export const SECTIONS: SiteSection[] = [
 
 /** First steps for someone new to the site, shown above the section tiles. */
 export const START_HERE: { title: string; why: string; href: string }[] = [
+  { title: 'Inside a computer', why: 'New to IT? Start with the parts of a computer and the boxes of a network.', href: href.category('hardware') },
   { title: 'OSI and TCP/IP overview', why: 'The map: every layer, what it does, and what on this site belongs to it.', href: href.lesson('layers') },
   { title: 'From URL to page', why: 'Everything at once: a laptop joins a network and loads a page, frame by frame.', href: href.lesson('url-to-page', 1) },
   { title: 'TCP', why: 'The classic: handshake, data and close, with every header field explained.', href: href.exchange('tcp') },

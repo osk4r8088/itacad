@@ -8,6 +8,12 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 
 ## What is inside
 
+### Basics & Concepts
+
+The building blocks of IT around the network, from level 1 (no prior knowledge) upwards. Eight categories: hardware, operating systems, virtualization and containers, software development, data and encoding, cloud and operations, security basics, databases. Every topic follows one template: definition and why it matters, the explanation in short sections, misconceptions, commands to try on Linux, Windows and macOS, typical numbers, key terms (collected in a glossary), a quiz, related pages and sources.
+
+- **Hardware (pilot):** CPU, RAM and the memory hierarchy (with a latency scale that can stretch nanoseconds to human time), storage (HDD, SSD, SATA, NVMe), the network interface card, and switch, router, firewall and access point. An "inside a computer" diagram links each part to its topic. GPU, mainboard and buses, server vs desktop, virtualization hardware and power are planned.
+
 ### Protocols
 
 17 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
@@ -135,6 +141,13 @@ src/learn/
   spec.ts                 flat step format shared by the lessons
   exchanges.ts            all lesson exchanges, for the tests
   LessonExchange.tsx      shows a lesson exchange on the exchange page
+src/basics/
+  schema.ts               topic template
+  catalog.ts              categories and topics (metadata; topics load on demand)
+  topics/<category>/      one file per topic
+  figures/                diagrams and interactive pieces that topics refer to by id
+  links.ts                resolves related links to protocols, tools, lessons and topics
+  BasicsPages.tsx         overview, category, topic and glossary pages
 src/quizzes/
   schema.ts               question format
   catalog.ts              quizzes by exchange id, loaded on demand
@@ -158,6 +171,15 @@ Each protocol, tool and lesson is loaded only when it is opened.
 2. In `src/tools/registry.ts`, give the entry a `purpose`, set it to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. `use` puts it under Tools (`#/tools/<id>`), `understand` under Explore and understand (`#/explore/<id>`); the section pages and the header pick it up (start page highlights are chosen in `src/app/sections.ts`). Link to an entry with `entryHref(id)`, which knows its section; a link to the other section redirects.
 
 Lessons work the same way in `src/learn/`. A lesson can also be an exchange: give its registry entry an `exchange` loader instead of a component, and it opens on the exchange page at `#/learn/<id>/<step>`. Exchanges that chain protocols set `phases` (with a `deepDive` exchange each), a `phase` on every step, and `learned` facts where the client learns something; the page then shows the phase bar and the "known so far" panel. A fact can be learned again with a new value (a poisoned cache entry), which the panel marks as changed. Add every lesson exchange to `src/learn/exchanges.ts` so the tests cover it. `src/learn/url-to-page/` is the example; it reuses the frames of the protocol exchanges, so the bytes always match.
+
+## Adding a Basics & Concepts topic
+
+1. Create `src/basics/topics/<category>/<id>.ts` exporting a `Topic` (see `src/basics/schema.ts`). Sections are made of blocks: text, list, comparison table, note, or a figure by id.
+2. Add the topic to `TOPICS` in `src/basics/catalog.ts` with its level and a loader, or flip a planned entry to ready.
+3. An interactive piece is a small component in `src/basics/figures/`, registered in `figures/index.ts`; topics refer to it by id.
+4. `pnpm test` checks that every part of the template is there, that related links and figures resolve, that quiz answers are valid, that glossary terms are unique, and that no source is Wikipedia.
+
+Sources for topics without RFCs: formal standards first (ISO/IEC, IEEE, JEDEC, NIST, vendor-neutral specifications), then official documentation, then established textbooks. Values that vary between machines are given as typical ranges and say so.
 
 ## Adding a quiz
 
@@ -189,6 +211,9 @@ Hash routes work on any static host:
 | `#/learn`, `#/learn/<id>` | lessons |
 | `#/learn/url-to-page/7` | step 7 of a lesson that is an exchange |
 | `#/learn/quizzes/tcp` | the quiz of one protocol |
+| `#/basics`, `#/basics/<category>` | Basics & Concepts, one category |
+| `#/basics/<category>/<topic>` | one topic |
+| `#/basics/glossary` | all key terms |
 
 Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts`.
 

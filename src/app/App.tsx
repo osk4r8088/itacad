@@ -13,6 +13,7 @@ import { LESSONS } from '../learn/registry';
 const ExchangeRoute = lazy(() => import('../protocols/ExchangeRoute'));
 const LessonExchange = lazy(() => import('../learn/LessonExchange'));
 const QuizPage = lazy(() => import('../quizzes/QuizPage'));
+const BasicsPages = lazy(() => import('../basics/BasicsPages'));
 
 function titleOf(route: Route): string | undefined {
   switch (route.page) {
@@ -35,6 +36,7 @@ function titleOf(route: Route): string | undefined {
 }
 
 function sectionOf(route: Route): Section | undefined {
+  if (route.page === 'basics' || route.page === 'category' || route.page === 'topic' || route.page === 'glossary') return 'basics';
   if (route.page === 'protocols' || route.page === 'exchange') return 'protocols';
   if (route.page === 'tools' || route.page === 'tool') return 'tools';
   if (route.page === 'explore' || route.page === 'explorer') return 'explore';
@@ -55,6 +57,7 @@ export function App() {
 
   useEffect(() => {
     if (route.page === 'exchange' || route.page === 'quiz') return; // ExchangeRoute and QuizPage set the title once the data is loaded
+    if (sectionOf(route) === 'basics') return; // so do the Basics & Concepts pages
     if (route.page === 'lesson' && LESSONS.find((l) => l.id === route.id)?.exchange) return; // so does LessonExchange
     const title = titleOf(route);
     document.title = pageTitle(title);
@@ -100,6 +103,11 @@ export function App() {
         )}
         {route.page === 'tool' && <HubEntryPage id={route.id} entry={TOOLS.find((t) => t.id === route.id)} back={{ label: 'All tools', href: href.tools }} />}
         {route.page === 'explorer' && <HubEntryPage id={route.id} entry={TOOLS.find((t) => t.id === route.id)} back={{ label: 'Explore and understand', href: href.explore }} />}
+        {(route.page === 'basics' || route.page === 'category' || route.page === 'topic' || route.page === 'glossary') && (
+          <Suspense fallback={<p className="notice muted">Loading...</p>}>
+            <BasicsPages route={route} />
+          </Suspense>
+        )}
         {route.page === 'quiz' && (
           <Suspense fallback={<p className="notice muted">Loading quiz...</p>}>
             <QuizPage id={route.id} />

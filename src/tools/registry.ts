@@ -84,8 +84,9 @@ export const TOOLS: HubEntry[] = [
     purpose: 'use',
     title: 'VLSM subnet planner',
     summary: 'Split one address block into subnets sized for the hosts each network needs.',
-    status: 'planned',
+    status: 'ready',
     issue: 31,
+    component: lazy(() => import('./vlsm/VlsmTool')),
   },
   {
     id: 'ipv6',

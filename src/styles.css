@@ -3090,3 +3090,96 @@ table.kv th {
 .ipv6-tool table.kv td {
   overflow-wrap: anywhere;
 }
+
+/* ---------- VLSM planner ---------- */
+.vlsm-tool .field.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+.vlsm-tool .field.check label {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.vlsm-needs {
+  border-collapse: collapse;
+}
+.vlsm-needs th {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0 0.5rem 0.3rem 0;
+}
+.vlsm-needs td {
+  padding: 0.2rem 0.5rem 0.2rem 0;
+}
+.vlsm-needs input {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+}
+.vlsm-needs td:first-child {
+  width: 60%;
+}
+.vlsm-needs input[type='number'] {
+  width: 7rem;
+}
+.vlsm-map {
+  display: flex;
+  min-height: 3.2rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.vlsm-seg {
+  min-width: 0;
+  padding: 0.3rem 0.35rem;
+  background: var(--accent-soft);
+  border-right: 2px solid var(--panel);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+.vlsm-seg:last-child {
+  border-right: 0;
+}
+.vlsm-seg.free {
+  background: repeating-linear-gradient(135deg, transparent 0 6px, var(--border) 6px 7px);
+  color: var(--muted);
+}
+.vlsm-seg-name,
+.vlsm-seg-cidr {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vlsm-plan {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+.vlsm-plan th,
+.vlsm-plan td {
+  text-align: left;
+  padding: 0.4rem 0.6rem 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.vlsm-plan thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+.bit.bit-fixed {
+  background: var(--k-internet);
+  color: var(--text);
+  font-weight: 600;
+}

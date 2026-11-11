@@ -11,6 +11,8 @@ describe('parseRoute', () => {
     ['#/protocols/tcp/0', { page: 'exchange', id: 'tcp', step: 1 }],
     ['#/tools', { page: 'tools' }],
     ['#/tools/subnet', { page: 'tool', id: 'subnet' }],
+    ['#/explore', { page: 'explore' }],
+    ['#/explore/raid', { page: 'explorer', id: 'raid' }],
     ['#/learn', { page: 'learn' }],
     ['#/learn/attacks', { page: 'lesson', id: 'attacks', step: 1 }],
     ['#/learn/url-to-page/7', { page: 'lesson', id: 'url-to-page', step: 7 }],

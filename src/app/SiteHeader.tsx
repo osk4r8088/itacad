@@ -1,10 +1,11 @@
 import { href } from './router';
 
-export type Section = 'protocols' | 'tools' | 'learn';
+export type Section = 'protocols' | 'tools' | 'explore' | 'learn';
 
 const SECTIONS: { id: Section; label: string; href: string }[] = [
   { id: 'protocols', label: 'Protocols', href: href.protocols },
   { id: 'tools', label: 'Tools', href: href.tools },
+  { id: 'explore', label: 'Explore', href: href.explore },
   { id: 'learn', label: 'Learn', href: href.learn },
 ];
 

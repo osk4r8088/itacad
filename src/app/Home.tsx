@@ -1,7 +1,7 @@
 import { CATALOG } from '../protocols/catalog';
 import { LESSONS } from '../learn/registry';
 import { HubCards } from './HubCards';
-import { ToolGroups } from './ToolGroups';
+import { SECTION_INFO, toolsFor } from '../tools/registry';
 import { href } from './router';
 
 /** Start page: one block per section, rendered from the catalog and the registries. */
@@ -10,7 +10,7 @@ export function Home() {
   return (
     <div className="index home">
       <p className="lead">
-        Learn how networks really work: step through real protocol exchanges down to every header field, and use tools that show the bits behind addresses and packets.
+        Learn how networks really work: step through real protocol exchanges down to every header field, use tools for everyday tasks, and explore models that show how things work inside.
       </p>
 
       <section className="hub-section" aria-labelledby="h-protocols">
@@ -32,10 +32,20 @@ export function Home() {
 
       <section className="hub-section" aria-labelledby="h-tools">
         <div className="hub-head">
-          <h2 id="h-tools">Tools</h2>
+          <h2 id="h-tools">{SECTION_INFO.use.title}</h2>
           <a href={href.tools}>All tools</a>
         </div>
-        <ToolGroups headingLevel="h3" />
+        <p className="small muted">{SECTION_INFO.use.about}</p>
+        <HubCards entries={toolsFor('use')} link={href.tool} />
+      </section>
+
+      <section className="hub-section" aria-labelledby="h-explore">
+        <div className="hub-head">
+          <h2 id="h-explore">{SECTION_INFO.understand.title}</h2>
+          <a href={href.explore}>All entries</a>
+        </div>
+        <p className="small muted">{SECTION_INFO.understand.about}</p>
+        <HubCards entries={toolsFor('understand')} link={href.explorer} />
       </section>
 
       <section className="hub-section" aria-labelledby="h-learn">

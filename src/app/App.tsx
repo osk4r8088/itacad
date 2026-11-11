@@ -3,10 +3,9 @@ import { href, replaceHash, useHashRoute, type Route } from './router';
 import { SiteHeader, type Section } from './SiteHeader';
 import { Home } from './Home';
 import { HubCards } from './HubCards';
-import { ToolGroups } from './ToolGroups';
 import { HubEntryPage } from './HubEntryPage';
 import { ProtocolIndex } from '../protocols/components/ProtocolIndex';
-import { TOOLS } from '../tools/registry';
+import { SECTION_INFO, TOOLS, toolsFor } from '../tools/registry';
 import { LESSONS } from '../learn/registry';
 
 // The exchange page and the exchange data load only when a protocol is opened.
@@ -20,9 +19,12 @@ function titleOf(route: Route): string | undefined {
       return 'Protocols';
     case 'tools':
       return 'Tools';
+    case 'explore':
+      return 'Explore and understand';
     case 'learn':
       return 'Learn';
     case 'tool':
+    case 'explorer':
       return TOOLS.find((t) => t.id === route.id)?.title;
     case 'lesson':
       return LESSONS.find((l) => l.id === route.id)?.title;
@@ -34,6 +36,7 @@ function titleOf(route: Route): string | undefined {
 function sectionOf(route: Route): Section | undefined {
   if (route.page === 'protocols' || route.page === 'exchange') return 'protocols';
   if (route.page === 'tools' || route.page === 'tool') return 'tools';
+  if (route.page === 'explore' || route.page === 'explorer') return 'explore';
   if (route.page === 'learn' || route.page === 'lesson' || route.page === 'quiz') return 'learn';
   return undefined;
 }
@@ -43,6 +46,10 @@ export function App() {
 
   useEffect(() => {
     if (route.page === 'redirect') replaceHash(route.to);
+    // An entry opened under the other section (for example an old #/tools/ link) moves to its own section.
+    const entry = route.page === 'tool' || route.page === 'explorer' ? TOOLS.find((t) => t.id === route.id) : undefined;
+    if (route.page === 'tool' && entry?.purpose === 'understand') replaceHash(href.explorer(route.id));
+    if (route.page === 'explorer' && entry?.purpose === 'use') replaceHash(href.tool(route.id));
   }, [route]);
 
   useEffect(() => {
@@ -77,10 +84,11 @@ export function App() {
       <main>
         {route.page === 'home' && <Home />}
         {route.page === 'protocols' && <ProtocolIndex />}
-        {route.page === 'tools' && (
+        {(route.page === 'tools' || route.page === 'explore') && (
           <div className="index">
-            <h1>Tools</h1>
-            <ToolGroups />
+            <h1>{SECTION_INFO[route.page === 'tools' ? 'use' : 'understand'].title}</h1>
+            <p className="lead">{SECTION_INFO[route.page === 'tools' ? 'use' : 'understand'].about}</p>
+            <HubCards entries={toolsFor(route.page === 'tools' ? 'use' : 'understand')} link={route.page === 'tools' ? href.tool : href.explorer} />
           </div>
         )}
         {route.page === 'learn' && (
@@ -90,6 +98,7 @@ export function App() {
           </div>
         )}
         {route.page === 'tool' && <HubEntryPage id={route.id} entry={TOOLS.find((t) => t.id === route.id)} back={{ label: 'All tools', href: href.tools }} />}
+        {route.page === 'explorer' && <HubEntryPage id={route.id} entry={TOOLS.find((t) => t.id === route.id)} back={{ label: 'Explore and understand', href: href.explore }} />}
         {route.page === 'quiz' && (
           <Suspense fallback={<p className="notice muted">Loading quiz...</p>}>
             <QuizPage id={route.id} />

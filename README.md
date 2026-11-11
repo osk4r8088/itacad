@@ -28,26 +28,28 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 
 ### Tools
 
-**Everyday tools:** for real tasks.
+For real tasks: calculate, decode, plan, generate. Section `#/tools`.
 
 | Tool | Status |
 |---|---|
 | Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
 | Header decoder: paste a frame as hex and see every field of Ethernet, 802.1Q, ARP, IPv4, TCP, UDP and ICMP, with checksums verified | ready |
-| Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 | VLSM subnet planner: one block split into subnets for a list of networks, largest first on aligned boundaries, with a block map, bit view, wasted and free space | ready |
 | IPv6 address tool: recommended text form (RFC 5952), prefix and range, address type from the IANA special-purpose registry, multicast scope, EUI-64, solicited-node group, reverse DNS name | ready |
 | Bandwidth calculator: bits and bytes with decimal and binary prefixes, transfer time with Ethernet, IP and TCP overhead, bandwidth-delay product and the window needed | ready |
 
-**Explore and understand:** interactive models of how something works.
+### Explore and understand
 
-| Tool | Status |
+Interactive models and references that show how something works inside. A section of its own, `#/explore`.
+
+| Entry | Status |
 |---|---|
 | TCP state machine: the RFC 9293 state diagram, walked through event by event, with scenarios and links into the TCP exchange | ready |
 | DNS record explorer: 15 record types with their fields and wire format, an example zone with mail, DNSSEC and reverse DNS, common mistakes | ready |
 | RAID visualizer: layouts of RAID 0, 1, 5, 6 and 10, failing disks, parity and Reed-Solomon reconstruction bit by bit, rebuild risk | ready |
+| Well-known ports: searchable reference of common ports with transport, purpose and source, plus the port ranges | ready |
 
 ### Learn
 
@@ -153,7 +155,7 @@ Each protocol, tool and lesson is loaded only when it is opened.
 ## Adding a tool or lesson
 
 1. Create `src/tools/<id>/` with the logic as plain functions, its tests, and a component with a default export.
-2. In `src/tools/registry.ts`, give the entry a `purpose` (`use` for everyday tools, `understand` for models), set it to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. The start page, the tools page and the route `#/tools/<id>` pick it up.
+2. In `src/tools/registry.ts`, give the entry a `purpose`, set it to `status: 'ready'` and `component: lazy(() => import('./<id>/<Component>'))`. `use` puts it under Tools (`#/tools/<id>`), `understand` under Explore and understand (`#/explore/<id>`); the start page, the section pages and the header pick it up. Link to an entry with `entryHref(id)`, which knows its section; a link to the other section redirects.
 
 Lessons work the same way in `src/learn/`. A lesson can also be an exchange: give its registry entry an `exchange` loader instead of a component, and it opens on the exchange page at `#/learn/<id>/<step>`. Exchanges that chain protocols set `phases` (with a `deepDive` exchange each), a `phase` on every step, and `learned` facts where the client learns something; the page then shows the phase bar and the "known so far" panel. A fact can be learned again with a new value (a poisoned cache entry), which the panel marks as changed. Add every lesson exchange to `src/learn/exchanges.ts` so the tests cover it. `src/learn/url-to-page/` is the example; it reuses the frames of the protocol exchanges, so the bytes always match.
 
@@ -182,7 +184,8 @@ Hash routes work on any static host:
 | `#/` | start page |
 | `#/protocols` | protocol overview |
 | `#/protocols/tcp/3` | step 3 of the TCP exchange |
-| `#/tools`, `#/tools/<id>` | tool overview, one tool |
+| `#/tools`, `#/tools/<id>` | everyday tools, one tool |
+| `#/explore`, `#/explore/<id>` | models and references to explore, one of them |
 | `#/learn`, `#/learn/<id>` | lessons |
 | `#/learn/url-to-page/7` | step 7 of a lesson that is an exchange |
 | `#/learn/quizzes/tcp` | the quiz of one protocol |

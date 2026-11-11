@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { TOOLS, TOOL_GROUPS, toolsFor } from './registry';
+import { TOOLS, entryHref, toolsFor } from './registry';
 import { LESSONS } from '../learn/registry';
 
 describe('tool registry', () => {
-  it('puts every tool in exactly one purpose group', () => {
-    const grouped = TOOL_GROUPS.flatMap((g) => toolsFor(g.purpose).map((t) => t.id));
+  it('puts every entry in exactly one section, and links it there', () => {
+    const grouped = [...toolsFor('use'), ...toolsFor('understand')].map((t) => t.id);
     expect(grouped.sort()).toEqual(TOOLS.map((t) => t.id).sort());
+    for (const t of toolsFor('understand')) expect(entryHref(t.id)).toBe(`#/explore/${t.id}`);
+    for (const t of toolsFor('use')) expect(entryHref(t.id)).toBe(`#/tools/${t.id}`);
   });
   it('gives ready entries something to show, planned entries an issue', () => {
     for (const e of [...TOOLS, ...LESSONS]) {

@@ -3247,3 +3247,91 @@ table.kv th {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* ---------- start page ---------- */
+.start-here {
+  margin: 1.25rem 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  max-width: 60rem;
+}
+.start-here h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+.start-here ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.start-here a {
+  font-weight: 600;
+}
+.section-tiles {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1rem;
+}
+.section-tiles > li {
+  display: flex;
+}
+.section-tile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.section-tile:hover,
+.section-tile:focus-within {
+  border-color: var(--accent);
+}
+.section-tile h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.section-tile h2 a {
+  color: var(--text);
+  text-decoration: none;
+}
+.section-tile h2 a:hover {
+  text-decoration: underline;
+}
+.section-tile p {
+  margin: 0;
+  color: var(--muted);
+}
+.tile-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tile-highlights a {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--text);
+}
+.tile-highlights a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tile-all {
+  margin-top: auto;
+  font-weight: 600;
+}

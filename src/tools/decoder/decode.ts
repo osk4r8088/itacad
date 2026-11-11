@@ -1,4 +1,4 @@
-import type { FieldDef, FieldValue, LayerDef, LayerInstance, StructDef, StructInstance } from '../../shared/schema';
+import type { LayerDef, LayerInstance, StructDef, StructInstance } from '../../shared/schema';
 import { ethernetDef } from '../../shared/headers/ethernet';
 import { ipv4Def } from '../../shared/headers/ipv4';
 import { tcpDef, optEolDef, optNopDef, optMssDef, optWsDef, optSackPermDef, optTsDef } from '../../shared/headers/tcp';
@@ -10,16 +10,17 @@ import { ipv6Def } from '../../shared/headers/ipv6';
 import { icmpv6EchoDef, rsDef, raDef, nsDef, naDef, optSllaDef, optTllaDef, optPrefixDef, optMtuDef, seconds } from '../../shared/headers/icmpv6';
 import { concat, crc32, internetChecksum } from '../../shared/lib/encode';
 import { formatIpv6 } from '../../shared/lib/ipv6';
+import { decodeDns } from './dns';
+import { decodeDhcp } from './dhcp';
+import { decodeNtp } from './ntp';
+import { arr, bit, type Display, type Issue, fixedOctets, forInput, hex, hexBytes, instance, ip4, mac, num, readBits, slice, stripExample } from './fields';
 
 // The decoder reads real bytes with the header definitions from src/shared/headers:
 // field names, sizes, explanations and sources are the same as in the protocol exchanges.
 
 export type Start = 'auto' | 'ethernet' | 'ipv4' | 'ipv6';
 
-export interface Issue {
-  level: 'error' | 'warning' | 'info';
-  text: string;
-}
+export type { Issue };
 
 export interface Check {
   label: string;
@@ -36,19 +37,6 @@ export interface Decoded {
 
 // ---- definitions adapted for real input
 
-/** Removes sentences that only make sense for the generated examples of the exchanges. */
-const stripExample = (text: string) => text.replace(/[^.]*\bthis example\b[^.]*\.\s*/g, '').trim();
-
-function forInput<D extends StructDef>(def: D, extra: Partial<D> = {}): D {
-  const field = (f: FieldDef): FieldDef => ({ ...f, about: stripExample(f.about) });
-  return {
-    ...def,
-    about: stripExample(def.about),
-    fields: def.fields.map(field),
-    ...(def.trailer ? { trailer: def.trailer.map(field) } : {}),
-    ...extra,
-  };
-}
 
 const ETH_WITH_FCS = forInput(ethernetDef);
 const ETH_NO_FCS = forInput(ethernetDef, {
@@ -171,7 +159,7 @@ const DATA: LayerDef = {
   short: 'Data',
   osi: [5, 6, 7],
   tcpip: 'application',
-  about: 'The bytes after the last decoded header. The decoder does not interpret them; the port numbers usually tell which application protocol it is.',
+  about: 'The bytes after the last decoded header. The decoder does not interpret them; the port numbers usually tell which application protocol it is. Of the application protocols it reads DNS, DHCP and NTP over UDP.',
   fields: [{ id: 'data', name: 'Data', bits: 'variable', compact: true, about: 'Shown as text when it is printable, otherwise as hex.' }],
   sources: [],
 };
@@ -246,85 +234,7 @@ const ICMP_TIME_CODES: Record<number, string> = { 0: 'TTL exceeded in transit', 
 const PORTS: Record<number, string> = { 20: 'FTP data', 21: 'FTP', 22: 'SSH', 25: 'SMTP', 53: 'DNS', 67: 'DHCP server', 68: 'DHCP client', 80: 'HTTP', 123: 'NTP', 143: 'IMAP', 443: 'HTTPS', 587: 'SMTP submission', 993: 'IMAPS' };
 const TCP_FLAGS = ['CWR', 'ECE', 'URG', 'ACK', 'PSH', 'RST', 'SYN', 'FIN'] as const;
 
-const hex = (n: number, digits: number) => `0x${n.toString(16).padStart(digits, '0')}`;
-const mac = (b: Uint8Array) => Array.from(b, (x) => x.toString(16).padStart(2, '0')).join(':');
-const ip4 = (b: Uint8Array) => Array.from(b).join('.');
-const bit = (r: Raw) => String(r as number);
-const hexBytes = (b: Uint8Array, max = 32) => Array.from(b.subarray(0, max), (x) => x.toString(16).padStart(2, '0')).join(' ') + (b.length > max ? ` ... (${b.length} octets)` : '');
 
-// ---- generic field slicer
-
-type Raw = number | Uint8Array;
-
-function readBits(bytes: Uint8Array, start: number, bits: number): number {
-  let v = 0;
-  for (let i = 0; i < bits; i++) {
-    const pos = start + i;
-    v = v * 2 + ((bytes[pos >> 3] >> (7 - (pos & 7))) & 1);
-  }
-  return v;
-}
-
-/**
- * Cuts a structure into its fields, following the bit widths of the definition.
- * Variable fields take the length given in `varOctets`, or all remaining octets.
- */
-function slice(fields: FieldDef[], bytes: Uint8Array, varOctets: Record<string, number> = {}): { raw: Record<string, Raw>; bin: Record<string, Uint8Array>; bits: Record<string, number>; octets: number } {
-  const raw: Record<string, Raw> = {};
-  const bin: Record<string, Uint8Array> = {};
-  const bits: Record<string, number> = {};
-  let pos = 0;
-  for (const f of fields) {
-    if (f.bits === 'variable') {
-      const start = pos >> 3;
-      const len = varOctets[f.id] ?? bytes.length - start;
-      raw[f.id] = bin[f.id] = bytes.slice(start, start + len);
-      bits[f.id] = len * 8;
-      pos += len * 8;
-    } else {
-      if (pos % 8 === 0 && f.bits % 8 === 0) bin[f.id] = bytes.slice(pos >> 3, (pos + f.bits) >> 3);
-      raw[f.id] = f.bits > 48 ? bin[f.id] : readBits(bytes, pos, f.bits);
-      bits[f.id] = f.bits;
-      pos += f.bits;
-    }
-  }
-  return { raw, bin, bits, octets: pos >> 3 };
-}
-
-/** Length in octets of the fixed part of a definition, before its first variable field. */
-function fixedOctets(fields: FieldDef[]): number {
-  let bits = 0;
-  for (const f of fields) {
-    if (f.bits === 'variable') break;
-    bits += f.bits;
-  }
-  return bits / 8;
-}
-
-type Display = Record<string, string | { display: string; note?: string; items?: StructInstance[] }>;
-
-function instance<D extends StructDef>(def: D, bytes: Uint8Array, sliced: ReturnType<typeof slice>, display: Display, summary?: string, trailer?: { bytes: Uint8Array; sliced: ReturnType<typeof slice> }): StructInstance<D> {
-  const values: Record<string, FieldValue> = {};
-  const all = [...def.fields, ...(def.trailer ?? [])];
-  for (const f of all) {
-    const s = def.trailer?.includes(f) && trailer ? trailer.sliced : sliced;
-    const raw = s.raw[f.id];
-    const given = display[f.id];
-    const fallback = raw instanceof Uint8Array ? (raw.length ? hexBytes(raw) : 'none') : String(raw);
-    const d = typeof given === 'string' ? { display: given } : (given ?? { display: fallback });
-    values[f.id] = { bits: s.bits[f.id], ...d };
-  }
-  return {
-    def,
-    values,
-    bytes: bytes.slice(0, sliced.octets),
-    ...(trailer ? { trailerBytes: trailer.bytes } : {}),
-    ...(summary ? { summary } : {}),
-  };
-}
-
-const num = (r: Raw) => r as number;
-const arr = (r: Raw) => r as Uint8Array;
 
 // ---- decoder state
 
@@ -768,9 +678,23 @@ class Decoder {
     return { ok, expected };
   }
 
-  portNote(src: number, dst: number): string | undefined {
+  /** What to say about data the decoder does not interpret, going by the port numbers. */
+  portNote(src: number, dst: number, transport: 'TCP' | 'UDP'): string {
+    const reads = 'The decoder reads DNS on UDP port 53, DHCP on UDP ports 67 and 68, and NTP on UDP port 123.';
     const known = [dst, src].find((p) => PORTS[p]);
-    return known !== undefined ? `Port ${known} is the well-known port of ${PORTS[known]}; the decoder does not interpret this protocol yet.` : undefined;
+    if (known === 53 && transport === 'TCP') return 'Port 53 is DNS. Over TCP every DNS message has a two-octet length in front and can span several segments (RFC 1035 section 4.2.2), so it is not decoded here; the decoder reads DNS over UDP.';
+    if (known !== undefined) return `Port ${known} is the well-known port of ${PORTS[known]}, which the decoder does not interpret. ${reads}`;
+    return `Neither port belongs to a protocol the decoder interprets. ${reads}`;
+  }
+
+  /** DNS, DHCP and NTP inside UDP, chosen by port. Returns false when the data is left for the caller to show. */
+  application(payload: Uint8Array, srcPort: number, dstPort: number): boolean {
+    const on = (...ports: number[]) => ports.includes(srcPort) || ports.includes(dstPort);
+    const report = (level: Issue['level'], text: string) => this.issue(level, text);
+    const layer = on(53) ? decodeDns(payload, report) : on(67, 68) ? decodeDhcp(payload, report) : on(123) ? decodeNtp(payload, report) : undefined;
+    if (!layer) return false;
+    this.layers.push(layer);
+    return true;
   }
 
   // ---- TCP
@@ -801,7 +725,7 @@ class Decoder {
     for (const f of TCP_FLAGS) display[`flag${f}`] = String(num(s.raw[`flag${f}`]));
     this.layers.push(instance(TCP, seg, s, display, `${srcPort} to ${dstPort}, [${flags.join(', ')}]`));
     const payload = seg.subarray(headerLen);
-    if (payload.length) this.data(payload, undefined, this.portNote(srcPort, dstPort));
+    if (payload.length) this.data(payload, undefined, this.portNote(srcPort, dstPort, 'TCP'));
   }
 
   tcpOptions(bytes: Uint8Array): StructInstance[] {
@@ -874,7 +798,12 @@ class Decoder {
     }
     this.layers.push(instance(UDP, dgram, s, { length: `${length} (8 header + ${Math.max(0, length - 8)} data)`, checksum }, `${srcPort} to ${dstPort}, length ${length}`));
     const payload = dgram.subarray(8, end);
-    if (payload.length) this.data(payload, undefined, this.portNote(srcPort, dstPort));
+    if (!payload.length) return;
+    if (!ctx.complete && [53, 67, 68, 123].some((p) => p === srcPort || p === dstPort)) {
+      this.data(payload, undefined, 'The datagram is incomplete, so the application data is not decoded.');
+      return;
+    }
+    if (!this.application(payload, srcPort, dstPort)) this.data(payload, undefined, this.portNote(srcPort, dstPort, 'UDP'));
   }
 
   // ---- ICMP

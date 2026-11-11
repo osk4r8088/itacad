@@ -1,0 +1,1 @@
+var e=e=>({id:e.id,phase:e.phase,from:e.from,to:e.to,path:e.path,...e.extraPaths?{extraPaths:e.extraPaths}:{},label:e.label,details:e.details,captures:e.captures,sources:e.sources,time:e.time,category:e.category,protocol:e.protocol,info:e.info,...e.states?{states:e.states}:{},...e.learned?{learned:e.learned}:{},...e.lost?{lost:!0}:{}});export{e as t};

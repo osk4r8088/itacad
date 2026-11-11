@@ -2,7 +2,7 @@ import type { Capture, Exchange } from '../../shared/schema';
 import { dhcp, type DhcpOption } from '../../shared/headers/dhcp';
 import { ethIpv4Udp } from '../../shared/headers/stacks';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542.
 const CLIENT_MAC = '00:00:5e:00:53:0a';
 const SERVER = { mac: '00:00:5e:00:53:01', ip: '192.0.2.1' };
 const OFFERED = '192.0.2.50';
@@ -125,7 +125,7 @@ export const dhcpExchange: Exchange = {
     { rfc: 951, note: 'BOOTP, the message format DHCP extends' },
     { rfc: 5227, note: 'IPv4 address conflict detection' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     { id: 'client', label: 'Client', kind: 'host', addr: { mac: CLIENT_MAC }, pos: { x: 0, y: 0 }, lifeline: true, note: 'No IP address yet' },

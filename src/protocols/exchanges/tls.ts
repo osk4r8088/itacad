@@ -3,7 +3,7 @@ import { changeCipherSpec, clientHello, encrypted, ext, record, serverHello } fr
 import { randomBytes } from './common';
 import { CLIENT_LAN, TcpConversation, clientServer, dir, type Side } from './conversation';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, names RFC 2606. Random values, key shares and
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, names RFC 2606. Random values, key shares and
 // ciphertext are deterministic stand-ins (see randomBytes), not real keys or real ciphertext.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.80';

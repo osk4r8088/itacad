@@ -4,7 +4,7 @@ import { arp } from '../../shared/headers/arp';
 import { bpdu, llc, STP_MULTICAST, type BpduParams, type BridgeId } from '../../shared/headers/stp';
 
 // Three switches in a triangle. First without Spanning Tree (a broadcast storm), then with classic STP
-// (IEEE 802.1D): election, a blocked port, and a link failure. MAC addresses RFC 7042, IPv4 RFC 5737.
+// (IEEE 802.1D): election, a blocked port, and a link failure. MAC addresses RFC 9542, IPv4 RFC 5737.
 // All links 1 Gbit/s, port cost 20,000 (802.1D-2004 recommendation).
 
 const SW1: BridgeId = { priority: 32768, mac: '00:00:5e:00:53:11' };

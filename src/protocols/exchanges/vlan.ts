@@ -5,7 +5,7 @@ import { icmpEcho } from '../../shared/headers/icmp';
 import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 
 // Two VLANs on two switches joined by a trunk, and a router on a stick that routes between them.
-// VLAN 10: 192.0.2.0/26, VLAN 20: 192.0.2.64/26 (RFC 5737). MAC addresses RFC 7042.
+// VLAN 10: 192.0.2.0/26, VLAN 20: 192.0.2.64/26 (RFC 5737). MAC addresses RFC 9542.
 // The trunk carries VLAN 10 tagged and VLAN 20 as its native VLAN, untagged.
 
 const A = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.10' };

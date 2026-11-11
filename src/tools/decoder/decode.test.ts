@@ -131,11 +131,11 @@ describe('problems in the input', () => {
 
   it('stops at an unknown EtherType', () => {
     const b = example('ping');
-    b[12] = 0x86;
-    b[13] = 0xdd;
+    b[12] = 0x88;
+    b[13] = 0xcc;
     const d = decode(b, 'ethernet');
     expect(ids(d)).toEqual(['ethernet', 'data']);
-    expect(value(d, 'ethernet', 'type').display).toBe('0x86dd (IPv6)');
+    expect(value(d, 'ethernet', 'type').display).toBe('0x88cc (LLDP)');
     expect(d.issues[0]).toMatchObject({ level: 'info' });
   });
 
@@ -186,5 +186,99 @@ describe('texts for real input', () => {
         for (const t of texts) expect(t).not.toMatch(/this example/);
       }
     }
+  });
+});
+
+describe('IPv6', () => {
+  /** An IPv6 packet between documentation addresses with the given Next Header, Hop Limit and payload. */
+  const SRC = Uint8Array.from([0x20, 0x01, 0x0d, 0xb8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0a]);
+  const DST = Uint8Array.from([0x20, 0x01, 0x0d, 0xb8, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x50]);
+  const packet = (nextHeader: number, payload: Uint8Array, hopLimit = 64) =>
+    Uint8Array.from([0x60, 0, 0, 0, payload.length >> 8, payload.length & 0xff, nextHeader, hopLimit, ...SRC, ...DST, ...payload]);
+  /** Fills in the checksum at `at` over the IPv6 pseudo-header for the upper-layer protocol `protocol`. */
+  const withChecksum = (segment: Uint8Array, protocol: number, at: number) => {
+    const n = segment.length;
+    const pseudo = Uint8Array.from([...SRC, ...DST, n >>> 24, (n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff, 0, 0, 0, protocol]);
+    const all = Uint8Array.from([...pseudo, ...segment]);
+    let sum = 0;
+    for (let i = 0; i < all.length; i += 2) sum += (all[i] << 8) | (all[i + 1] ?? 0);
+    while (sum >> 16) sum = (sum & 0xffff) + (sum >> 16);
+    const c = ~sum & 0xffff;
+    const out = segment.slice();
+    out[at] = c >> 8;
+    out[at + 1] = c & 0xff;
+    return out;
+  };
+  const tcpSyn = () => withChecksum(Uint8Array.from([0xc2, 0x94, 0, 80, 0, 0, 0, 1, 0, 0, 0, 0, 0x50, 0x02, 0xfa, 0xf0, 0, 0, 0, 0]), 6, 16);
+  const udp = (checksum: boolean) => {
+    const d = Uint8Array.from([0xc4, 0x88, 0, 53, 0, 12, 0, 0, 1, 2, 3, 4]);
+    return checksum ? withChecksum(d, 17, 6) : d;
+  };
+
+  it('decodes a Router Advertisement with its options', () => {
+    const d = decode(example('ipv6-ra'));
+    expect(ids(d)).toEqual(['ethernet', 'ipv6', 'icmpv6-ra']);
+    expect(d.checks).toContainEqual({ label: 'ICMPv6 checksum', ok: true });
+    expect(d.checks.every((c) => c.ok)).toBe(true);
+    expect(d.issues.filter((i) => i.level !== 'info')).toEqual([]);
+    const options = value(d, 'icmpv6-ra', 'options');
+    expect(options.items?.map((o) => o.def.id)).toEqual(['nd-opt-slla', 'nd-opt-mtu', 'nd-opt-prefix']);
+    expect(options.display).toContain('Prefix 2001:db8:1::/64, SLAAC');
+  });
+
+  it('detects an IPv6 packet without Ethernet header', () => {
+    const frame = example('ipv6-ping');
+    const d = decode(frame.subarray(14, 14 + 40 + ((frame[18] << 8) | frame[19]))); // without Ethernet header and FCS
+    expect(d.start).toBe('ipv6');
+    expect(ids(d)).toEqual(['ipv6', 'icmpv6-echo']);
+    expect(d.checks.every((c) => c.ok)).toBe(true);
+  });
+
+  it('checks TCP over IPv6 with the IPv6 pseudo-header', () => {
+    const d = decode(packet(6, tcpSyn()), 'ipv6');
+    expect(ids(d)).toEqual(['ipv6', 'tcp']);
+    expect(d.checks).toEqual([{ label: 'TCP checksum', ok: true }]);
+    const broken = packet(6, tcpSyn());
+    broken[39] ^= 1; // change the destination address: the pseudo-header covers it
+    expect(decode(broken, 'ipv6').checks).toEqual([{ label: 'TCP checksum', ok: false }]);
+  });
+
+  it('checks UDP over IPv6 and rejects a zero checksum', () => {
+    expect(decode(packet(17, udp(true)), 'ipv6').checks).toEqual([{ label: 'UDP checksum', ok: true }]);
+    const zero = decode(packet(17, udp(false)), 'ipv6');
+    expect(zero.issues.some((i) => i.level === 'warning' && i.text.includes('mandatory'))).toBe(true);
+  });
+
+  it('skips extension headers by their length', () => {
+    const hopByHop = Uint8Array.from([6, 0, 1, 4, 0, 0, 0, 0]); // Next Header TCP, 8 octets, PadN
+    const destOpts = Uint8Array.from([0, 1, 1, 12, ...new Array(12).fill(0)]); // Next Header Hop-by-Hop (for the test), 16 octets
+    const d = decode(packet(60, Uint8Array.from([...destOpts, ...hopByHop, ...tcpSyn()])), 'ipv6');
+    expect(ids(d)).toEqual(['ipv6', 'ipv6-ext', 'ipv6-ext', 'tcp']);
+    expect(d.layers[1].def.name).toBe('Destination Options');
+    expect(d.layers[1].bytes.length).toBe(16);
+    expect(d.checks).toEqual([{ label: 'TCP checksum', ok: true }]);
+  });
+
+  it('reads the Fragment header and stops at a later fragment', () => {
+    const first = decode(packet(44, Uint8Array.from([6, 0, 0, 1, 0, 0, 0, 7, ...tcpSyn()])), 'ipv6');
+    expect(ids(first)).toEqual(['ipv6', 'ipv6-frag', 'tcp']);
+    expect(first.checks).toEqual([]); // the checksum covers the whole packet, not just this fragment
+    const later = decode(packet(44, Uint8Array.from([6, 0, 0, 0xb8, 0, 0, 0, 7, 1, 2, 3, 4])), 'ipv6');
+    expect(ids(later)).toEqual(['ipv6', 'ipv6-frag', 'fragment']);
+    expect(value(later, 'ipv6-frag', 'fragOffset').display).toBe('23 (184 octets)');
+  });
+
+  it('warns when a Neighbor Discovery message has crossed a router', () => {
+    const b = example('ipv6-ra');
+    b[14 + 7] = 64; // Hop Limit is not covered by the checksum
+    const d = decode(b);
+    expect(d.checks.every((c) => c.ok)).toBe(true);
+    expect(d.issues.some((i) => i.level === 'warning' && i.text.includes('Hop Limit 255'))).toBe(true);
+  });
+
+  it('reports a Neighbor Discovery option with length zero', () => {
+    const b = example('ipv6-ra');
+    b[14 + 40 + 16 + 1] = 0; // Length of the first option
+    expect(decode(b).issues.some((i) => i.level === 'error' && i.text.includes('invalid length'))).toBe(true);
   });
 });

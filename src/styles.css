@@ -3183,3 +3183,67 @@ table.kv th {
   color: var(--text);
   font-weight: 600;
 }
+
+/* ---------- bandwidth calculator ---------- */
+.bandwidth-tool section + section {
+  margin-top: 2rem;
+}
+.bw-pair {
+  display: flex;
+  gap: 0.4rem;
+}
+.bw-pair input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bandwidth-tool select {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.bw-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.bandwidth-tool .field.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+.bandwidth-tool .field.check label {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.bw-units {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.75rem;
+}
+.bw-units caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.3rem;
+}
+.bw-units tr.is-input th,
+.bw-units tr.is-input td {
+  color: var(--accent);
+  font-weight: 600;
+}
+.bw-frame {
+  display: flex;
+  margin: 0.75rem 0 0.3rem;
+  font-size: 0.75rem;
+}
+.bw-part {
+  min-width: 2.2rem;
+  padding: 0.35rem 0.3rem;
+  border: 1px solid;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

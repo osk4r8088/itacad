@@ -1,0 +1,163 @@
+import type { Topic } from '../../schema';
+
+const PCIE = { spec: 'PCI-SIG: PCI Express Base Specification', url: 'https://pcisig.com/specifications' };
+
+export const mainboard: Topic = {
+  id: 'mainboard',
+  category: 'hardware',
+  title: 'Mainboard and buses',
+  level: 2,
+  definition: 'The mainboard (motherboard) is the circuit board that holds the CPU, the memory and the slots for everything else, and connects them with buses: sets of wires with rules for how data travels over them.',
+  why: 'Whether a fast SSD or graphics card reaches its speed depends on the slot it sits in and the lanes behind that slot. The names involved (PCIe generation, x4, x16, chipset, USB 3.2 Gen 2x2) describe exactly that, and reading them saves wrong purchases and puzzling slowdowns.',
+  sections: [
+    {
+      heading: 'What is on the board',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'The CPU socket, and next to it the voltage regulator (VRM) that turns the 12 V of the power supply into the roughly 1 V the processor runs on.',
+            'Memory slots, wired directly to the CPU.',
+            'PCI Express slots and M.2 slots for graphics cards, SSDs and other expansion cards.',
+            'The chipset: a chip that provides further connections, such as SATA ports, USB ports and more PCI Express lanes.',
+            'A flash chip with the firmware (UEFI), the first program that runs after power-on. It initializes the hardware and starts the boot loader of the operating system.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Some connections go straight to the CPU, typically the memory, the main graphics slot and one or two M.2 slots. Everything else hangs off the chipset, and the chipset itself is connected to the CPU by a single link. All devices behind the chipset share that link, so several fast devices there can slow each other down when they are busy at the same time.',
+        },
+      ],
+    },
+    {
+      heading: 'PCI Express: lanes instead of a shared bus',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Older buses such as PCI were shared: all cards sat on the same parallel wires and took turns. PCI Express (PCIe) replaced this with point-to-point links. Each device has its own link, and a link consists of one or more lanes. A lane is two pairs of wires, one pair per direction, carrying bits one after the other.',
+        },
+        {
+          kind: 'text',
+          text: 'The width of a link is written x1, x2, x4, x8 or x16: the number of lanes. More lanes carry proportionally more data. An NVMe SSD normally uses x4, a graphics card x16. Each generation of the standard doubled the rate of a lane.',
+        },
+        {
+          kind: 'table',
+          caption: 'PCI Express generations, per lane and per direction',
+          columns: ['Generation', 'Transfer rate', 'Line code', 'Usable data rate per lane'],
+          rows: [
+            ['1.0', '2.5 GT/s', '8b/10b', '250 MB/s'],
+            ['2.0', '5 GT/s', '8b/10b', '500 MB/s'],
+            ['3.0', '8 GT/s', '128b/130b', 'about 985 MB/s'],
+            ['4.0', '16 GT/s', '128b/130b', 'about 1.97 GB/s'],
+            ['5.0', '32 GT/s', '128b/130b', 'about 3.94 GB/s'],
+            ['6.0', '64 GT/s', 'PAM4 signaling, flit mode', 'close to 8 GB/s'],
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'GT/s counts the symbols on the wire. The line code adds bits so the receiver can stay in step: with 8b/10b, 10 bits on the wire carry 8 bits of data, with 128b/130b it is 130 for 128. The data rates are calculated from that and do not include protocol overhead. From 6.0 on, error correction replaces the line code; the value for 6.0 is the rate on the wire, the usable rate is somewhat lower.',
+        },
+        {
+          kind: 'text',
+          text: 'Both ends negotiate when the link starts (link training): they agree on the highest generation and the largest width that both support. So a PCIe 3.0 card works in a 5.0 slot at 3.0 speed, and an x4 card works in an x16 slot with four lanes. A slot can also be longer than it is wired: an x16-sized slot with only four lanes connected is common, and the manual of the board says which slots are which.',
+        },
+      ],
+    },
+    {
+      heading: 'USB: one name, many speeds',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'USB connects devices outside the case. Its naming has been changed several times, so the same speed carries several names, and the plug says little about the speed.',
+        },
+        {
+          kind: 'table',
+          caption: 'USB speeds and their names',
+          columns: ['Speed', 'Names in use', 'Remark'],
+          rows: [
+            ['480 Mb/s', 'USB 2.0, Hi-Speed', 'Enough for keyboards, mice, audio'],
+            ['5 Gb/s', 'USB 3.0, USB 3.1 Gen 1, USB 3.2 Gen 1, USB 5Gbps', 'All four names mean the same'],
+            ['10 Gb/s', 'USB 3.1 Gen 2, USB 3.2 Gen 2, USB 10Gbps', ''],
+            ['20 Gb/s', 'USB 3.2 Gen 2x2, USB 20Gbps', 'Two lanes of 10 Gb/s, USB-C only'],
+            ['20 or 40 Gb/s', 'USB4, USB 40Gbps', 'USB-C only'],
+            ['80 Gb/s', 'USB4 Version 2.0, USB 80Gbps', 'USB-C only'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'USB-C is the name of the plug, not of a speed. A USB-C port can be anything from USB 2.0 to USB4, and it may or may not carry video or charge a laptop. The speed that is reached is the lowest of port, cable and device.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'A card only works in a slot of its own generation and size.', truth: 'PCI Express is compatible in both directions. A card and a slot negotiate the highest generation and width both support; an older or narrower partner only limits the speed.' },
+    { myth: 'A USB-C port is a fast port.', truth: 'USB-C is only the shape of the plug. Behind it can be USB 2.0 with 480 Mb/s or USB4 with 40 Gb/s. The specification of the device or a symbol next to the port tells which.' },
+    { myth: 'A long x16 slot always has 16 lanes.', truth: 'The length says which cards fit mechanically. How many lanes are wired is a separate matter; second and third long slots often have four or eight.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'sudo lspci -vv | grep -E "^[0-9a-f]|LnkCap:|LnkSta:"', shows: 'For every PCIe device what its link can do (LnkCap: speed and width) and what was negotiated (LnkSta). A device running below its capability sits in a slower or narrower slot.' },
+      { os: 'Linux', command: 'sudo dmidecode -t baseboard', shows: 'Maker, model and version of the mainboard, read from the firmware tables (SMBIOS).' },
+      { os: 'Linux', command: 'lsusb -t', shows: 'The USB devices as a tree with the speed each one runs at (480M, 5000M, 10000M).' },
+      { os: 'Windows', command: 'Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product, Version', shows: 'Maker and model of the mainboard (PowerShell).' },
+      { os: 'macOS', command: 'system_profiler SPHardwareDataType', shows: 'Model, processor and memory of the machine.' },
+    ],
+    numbers: [
+      { label: 'PCIe 3.0, one lane', value: 'about 985 MB/s', note: 'calculated: 8 Gb/s x 128/130 / 8' },
+      { label: 'PCIe 4.0 x4 (typical NVMe SSD)', value: 'about 7.9 GB/s', note: 'calculated: 4 lanes of 1.97 GB/s' },
+      { label: 'PCIe 5.0 x16', value: 'about 63 GB/s', note: 'calculated: 16 lanes of 3.94 GB/s, per direction' },
+      { label: 'USB 2.0', value: '480 Mb/s', note: 'that is 60 MB/s before overhead' },
+    ],
+    examples: [
+      'An NVMe SSD that reaches only half its advertised speed: it sits in an M.2 slot that provides an older PCIe generation or only two lanes.',
+      'An external SSD that copies at 40 MB/s: it is plugged into a USB 2.0 port or connected with a USB 2.0 cable.',
+    ],
+  },
+  terms: [
+    { term: 'Mainboard', definition: 'The main circuit board of a computer, also called motherboard: it holds CPU, memory and slots and connects them.' },
+    { term: 'Bus', definition: 'A connection between components together with the rules for transferring data over it.' },
+    { term: 'PCI Express (PCIe)', definition: 'The standard point-to-point connection for expansion cards and SSDs inside a computer, built from serial lanes.' },
+    { term: 'Lane', definition: 'One serial connection of a PCI Express link: two wire pairs, one per direction. Links have 1, 2, 4, 8 or 16 lanes.' },
+    { term: 'Chipset', definition: 'A chip on the mainboard that provides additional ports and lanes and shares one link to the CPU among them.' },
+    { term: 'UEFI', definition: 'The firmware interface of current computers: the program on the mainboard that initializes the hardware and starts the operating system.' },
+    { term: 'USB-C', definition: 'A reversible plug used by USB and other standards. It says nothing about the speed of the port.' },
+  ],
+  related: [{ topic: 'cpu' }, { topic: 'storage' }, { topic: 'gpu' }, { topic: 'nic' }, { entry: 'bandwidth' }],
+  sources: [
+    { ...PCIE, note: 'lanes and links, transfer rates and encodings per generation, link training' },
+    { spec: 'USB Implementers Forum: USB 3.2 and USB4 specifications, and the USB data performance language guidelines', url: 'https://www.usb.org/documents', note: 'speeds and names' },
+    { spec: 'UEFI Forum: Unified Extensible Firmware Interface (UEFI) Specification', url: 'https://uefi.org/specifications' },
+    { spec: 'DMTF: System Management BIOS (SMBIOS) Reference Specification, DSP0134', url: 'https://www.dmtf.org/standards/smbios', note: 'baseboard information read by dmidecode' },
+  ],
+  quiz: [
+    {
+      id: 'negotiate',
+      prompt: 'A PCIe 5.0 x4 SSD is put into a slot that provides PCIe 3.0 with four lanes. What happens?',
+      options: ['It does not work', 'It runs at PCIe 3.0 speed on four lanes', 'It runs at PCIe 5.0 speed on two lanes', 'It runs at full speed, the slot adapts'],
+      answer: 1,
+      explanation: 'Both ends negotiate the highest generation both support, here 3.0. Per lane that is about 985 MB/s, so about 3.9 GB/s on four lanes.',
+    },
+    {
+      id: 'x16',
+      prompt: 'How much data can a PCIe 4.0 link with 16 lanes carry per direction, compared with one lane?',
+      options: ['The same, the lanes are only for redundancy', '4 times as much', '16 times as much', '256 times as much'],
+      answer: 2,
+      explanation: 'Lanes add up: 16 lanes of about 1.97 GB/s give about 31.5 GB/s.',
+    },
+    {
+      id: 'usbc',
+      prompt: 'What does it tell you that a port has a USB-C socket?',
+      options: ['It transfers at least 10 Gb/s', 'It can charge a laptop', 'Only which plug fits; the speed can be anything from USB 2.0 to USB4', 'It is a Thunderbolt port'],
+      answer: 2,
+      explanation: 'USB-C is a connector. The standard and speed behind it are a separate property of the port.',
+    },
+    {
+      id: 'chipset',
+      prompt: 'Two SSDs connected through the chipset are both copying large files and are slower than each one alone. What is a likely reason?',
+      options: ['The CPU is too slow', 'They share the one link between chipset and CPU', 'SSDs cannot be used in parallel', 'The firmware limits them'],
+      answer: 1,
+      explanation: 'All devices behind the chipset share its link to the CPU. When their combined traffic exceeds what that link carries, they slow each other down.',
+    },
+  ],
+};

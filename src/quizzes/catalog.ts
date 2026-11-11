@@ -22,6 +22,7 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   nat: () => import('./nat').then((m) => m.natQuiz),
   ipv6: () => import('./ipv6').then((m) => m.ipv6Quiz),
   vlan: () => import('./vlan').then((m) => m.vlanQuiz),
+  stp: () => import('./stp').then((m) => m.stpQuiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

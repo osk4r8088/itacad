@@ -158,6 +158,13 @@ export const CATALOG: CatalogEntry[] = [
     load: () => import('./exchanges/vlan').then((m) => m.vlanExchange),
   },
   {
+    id: 'stp',
+    title: 'Spanning Tree',
+    summary: 'Three switches in a triangle: a broadcast storm without STP, the root election, a blocked port, and recovery after a link failure.',
+    group: 'Link',
+    load: () => import('./exchanges/stp').then((m) => m.stpExchange),
+  },
+  {
     id: 'arp',
     title: 'ARP',
     summary: 'Resolving the MAC address of the default gateway before the first packet can leave.',
@@ -169,7 +176,6 @@ export const CATALOG: CatalogEntry[] = [
 
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
-  { title: 'Spanning Tree', group: 'Link' },
 ];
 
 export interface NavEntry {

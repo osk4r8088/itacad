@@ -85,22 +85,61 @@ export interface Instant {
 
 const NTP_EPOCH_OFFSET = 2208988800n;
 
+/** Shows a 64-bit NTP timestamp as a date in era 0, to the microsecond. */
+export function ntpTimestampDisplay(raw: bigint): string {
+  if (raw === 0n) return '0 (not set)';
+  let secs = raw >> 32n;
+  let us = ((raw & 0xffffffffn) * 1000000n + (1n << 31n)) >> 32n;
+  if (us === 1000000n) {
+    secs += 1n;
+    us = 0n;
+  }
+  const iso = new Date(Number(secs - NTP_EPOCH_OFFSET) * 1000).toISOString().replace('T', ' ').replace('.000Z', '');
+  return `${iso}.${String(us).padStart(6, '0')} UTC (${hex(raw, 16)})`;
+}
+
 function ntpTimestamp(t: Instant | null): { raw: bigint; display: string } {
-  if (!t) return { raw: 0n, display: '0 (not set)' };
+  if (!t) return { raw: 0n, display: ntpTimestampDisplay(0n) };
   const secs = BigInt(t.unix) + NTP_EPOCH_OFFSET;
   const frac = (BigInt(t.us) << 32n) / 1000000n;
   const raw = (secs << 32n) | frac;
-  const iso = new Date(t.unix * 1000).toISOString().replace('T', ' ').replace('.000Z', '');
-  return { raw, display: `${iso}.${String(t.us).padStart(6, '0')} UTC (${hex(raw, 16)})` };
+  return { raw, display: ntpTimestampDisplay(raw) };
 }
+
+/** NTP short format: 16 bits of seconds and 16 bits of fraction. */
+export const ntpShortDisplay = (raw: number) => `${hex(raw, 8)} (${(raw / 65536).toFixed(4)} s)`;
 
 function short(seconds: number): { raw: number; display: string } {
   const raw = Math.round(seconds * 65536);
-  return { raw, display: `${hex(raw, 8)} (${(raw / 65536).toFixed(4)} s)` };
+  return { raw, display: ntpShortDisplay(raw) };
 }
 
 function signed8(n: number) {
   return n < 0 ? 256 + n : n;
+}
+
+/** RFC 5905 Figure 9. */
+export const NTP_LI = ['0 (no warning)', '1 (61 s minute)', '2 (59 s minute)', '3 (not synchronized)'];
+/** RFC 5905 Figure 10. */
+export const NTP_MODES = ['reserved', 'symmetric active', 'symmetric passive', 'client', 'server', 'broadcast', 'NTP control message', 'reserved for private use'];
+
+/** RFC 5905 Figure 11. */
+export function ntpStratumDisplay(stratum: number): string {
+  if (stratum === 0) return '0 (unspecified)';
+  if (stratum === 1) return '1 (primary server)';
+  if (stratum <= 15) return `${stratum} (secondary server)`;
+  return stratum === 16 ? '16 (unsynchronized)' : `${stratum} (reserved)`;
+}
+
+/** Poll as a signed power of two in seconds. */
+export const ntpPollDisplay = (poll: number) => `${poll} (${2 ** poll} s)`;
+
+/** Precision as a signed power of two in seconds, with the value in a readable unit. */
+export function ntpPrecisionDisplay(precision: number): string {
+  if (precision === 0) return '0';
+  const s = 2 ** precision;
+  const approx = s < 1e-6 ? `${Math.round(s * 1e9)} ns` : s < 1e-3 ? `${+(s * 1e6).toPrecision(3)} us` : s < 1 ? `${+(s * 1e3).toPrecision(3)} ms` : `${s} s`;
+  return `${precision} (about ${approx})`;
 }
 
 export interface NtpParams extends Annotations {
@@ -121,19 +160,15 @@ export interface NtpParams extends Annotations {
 }
 
 export function ntp(p: NtpParams): LayerInstance {
-  const LI = ['0 (no warning)', '1 (61 s minute)', '2 (59 s minute)', '3 (not synchronized)'];
   return buildStruct(
     ntpDef,
     {
-      li: { raw: p.li, display: LI[p.li] },
+      li: { raw: p.li, display: NTP_LI[p.li] },
       vn: { raw: p.vn, display: String(p.vn) },
-      mode: { raw: p.mode, display: p.mode === 3 ? '3 (client)' : '4 (server)' },
-      stratum: { raw: p.stratum, display: p.stratum === 0 ? '0 (unspecified)' : String(p.stratum) },
-      poll: { raw: signed8(p.poll), display: `${p.poll} (${2 ** p.poll} s)` },
-      precision: {
-        raw: signed8(p.precision),
-        display: p.precision === 0 ? '0' : `${p.precision} (about ${Math.round(2 ** p.precision * 1e9)} ns)`,
-      },
+      mode: { raw: p.mode, display: `${p.mode} (${NTP_MODES[p.mode]})` },
+      stratum: { raw: p.stratum, display: ntpStratumDisplay(p.stratum) },
+      poll: { raw: signed8(p.poll), display: ntpPollDisplay(p.poll) },
+      precision: { raw: signed8(p.precision), display: ntpPrecisionDisplay(p.precision) },
       rootDelay: short(p.rootDelay),
       rootDisp: short(p.rootDisp),
       refid: p.refid ? { raw: parseIpv4(p.refid), display: p.refid } : { raw: 0, display: '0' },
@@ -143,6 +178,6 @@ export function ntp(p: NtpParams): LayerInstance {
       xmtTs: ntpTimestamp(p.xmtTs),
     },
     p,
-    `NTPv${p.vn} ${p.mode === 3 ? 'client' : 'server'}, stratum ${p.stratum}`,
+    `NTPv${p.vn} ${NTP_MODES[p.mode]}, stratum ${p.stratum}`,
   );
 }

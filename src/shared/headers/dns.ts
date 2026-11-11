@@ -99,6 +99,104 @@ export const dnsRrDef: StructDef = {
   sources: [{ rfc: 1035, section: '4.1.3' }],
 };
 
+/**
+ * The OPT pseudo-record of EDNS(0). It has the outline of a resource record, but CLASS and TTL carry other values.
+ * RFC 6891 sections 6.1.2 and 6.1.3.
+ */
+export const dnsOptDef: StructDef = {
+  id: 'dns-opt',
+  name: 'OPT pseudo-record (EDNS)',
+  about:
+    'EDNS(0) extends DNS without changing the header: the sender adds one OPT record to the Additional section. It is not data about a name. It tells the other side how large a UDP message the sender can take, carries more flag and response code bits, and can hold options. A message may contain only one OPT record.',
+  fields: [
+    { id: 'name', name: 'NAME', bits: 8, about: 'Always the root name: a single zero octet.', source: { rfc: 6891, section: '6.1.2' } },
+    { id: 'type', name: 'TYPE', bits: 16, about: '41 = OPT.', source: { rfc: 6891, section: '6.1.1' } },
+    {
+      id: 'udpSize',
+      name: 'CLASS (UDP payload size)',
+      bits: 16,
+      about: 'In place of the class: the largest UDP message, in octets, that the sender can receive. Values below 512 count as 512.',
+      source: { rfc: 6891, section: '6.2.3' },
+    },
+    {
+      id: 'extRcode',
+      name: 'EXTENDED-RCODE',
+      bits: 8,
+      about: 'The first part of the TTL field. These are the upper 8 bits of a 12-bit response code; the RCODE in the header holds the lower 4.',
+      source: { rfc: 6891, section: '6.1.3' },
+    },
+    { id: 'version', name: 'VERSION', bits: 8, about: 'EDNS version of the sender. 0 is the version RFC 6891 defines.', source: { rfc: 6891, section: '6.1.3' } },
+    { id: 'do', name: 'DO', short: 'DO', bits: 1, about: 'DNSSEC OK: the sender can handle DNSSEC records and wants them in the response.', source: { rfc: 6891, section: '6.1.4' } },
+    { id: 'z', name: 'Z', bits: 15, about: 'Reserved. Senders set it to zero, receivers ignore it.', source: { rfc: 6891, section: '6.1.3' } },
+    { id: 'rdlength', name: 'RDLENGTH', bits: 16, about: 'Length of the options in octets.', source: { rfc: 6891, section: '6.1.2' } },
+    {
+      id: 'rdata',
+      name: 'RDATA',
+      bits: 'variable',
+      about: 'Zero or more options, each with a 16-bit OPTION-CODE, a 16-bit OPTION-LENGTH and its data.',
+      source: { rfc: 6891, section: '6.1.2' },
+    },
+  ],
+  sources: [{ rfc: 6891, section: '6.1' }],
+};
+
+/** Record types by number. Source: IANA Resource Record (RR) TYPEs registry. */
+export const DNS_TYPES: Record<number, string> = {
+  1: 'A',
+  2: 'NS',
+  5: 'CNAME',
+  6: 'SOA',
+  12: 'PTR',
+  15: 'MX',
+  16: 'TXT',
+  28: 'AAAA',
+  33: 'SRV',
+  35: 'NAPTR',
+  41: 'OPT',
+  43: 'DS',
+  46: 'RRSIG',
+  47: 'NSEC',
+  48: 'DNSKEY',
+  50: 'NSEC3',
+  52: 'TLSA',
+  64: 'SVCB',
+  65: 'HTTPS',
+  252: 'AXFR',
+  255: 'ANY',
+  257: 'CAA',
+};
+/** Classes by number. Source: IANA DNS CLASSes registry. */
+export const DNS_CLASSES: Record<number, string> = { 1: 'IN', 3: 'CH', 4: 'HS', 254: 'NONE', 255: 'ANY' };
+/** Source: IANA DNS OpCodes registry. */
+export const DNS_OPCODES: Record<number, string> = { 0: 'QUERY', 1: 'IQUERY', 2: 'STATUS', 4: 'NOTIFY', 5: 'UPDATE', 6: 'DSO' };
+/** Source: IANA DNS RCODEs registry. */
+export const DNS_RCODES: Record<number, string> = {
+  0: 'NOERROR',
+  1: 'FORMERR',
+  2: 'SERVFAIL',
+  3: 'NXDOMAIN',
+  4: 'NOTIMP',
+  5: 'REFUSED',
+  6: 'YXDOMAIN',
+  7: 'YXRRSET',
+  8: 'NXRRSET',
+  9: 'NOTAUTH',
+  10: 'NOTZONE',
+};
+
+const named = (n: number, names: Record<number, string>) => (names[n] ? `${n} (${names[n]})` : String(n));
+export const dnsTypeDisplay = (type: number) => named(type, DNS_TYPES);
+export const dnsClassDisplay = (cls: number) => named(cls, DNS_CLASSES);
+export const dnsOpcodeDisplay = (opcode: number) => named(opcode, DNS_OPCODES);
+export const dnsRcodeDisplay = (rcode: number) => named(rcode, DNS_RCODES);
+
+/** A time to live in seconds, with hours or minutes where that is easier to read. */
+export function dnsTtlDisplay(ttl: number): string {
+  if (ttl >= 3600) return `${ttl} s (${+(ttl / 3600).toFixed(2)} h)`;
+  if (ttl >= 60) return `${ttl} s (${+(ttl / 60).toFixed(2)} min)`;
+  return `${ttl} s`;
+}
+
 export type RrType = 'A' | 'NS';
 const TYPE_CODE: Record<RrType, number> = { A: 1, NS: 2 };
 
@@ -187,7 +285,7 @@ export function dns(p: DnsParams): LayerInstance {
         name: { raw: n.bytes, display: n.display },
         type: { raw: TYPE_CODE[r.type], display: `${TYPE_CODE[r.type]} (${r.type})` },
         class: { raw: 1, display: '1 (IN)' },
-        ttl: { raw: r.ttl, display: `${r.ttl} s (${r.ttl >= 3600 ? `${r.ttl / 3600} h` : `${r.ttl / 60} min`})` },
+        ttl: { raw: r.ttl, display: dnsTtlDisplay(r.ttl) },
         rdlength: { raw: rdata.bytes.length, display: String(rdata.bytes.length) },
         rdata: { raw: rdata.bytes, display: rdata.display },
       },
@@ -226,7 +324,7 @@ export function dns(p: DnsParams): LayerInstance {
       z: bit(false),
       ad: bit(false),
       cd: bit(false),
-      rcode: { raw: rcode, display: rcode === 0 ? '0 (NOERROR)' : String(rcode) },
+      rcode: { raw: rcode, display: dnsRcodeDisplay(rcode) },
       qdcount: { raw: 1, display: '1' },
       ancount: { raw: answer.length, display: String(answer.length) },
       nscount: { raw: authority.length, display: String(authority.length) },

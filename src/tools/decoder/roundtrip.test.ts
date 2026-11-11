@@ -4,9 +4,22 @@ import { lessonExchanges } from '../../learn/exchanges';
 
 const exchanges = [...protocolExchanges, ...lessonExchanges];
 import { nestedBytes } from '../../shared/headers/stacks';
+import type { StructInstance } from '../../shared/schema';
 import { decode } from './decode';
 
-const DECODED = new Set(['ethernet', 'vlan', 'ipv4', 'tcp', 'udp', 'arp', 'icmp-echo', 'icmp-time-exceeded', 'icmp-dest-unreachable', 'icmp-frag-needed', 'ipv6', 'icmpv6-echo', 'icmpv6-rs', 'icmpv6-ra', 'icmpv6-ns', 'icmpv6-na']);
+const DECODED = new Set(['ethernet', 'vlan', 'ipv4', 'tcp', 'udp', 'arp', 'icmp-echo', 'icmp-time-exceeded', 'icmp-dest-unreachable', 'icmp-frag-needed', 'ipv6', 'icmpv6-echo', 'icmpv6-rs', 'icmpv6-ra', 'icmpv6-ns', 'icmpv6-na', 'dns', 'dhcp', 'ntp']);
+
+/** DNS, DHCP and NTP: every question, record and option has to match the builders as well. */
+const APPLICATION = new Set(['dns', 'dhcp', 'ntp']);
+
+/** Sub-structures of a field in a comparable form: definition, bytes, and the text and size of every value. */
+const flat = (items: StructInstance[] | undefined): unknown =>
+  (items ?? []).map((i) => ({
+    def: i.def.id,
+    summary: i.summary,
+    bytes: Array.from(i.bytes),
+    values: Object.fromEntries(Object.entries(i.values).map(([id, v]) => [id, `${v.display} [${v.bits} bits]`])),
+  }));
 
 const frames = exchanges.flatMap((ex) =>
   ex.steps.flatMap((step) =>
@@ -31,9 +44,12 @@ describe('decoding every frame shown on the site', () => {
       if (!original || !DECODED.has(layer.def.id)) continue;
       expect(layer.bytes, `${layer.def.id} header bytes`).toEqual(original.bytes);
       for (const [id, v] of Object.entries(layer.values)) {
-        if (!original.values[id] || id === 'options' || id === 'data' || id === 'original') continue;
-        expect(`${layer.def.id}.${id} = ${v.display}`).toBe(`${layer.def.id}.${id} = ${original.values[id].display}`);
+        if (!original.values[id] || id === 'data' || id === 'original') continue;
+        // Option lists of TCP and Neighbor Discovery are compared item by item below; their one-line text differs in wording.
+        const list = id === 'options' && !APPLICATION.has(layer.def.id);
+        if (!list) expect(`${layer.def.id}.${id} = ${v.display}`).toBe(`${layer.def.id}.${id} = ${original.values[id].display}`);
         expect(v.bits, `${layer.def.id}.${id} bits`).toBe(original.values[id].bits);
+        if (APPLICATION.has(layer.def.id)) expect(flat(v.items), `${layer.def.id}.${id} items`).toEqual(flat(original.values[id].items));
       }
     }
   });

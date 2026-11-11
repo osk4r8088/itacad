@@ -115,7 +115,7 @@ export default function DecoderTool() {
     <div className="index tool decoder-tool">
       <h1>Header decoder</h1>
       <p className="lead">
-        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet with 802.1Q VLAN tags, ARP, IPv4, IPv6 with its extension headers, TCP, UDP, ICMP and ICMPv6 with Neighbor Discovery, checks the checksums, and shows every field with its meaning.
+        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet with 802.1Q VLAN tags, ARP, IPv4, IPv6 with its extension headers, TCP, UDP, ICMP and ICMPv6 with Neighbor Discovery, and inside UDP the application protocols DNS, DHCP and NTP. It checks the checksums and shows every field with its meaning.
       </p>
 
       <div className="tool-input decoder-input">
@@ -205,6 +205,9 @@ export default function DecoderTool() {
           </p>
           <p>
             Checksums are recomputed from the content. The IPv4 checksum covers only the IPv4 header, and IPv6 has none; TCP, UDP and ICMPv6 checksums cover a pseudo-header with both IP addresses, their header and the data; the Ethernet FCS is a CRC-32 over the whole frame. Captures from the sending host often show wrong TCP or UDP checksums because the network card fills them in later (checksum offloading).
+          </p>
+          <p>
+            Above UDP no field names the protocol, so the decoder goes by the port numbers, as a receiving host does: 53 is DNS, 67 and 68 are DHCP, 123 is NTP. In a DNS message it follows the four counts of the header record by record and resolves compressed names; a pointer has to refer to an earlier place in the message, which also rules out loops. In a DHCP message it walks the options by their code and length, and in an NTP packet it shows the timestamps as dates. Data on other ports stays undecoded.
           </p>
           <p>Field names, explanations and sources are the same as in the protocol pages. Nothing you paste leaves your browser.</p>
         </div>

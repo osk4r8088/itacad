@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Exchange } from '../shared/schema';
-import type { HubEntry } from '../shared/hub';
+import { pageTitle, type HubEntry } from '../shared/hub';
 import { ExchangePage } from '../protocols/components/ExchangePage';
 import { href } from '../app/router';
 import { SiteHeader } from '../app/SiteHeader';
@@ -27,7 +27,7 @@ export default function LessonExchange({ entry, step }: { entry: HubEntry; step:
   }, [entry]);
 
   useEffect(() => {
-    document.title = `${entry.title} | Netkit`;
+    document.title = pageTitle(entry.title);
   }, [entry.title]);
 
   const stepHref = useCallback((n: number) => href.lesson(entry.id, n), [entry.id]);

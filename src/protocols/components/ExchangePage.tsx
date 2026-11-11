@@ -11,6 +11,7 @@ import { Prose } from '../../shared/components/Prose';
 import { FlowTable } from './FlowTable';
 import { ProtocolSwitcher } from './ProtocolSwitcher';
 import { PhaseBar } from './PhaseBar';
+import { SITE_NAME } from '../../shared/hub';
 import { hasQuiz } from '../../quizzes/catalog';
 
 /** Relative width of the sequence column in the dashboard: more lifelines need more room. */
@@ -92,7 +93,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb }: Props) {
       <header className="ex-bar">
         <div className="ex-title">
           <a href={href.home} className="site-title">
-            Netkit
+            {SITE_NAME}
           </a>
           <span className="crumb">
             {crumb ?? <ProtocolSwitcher currentId={exchange.id} currentTitle={exchange.title} />}

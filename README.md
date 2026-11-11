@@ -1,8 +1,8 @@
-# Netkit
+# ITACAD
 
-An interactive learning site for computer networks. It shows what really happens on the wire, down to every bit of every header, and offers tools to work with addresses and packets yourself.
+A visual learning site for IT, meant to grow from basic concepts down to the details. Its core today is networking: what really happens on the wire, down to every bit of every header, with tools to work with addresses and packets yourself. Formerly called Netkit.
 
-**Live:** https://osk4r8088.github.io/netkit-webvisualizer/
+**Live:** https://osk4r8088.github.io/itacad/
 
 Static site, Vite + React + TypeScript. Everything runs in the browser: no server, no tracking, no requests at runtime.
 
@@ -87,7 +87,7 @@ pnpm build      # type check and static build into dist/
 1. Pick or open an issue.
 2. Create a branch, commit, and open a pull request that says `Closes #<issue>`.
 3. CI runs typecheck, tests and build on the pull request. `main` is protected, so merging requires a green CI.
-4. A preview of the pull request is published at `https://osk4r8088.github.io/netkit-webvisualizer/pr-<number>/`, and a comment on the pull request links to it.
+4. A preview of the pull request is published at `https://osk4r8088.github.io/itacad/pr-<number>/`, and a comment on the pull request links to it.
 5. Squash and merge. The merge deploys the site to GitHub Pages, removes the preview, and closes the issue.
 
 Dependabot opens pull requests for dependency and action updates.

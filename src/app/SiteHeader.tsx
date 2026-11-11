@@ -1,4 +1,5 @@
 import { href } from './router';
+import { SITE_NAME } from '../shared/hub';
 
 export type Section = 'protocols' | 'tools' | 'explore' | 'learn';
 
@@ -14,7 +15,7 @@ export function SiteHeader({ current }: { current?: Section }) {
   return (
     <header className="site-header">
       <a href={href.home} className="site-title">
-        Netkit
+        {SITE_NAME}
       </a>
       <nav className="site-nav" aria-label="Sections">
         {SECTIONS.map((s) => (

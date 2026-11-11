@@ -10,7 +10,7 @@ export function Home() {
   return (
     <div className="index home">
       <p className="lead">
-        Learn how networks really work: step through real protocol exchanges down to every header field, use tools for everyday tasks, and explore models that show how things work inside.
+        Learn how IT really works, at your own depth: step through real protocol exchanges down to every header field, use tools for everyday tasks, and explore models that show how things work inside.
       </p>
 
       <section className="hub-section" aria-labelledby="h-protocols">

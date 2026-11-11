@@ -21,4 +21,11 @@ export interface HubEntry {
   exchange?: () => Promise<Exchange>;
 }
 
-export const ISSUES_URL = 'https://github.com/osk4r8088/netkit-webvisualizer/issues';
+/** Name of the site, used in the header and page titles. */
+export const SITE_NAME = 'ITACAD';
+
+export const REPO_URL = 'https://github.com/osk4r8088/itacad';
+export const ISSUES_URL = `${REPO_URL}/issues`;
+
+/** Page title in the browser tab: "Topic | ITACAD", or the site name alone. */
+export const pageTitle = (title?: string) => (title ? `${title} | ${SITE_NAME}` : SITE_NAME);

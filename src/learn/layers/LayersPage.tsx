@@ -2,7 +2,7 @@ import { useState, type KeyboardEvent } from 'react';
 import type { OsiLayer, TcpIpLayer } from '../../shared/schema';
 import { OSI_LAYERS, TCPIP_LAYERS, TCPIP_ORDER } from '../../shared/layers';
 import { CATALOG } from '../../protocols/catalog';
-import { TOOLS } from '../../tools/registry';
+import { TOOLS, entryHref } from '../../tools/registry';
 import { tcpExchange } from '../../protocols/exchanges/tcp';
 import { href } from '../../app/router';
 import { SourceList } from '../../shared/components/SourceList';
@@ -147,7 +147,7 @@ export default function LayersPage() {
                 : tools.map((t, i) => (
                     <span key={t.id}>
                       {i > 0 && ', '}
-                      {t.status === 'ready' ? <a href={href.tool(t.id)}>{t.title}</a> : <span className="muted">{t.title} (planned)</span>}
+                      {t.status === 'ready' ? <a href={entryHref(t.id)}>{t.title}</a> : <span className="muted">{t.title} (planned)</span>}
                     </span>
                   ))}
             </dd>

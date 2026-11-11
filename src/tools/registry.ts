@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import type { HubEntry } from '../shared/hub';
+import { href } from '../app/router';
 
 /**
  * All tools. To add one: create src/tools/<id>/ with its logic, tests and a component
@@ -36,7 +37,7 @@ export const TOOLS: HubEntry[] = [
   },
   {
     id: 'ports',
-    purpose: 'use',
+    purpose: 'understand',
     title: 'Well-known ports',
     summary: 'Common ports with their protocol and transport, and the port ranges.',
     status: 'ready',
@@ -108,13 +109,21 @@ export const TOOLS: HubEntry[] = [
   },
 ];
 
-export const TOOL_GROUPS: { purpose: 'use' | 'understand'; title: string; about: string }[] = [
-  { purpose: 'use', title: 'Everyday tools', about: 'For real tasks: calculate, decode, look up, generate.' },
-  { purpose: 'understand', title: 'Explore and understand', about: 'Interactive models that show how something works inside.' },
-];
+export type Purpose = 'use' | 'understand';
 
-/** Tools of one group, ready ones first. */
-export function toolsFor(purpose: 'use' | 'understand'): HubEntry[] {
+/** The two sections built from this registry: everyday tools, and models to explore. */
+export const SECTION_INFO: Record<Purpose, { title: string; about: string }> = {
+  use: { title: 'Tools', about: 'For real tasks: calculate, decode, plan, generate.' },
+  understand: { title: 'Explore and understand', about: 'Interactive models and references that show how something works inside.' },
+};
+
+/** Entries of one section, ready ones first. */
+export function toolsFor(purpose: Purpose): HubEntry[] {
   const list = TOOLS.filter((t) => t.purpose === purpose);
   return [...list.filter((t) => t.status === 'ready'), ...list.filter((t) => t.status !== 'ready')];
+}
+
+/** Link to an entry of this registry, in the section its purpose puts it in. */
+export function entryHref(id: string): string {
+  return TOOLS.find((t) => t.id === id)?.purpose === 'understand' ? href.explorer(id) : href.tool(id);
 }

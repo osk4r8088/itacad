@@ -1,4 +1,4 @@
-import{n as e,t}from"./jsx-runtime-Am8b9ysO.js";import{n}from"./SourceList-Bxr7jCea.js";import{o as r}from"./index-B4JfIP1X.js";var i=e(),a=`11111	abacus
+import{n as e,t}from"./jsx-runtime-Am8b9ysO.js";import{n}from"./SourceList-Bxr7jCea.js";import{s as r}from"./index-C6OJOW5v.js";var i=e(),a=`11111	abacus
 11112	abdomen
 11113	abdominal
 11114	abide

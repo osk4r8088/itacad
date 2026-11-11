@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
  *   #/                     start page
  *   #/protocols            protocol overview
  *   #/protocols/tcp/3      step 3 of the TCP exchange
+ *   #/protocols/tcp/3/tcp/window  the same step with the Window field of the TCP header selected
  *   #/tools, #/tools/<id>  everyday tools, one tool
  *   #/explore, #/explore/<id>  models and references to explore, one of them
  *   #/learn, #/learn/<id>  learning content; lessons that are exchanges take a step: #/learn/<id>/<step>
@@ -13,16 +14,24 @@ import { useEffect, useState } from 'react';
  *   #/basics/glossary      all key terms
  * Links of the old form #/tcp/3 redirect to #/protocols/tcp/3.
  */
+/** A header, and optionally one of its fields, to select in the packet view of a step. */
+export interface Select {
+  layer: string;
+  field?: string;
+}
+
+const selectPath = (select?: Select) => (select ? `/${select.layer}${select.field ? `/${select.field}` : ''}` : '');
+
 export type Route =
   | { page: 'home' }
   | { page: 'protocols' }
-  | { page: 'exchange'; id: string; step: number }
+  | { page: 'exchange'; id: string; step: number; select?: Select }
   | { page: 'tools' }
   | { page: 'tool'; id: string }
   | { page: 'explore' }
   | { page: 'explorer'; id: string }
   | { page: 'learn' }
-  | { page: 'lesson'; id: string; step: number }
+  | { page: 'lesson'; id: string; step: number; select?: Select }
   | { page: 'quiz'; id: string }
   | { page: 'basics' }
   | { page: 'category'; id: string }
@@ -33,13 +42,13 @@ export type Route =
 export const href = {
   home: '#/',
   protocols: '#/protocols',
-  exchange: (id: string, step = 1) => `#/protocols/${id}/${step}`,
+  exchange: (id: string, step = 1, select?: Select) => `#/protocols/${id}/${step}${selectPath(select)}`,
   tools: '#/tools',
   tool: (id: string) => `#/tools/${id}`,
   explore: '#/explore',
   explorer: (id: string) => `#/explore/${id}`,
   learn: '#/learn',
-  lesson: (id: string, step?: number) => (step ? `#/learn/${id}/${step}` : `#/learn/${id}`),
+  lesson: (id: string, step?: number, select?: Select) => (step ? `#/learn/${id}/${step}${selectPath(select)}` : `#/learn/${id}`),
   quizzes: '#/learn/quizzes',
   quiz: (id: string) => `#/learn/quizzes/${id}`,
   basics: '#/basics',
@@ -54,19 +63,20 @@ function stepOf(value: string | undefined): number {
 }
 
 export function parseRoute(hash: string): Route {
-  const [section, id, rest] = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const [section, id, rest, layer, field] = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const select = layer ? { select: { layer, ...(field ? { field } : {}) } } : {};
   switch (section) {
     case undefined:
       return { page: 'home' };
     case 'protocols':
-      return id ? { page: 'exchange', id, step: stepOf(rest) } : { page: 'protocols' };
+      return id ? { page: 'exchange', id, step: stepOf(rest), ...select } : { page: 'protocols' };
     case 'tools':
       return id ? { page: 'tool', id } : { page: 'tools' };
     case 'explore':
       return id ? { page: 'explorer', id } : { page: 'explore' };
     case 'learn':
       if (id === 'quizzes' && rest) return { page: 'quiz', id: rest };
-      return id ? { page: 'lesson', id, step: stepOf(rest) } : { page: 'learn' };
+      return id ? { page: 'lesson', id, step: stepOf(rest), ...select } : { page: 'learn' };
     case 'basics':
       if (id === 'glossary') return { page: 'glossary' };
       if (id && rest) return { page: 'topic', category: id, id: rest };

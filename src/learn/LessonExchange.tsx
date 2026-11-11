@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Exchange } from '../shared/schema';
 import { pageTitle, type HubEntry } from '../shared/hub';
 import { ExchangePage } from '../protocols/components/ExchangePage';
-import { href } from '../app/router';
+import { href, type Select } from '../app/router';
 import { SiteHeader } from '../app/SiteHeader';
 
 const cache = new Map<string, Exchange>();
 
 /** A lesson shown as a step-by-step exchange, at #/learn/<id>/<step>. */
-export default function LessonExchange({ entry, step }: { entry: HubEntry; step: number }) {
+export default function LessonExchange({ entry, step, select }: { entry: HubEntry; step: number; select?: Select }) {
   const [exchange, setExchange] = useState<Exchange | 'failed' | undefined>(() => cache.get(entry.id));
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export default function LessonExchange({ entry, step }: { entry: HubEntry; step:
         exchange={exchange}
         stepNumber={step}
         stepHref={stepHref}
+        select={select}
         entry={{ entry: entry.id }}
         crumb={
           <span className="lesson-crumb">

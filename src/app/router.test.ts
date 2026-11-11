@@ -9,6 +9,9 @@ describe('parseRoute', () => {
     ['#/protocols/tcp', { page: 'exchange', id: 'tcp', step: 1 }],
     ['#/protocols/tcp/3', { page: 'exchange', id: 'tcp', step: 3 }],
     ['#/protocols/tcp/0', { page: 'exchange', id: 'tcp', step: 1 }],
+    ['#/protocols/tcp/3/tcp', { page: 'exchange', id: 'tcp', step: 3, select: { layer: 'tcp' } }],
+    ['#/protocols/tcp/3/tcp/window', { page: 'exchange', id: 'tcp', step: 3, select: { layer: 'tcp', field: 'window' } }],
+    ['#/learn/url-to-page/7/dns/question', { page: 'lesson', id: 'url-to-page', step: 7, select: { layer: 'dns', field: 'question' } }],
     ['#/tools', { page: 'tools' }],
     ['#/tools/subnet', { page: 'tool', id: 'subnet' }],
     ['#/explore', { page: 'explore' }],
@@ -30,6 +33,8 @@ describe('parseRoute', () => {
 
   it('round-trips the link helpers', () => {
     expect(parseRoute(href.exchange('tls', 4))).toEqual({ page: 'exchange', id: 'tls', step: 4 });
+    expect(parseRoute(href.exchange('tcp', 1, { layer: 'tcp', field: 'options' }))).toEqual({ page: 'exchange', id: 'tcp', step: 1, select: { layer: 'tcp', field: 'options' } });
+    expect(parseRoute(href.lesson('syn-flood', 2, { layer: 'ipv4' }))).toEqual({ page: 'lesson', id: 'syn-flood', step: 2, select: { layer: 'ipv4' } });
     expect(parseRoute(href.tool('decoder'))).toEqual({ page: 'tool', id: 'decoder' });
     expect(parseRoute(href.quiz('dns'))).toEqual({ page: 'quiz', id: 'dns' });
     expect(parseRoute(href.topic('hardware', 'memory'))).toEqual({ page: 'topic', category: 'hardware', id: 'memory' });

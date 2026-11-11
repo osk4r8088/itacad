@@ -1,6 +1,7 @@
 import { href } from './router';
 import { SECTIONS, type Section } from './sections';
 import { SITE_NAME } from '../shared/hub';
+import { SearchButton } from '../search/SearchButton';
 
 export type { Section } from './sections';
 
@@ -18,6 +19,7 @@ export function SiteHeader({ current }: { current?: Section }) {
           </a>
         ))}
       </nav>
+      <SearchButton />
     </header>
   );
 }

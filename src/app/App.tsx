@@ -70,7 +70,7 @@ export function App() {
   if (route.page === 'lesson' && lesson?.status === 'ready' && lesson.exchange)
     return (
       <Suspense fallback={<p className="notice muted">Loading...</p>}>
-        <LessonExchange entry={lesson} step={route.step} />
+        <LessonExchange entry={lesson} step={route.step} select={route.select} />
       </Suspense>
     );
 
@@ -78,7 +78,7 @@ export function App() {
   if (route.page === 'exchange')
     return (
       <Suspense fallback={<p className="notice muted">Loading...</p>}>
-        <ExchangeRoute id={route.id} step={route.step} />
+        <ExchangeRoute id={route.id} step={route.step} select={route.select} />
       </Suspense>
     );
 

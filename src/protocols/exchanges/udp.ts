@@ -4,7 +4,7 @@ import { icmpError } from '../../shared/headers/icmp';
 import { textPayload } from '../../shared/headers/payload';
 import { ethIpv4, ipDatagram } from '../../shared/headers/stacks';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, host names RFC 2606.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, host names RFC 2606.
 const WEB = { mac: '00:00:5e:00:53:14', ip: '192.0.2.20' };
 const LOG = { mac: '00:00:5e:00:53:1e', ip: '192.0.2.30' };
 const BACKUP = { mac: '00:00:5e:00:53:1f', ip: '192.0.2.31' };
@@ -79,7 +79,7 @@ export const udpExchange: Exchange = {
     { rfc: 5426, note: 'Syslog over UDP' },
     { rfc: 792, note: 'ICMP Destination Unreachable' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     { id: 'web', label: 'web01', kind: 'server', addr: { mac: WEB.mac, ipv4: WEB.ip }, pos: { x: 0, y: 0 }, lifeline: true, note: 'Web server that sends its logs' },

@@ -5,7 +5,7 @@ import { dns, dnsInfo, type DnsParams } from '../../shared/headers/dns';
 
 // NAT and PAT on a home router. The LAN uses private addresses (RFC 1918); the router has one
 // public address on its uplink. Public addresses are documentation ranges (RFC 5737), MAC
-// addresses RFC 7042. Every step has a capture on each side of the router, inside first.
+// addresses RFC 9542. Every step has a capture on each side of the router, inside first.
 
 const A = { mac: '00:00:5e:00:53:0a', ip: '192.168.1.10' };
 const B = { mac: '00:00:5e:00:53:0b', ip: '192.168.1.11' };

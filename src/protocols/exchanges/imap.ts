@@ -3,7 +3,7 @@ import { textMessage, type TextPart } from '../../shared/headers/text';
 import { CLIENT_LAN, TcpConversation, clientServer, dir, type Side } from './conversation';
 import { BODY, HEADERS } from './smtp';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, names RFC 2606. The password is made up.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, names RFC 2606. The password is made up.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.25';
 

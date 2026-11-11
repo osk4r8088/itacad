@@ -197,7 +197,7 @@ Answers follow the exchange and its RFCs; a question that needs a fact the excha
 
 - Every factual statement follows the RFCs (or IEEE for Ethernet), with sources on the page; steps and fields cite sections.
 - Where a value or statement is not verified, set `unverified` on the field. The site marks it and `pnpm test` lists it.
-- Example addresses come from documentation ranges: IPv4 RFC 5737, IPv6 RFC 3849, MAC RFC 7042, domains RFC 2606.
+- Example addresses come from documentation ranges: IPv4 RFC 5737, IPv6 RFC 3849, MAC RFC 9542, domains RFC 2606.
 - English texts, no emojis, no em dashes.
 - The repository is public: no personal data, private hostnames or infrastructure details.
 

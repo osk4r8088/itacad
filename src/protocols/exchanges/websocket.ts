@@ -4,7 +4,7 @@ import { closePayload, wsFrame } from '../../shared/headers/websocket';
 import { ascii } from '../../shared/lib/encode';
 import { CLIENT_LAN, TcpConversation, clientServer, dir, type Side } from './conversation';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, names RFC 2606. The key, the accept value and the
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, names RFC 2606. The key, the accept value and the
 // masked "Hello" frame are the examples from RFC 6455 sections 1.3 and 5.7.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.80';

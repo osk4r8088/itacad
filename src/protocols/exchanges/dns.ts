@@ -3,7 +3,7 @@ import { dns, dnsInfo, type DnsParams } from '../../shared/headers/dns';
 import { ethIpv4Udp } from '../../shared/headers/stacks';
 
 // Addresses: the client, resolver, router and the example.com name server use documentation
-// addresses (RFC 5737, MAC RFC 7042). The root server a.root-servers.net and the .com server
+// addresses (RFC 5737, MAC RFC 9542). The root server a.root-servers.net and the .com server
 // a.gtld-servers.net are shown with their real IPv4 addresses.
 const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
 const RESOLVER = { mac: '00:00:5e:00:53:35', ip: '192.0.2.53' };

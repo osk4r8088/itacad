@@ -4,7 +4,7 @@ import { icmpEcho } from '../../shared/headers/icmp';
 import { ethArp, ethIpv4 } from '../../shared/headers/stacks';
 import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542.
 const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
 const HOST_B = { mac: '00:00:5e:00:53:0b', ip: '192.0.2.11' };
 const ROUTER = { mac: '00:00:5e:00:53:01', ip: '192.0.2.1' };
@@ -53,7 +53,7 @@ export const arpExchange: Exchange = {
     { rfc: 894, note: 'IPv4 over Ethernet' },
     { spec: 'IEEE 802.3-2022', note: 'Ethernet, minimum frame size' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     { id: 'client', label: 'Client', kind: 'host', addr: { mac: CLIENT.mac, ipv4: CLIENT.ip }, pos: { x: 0, y: 0 }, lifeline: true },

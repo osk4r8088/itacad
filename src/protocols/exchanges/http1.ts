@@ -2,7 +2,7 @@ import type { Exchange, LayerInstance } from '../../shared/schema';
 import { textMessage } from '../../shared/headers/text';
 import { CLIENT_LAN, TcpConversation, clientServer, dir } from './conversation';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, names RFC 2606.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, names RFC 2606.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.80';
 

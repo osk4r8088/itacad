@@ -16,7 +16,7 @@ The building blocks of IT around the network, from level 1 (no prior knowledge) 
 
 ### Protocols
 
-17 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
+21 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
 
 - **Network view:** the participants and an animated packet for every message.
 - **Packet flow and sequence diagram:** the whole exchange at a glance, in the style of a packet analyzer.
@@ -39,7 +39,7 @@ For real tasks: calculate, decode, plan, generate. Section `#/tools`.
 | Tool | Status |
 |---|---|
 | Subnet calculator: network, broadcast, host range and mask of an IPv4 prefix, bit by bit | ready |
-| Header decoder: paste a frame as hex and see every field of Ethernet, 802.1Q, ARP, IPv4, IPv6 (extension headers skipped by length), TCP, UDP, ICMP and ICMPv6 with Neighbor Discovery, with checksums verified | ready |
+| Header decoder: paste a frame as hex and see every field of Ethernet, 802.1Q, ARP, IPv4, IPv6 (extension headers skipped by length), TCP, UDP, ICMP and ICMPv6 with Neighbor Discovery, and of DNS, DHCP and NTP inside UDP, with checksums verified | ready |
 | Number converter: decimal, binary, hexadecimal and octal, bit widths, two's complement, byte order | ready |
 | Passwords: passphrase and password generator with entropy, and a pattern-based strength check (zxcvbn) | ready |
 | VLSM subnet planner: one block split into subnets for a list of networks, largest first on aligned boundaries, with a block map, bit view, wasted and free space | ready |
@@ -121,7 +121,8 @@ src/protocols/
 src/tools/
   registry.ts             all tools, ready and planned
   subnet/                 subnet calculator
-  decoder/                header decoder
+  decoder/                header decoder: decode.ts for the link, internet and transport layers,
+                          dns.ts, dhcp.ts and ntp.ts for the application protocols inside UDP
   numbers/                number converter
   tcp-states/             TCP state machine
   ports/                  well-known ports

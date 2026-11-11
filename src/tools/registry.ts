@@ -102,8 +102,9 @@ export const TOOLS: HubEntry[] = [
     purpose: 'use',
     title: 'Bandwidth calculator',
     summary: 'Bits and bytes, transfer times with protocol overhead, and the bandwidth-delay product.',
-    status: 'planned',
+    status: 'ready',
     issue: 33,
+    component: lazy(() => import('./bandwidth/BandwidthTool')),
   },
 ];
 

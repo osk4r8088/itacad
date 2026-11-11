@@ -4,7 +4,7 @@ import type { TcpParams } from '../../shared/headers/tcp';
 import { textPayload } from '../../shared/headers/payload';
 
 // ---- scenario constants
-// Addresses come from documentation ranges: IPv4 RFC 5737, MAC RFC 7042, domain RFC 2606.
+// Addresses come from documentation ranges: IPv4 RFC 5737, MAC RFC 9542, domain RFC 2606.
 
 const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50', port: 49812 };
 const ROUTER_A = { mac: '00:00:5e:00:53:01' };
@@ -135,7 +135,7 @@ export const tcpExchange: Exchange = {
     { rfc: 894, note: 'IPv4 over Ethernet' },
     { spec: 'IEEE 802.3-2022', note: 'Ethernet' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     {

@@ -2,7 +2,7 @@ import type { Exchange } from '../../shared/schema';
 import { ntp, type Instant } from '../../shared/headers/ntp';
 import { ethIpv4Udp } from '../../shared/headers/stacks';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542.
 const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
 const ROUTER_MAC = '00:00:5e:00:53:01';
 const SERVER_IP = '203.0.113.123';
@@ -83,7 +83,7 @@ export const ntpExchange: Exchange = {
     { rfc: 4330, note: 'Simple NTP (SNTP) version 4, now part of RFC 5905' },
     { rfc: 9109, note: 'NTPv4 port randomization' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     { id: 'client', label: 'Client', kind: 'host', addr: { mac: CLIENT.mac, ipv4: CLIENT.ip }, pos: { x: 0, y: 0 }, lifeline: true, note: 'Clock 348 ms fast' },

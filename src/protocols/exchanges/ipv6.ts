@@ -6,7 +6,7 @@ import { eui64, multicastMac, solicitedNode, withInterfaceId } from '../../share
 import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 
 // A host joins an IPv6 network and pings a server: the IPv6 counterpart of DHCP, ARP and the
-// first packet. Addresses from the documentation prefix 2001:db8::/32 (RFC 3849), MAC addresses RFC 7042.
+// first packet. Addresses from the documentation prefix 2001:db8::/32 (RFC 3849), MAC addresses RFC 9542.
 
 const HOST_MAC = '00:00:5e:00:53:0a';
 const ROUTER_MAC = '00:00:5e:00:53:01';

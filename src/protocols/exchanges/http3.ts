@@ -4,7 +4,7 @@ import { ethIpv4Udp } from '../../shared/headers/stacks';
 import { randomBytes } from './common';
 import { CLIENT_LAN, clientServer, dir, type Side } from './conversation';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042, names RFC 2606. Connection IDs, protected header
+// Addresses: IPv4 RFC 5737, MAC RFC 9542, names RFC 2606. Connection IDs, protected header
 // bits and ciphertext are deterministic stand-ins with the correct sizes.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.80';

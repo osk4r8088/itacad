@@ -3,7 +3,7 @@ import { icmpEcho, icmpError } from '../../shared/headers/icmp';
 import { ethIpv4, ipDatagram } from '../../shared/headers/stacks';
 import { LINUX_PING_DISPLAY, linuxPingData } from './common';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042.
+// Addresses: IPv4 RFC 5737, MAC RFC 9542.
 // Client LAN 192.0.2.0/24, server LAN 203.0.113.64/26. Router uplinks use addresses of their own
 // documentation ranges: Router A 198.51.100.2, Router B 203.0.113.2.
 const CLIENT = { mac: '00:00:5e:00:53:0a', ip: '192.0.2.50' };
@@ -139,7 +139,7 @@ export const icmpExchange: Exchange = {
     { rfc: 1812, section: '4.3', note: 'ICMP requirements for routers' },
     { rfc: 791, note: 'IPv4, Time to Live' },
     { rfc: 5737, note: 'Documentation IPv4 addresses used here' },
-    { rfc: 7042, note: 'Documentation MAC addresses used here' },
+    { rfc: 9542, section: '2.1.4', note: 'Documentation MAC addresses used here' },
   ],
   participants: [
     { id: 'client', label: 'Client', kind: 'host', addr: { mac: CLIENT.mac, ipv4: CLIENT.ip }, pos: { x: 0, y: 0 }, lifeline: true },

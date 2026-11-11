@@ -4,7 +4,7 @@ import { textMessage } from '../../shared/headers/text';
 import { randomBytes } from './common';
 import { CLIENT_LAN, TcpConversation, clientServer, dir, type Side } from './conversation';
 
-// Addresses: IPv4 RFC 5737, MAC RFC 7042. Keys, signatures and ciphertext are deterministic
+// Addresses: IPv4 RFC 5737, MAC RFC 9542. Keys, signatures and ciphertext are deterministic
 // stand-ins with the correct sizes, not real values.
 const CLIENT_IP = '192.0.2.50';
 const SERVER_IP = '203.0.113.22';

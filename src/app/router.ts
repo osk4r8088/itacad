@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
  *   #/explore, #/explore/<id>  models and references to explore, one of them
  *   #/learn, #/learn/<id>  learning content; lessons that are exchanges take a step: #/learn/<id>/<step>
  *   #/learn/quizzes/tcp    the quiz of one protocol
+ *   #/basics, #/basics/<category>, #/basics/<category>/<topic>  Basics & Concepts
+ *   #/basics/glossary      all key terms
  * Links of the old form #/tcp/3 redirect to #/protocols/tcp/3.
  */
 export type Route =
@@ -22,6 +24,10 @@ export type Route =
   | { page: 'learn' }
   | { page: 'lesson'; id: string; step: number }
   | { page: 'quiz'; id: string }
+  | { page: 'basics' }
+  | { page: 'category'; id: string }
+  | { page: 'topic'; category: string; id: string }
+  | { page: 'glossary' }
   | { page: 'redirect'; to: string };
 
 export const href = {
@@ -36,6 +42,10 @@ export const href = {
   lesson: (id: string, step?: number) => (step ? `#/learn/${id}/${step}` : `#/learn/${id}`),
   quizzes: '#/learn/quizzes',
   quiz: (id: string) => `#/learn/quizzes/${id}`,
+  basics: '#/basics',
+  category: (id: string) => `#/basics/${id}`,
+  topic: (category: string, id: string) => `#/basics/${category}/${id}`,
+  glossary: '#/basics/glossary',
 };
 
 function stepOf(value: string | undefined): number {
@@ -57,6 +67,10 @@ export function parseRoute(hash: string): Route {
     case 'learn':
       if (id === 'quizzes' && rest) return { page: 'quiz', id: rest };
       return id ? { page: 'lesson', id, step: stepOf(rest) } : { page: 'learn' };
+    case 'basics':
+      if (id === 'glossary') return { page: 'glossary' };
+      if (id && rest) return { page: 'topic', category: id, id: rest };
+      return id ? { page: 'category', id } : { page: 'basics' };
     default:
       // Old links: #/tcp/3 meant step 3 of TCP.
       return { page: 'redirect', to: href.exchange(section, stepOf(id)) };

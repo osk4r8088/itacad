@@ -3335,3 +3335,289 @@ table.kv th {
   margin-top: auto;
   font-weight: 600;
 }
+
+/* ---------- Basics & Concepts ---------- */
+.level {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.level-1 {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.level-3 {
+  border-color: var(--focus);
+  color: var(--focus);
+}
+.card .level {
+  align-self: flex-start;
+  margin-top: auto;
+}
+.levels-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.section-tile.is-planned {
+  border-style: dashed;
+}
+.section-tile.is-planned h2 {
+  color: var(--muted);
+}
+.basics-figure {
+  margin: 1.25rem 0;
+  max-width: 60rem;
+}
+.basics-figure figcaption {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* topic page */
+.topic {
+  max-width: 60rem;
+}
+.topic p,
+.topic li {
+  max-width: 70ch;
+}
+.topic-why {
+  max-width: 70ch;
+}
+.topic-section {
+  margin-top: 2rem;
+}
+.topic-section h2 {
+  margin-bottom: 0.5rem;
+}
+.topic-section h3 {
+  margin: 1.25rem 0 0.4rem;
+  font-size: 1rem;
+}
+.topic .tag {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.topic-note {
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--border);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+table.compare {
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  min-width: 100%;
+}
+table.compare caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.4rem;
+}
+table.compare th,
+table.compare td {
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+table.compare thead th {
+  color: var(--muted);
+  font-weight: 400;
+}
+table.compare tbody th {
+  font-weight: 600;
+}
+.misconceptions {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+.misconceptions p {
+  margin: 0.2rem 0;
+}
+.misconceptions .myth {
+  color: var(--muted);
+}
+.commands dl,
+.terms {
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.commands dd,
+.terms dd {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+}
+.commands code {
+  overflow-wrap: anywhere;
+}
+.terms dt {
+  font-weight: 600;
+}
+.related {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.topic-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.glossary-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+}
+.glossary-filter input {
+  flex: 0 1 20rem;
+  min-width: 0;
+}
+.glossary .terms {
+  max-width: 70ch;
+  margin-top: 1rem;
+}
+
+/* latency scale */
+.latency-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+.latency .chip {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--border);
+}
+.latency .chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.latency-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.latency-table th,
+.latency-table td {
+  padding: 0.4rem 0.75rem 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.latency-table thead th {
+  color: var(--muted);
+  font-weight: 400;
+}
+.latency-table tbody th {
+  font-weight: 600;
+}
+.latency-note {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.latency-value {
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+.latency-bar-col {
+  width: 35%;
+  vertical-align: middle !important;
+}
+.latency-bar {
+  display: block;
+  height: 0.7rem;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.latency-scale-note {
+  font-size: 0.85rem;
+}
+@media (max-width: 640px) {
+  .latency-bar-col {
+    width: 25%;
+  }
+}
+
+/* inside a computer */
+.computer {
+  width: 100%;
+  max-width: 48rem;
+  height: auto;
+  display: block;
+}
+.computer-line {
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+.computer-part {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+.computer-part.is-external {
+  stroke-dasharray: 6 4;
+}
+.computer-label {
+  fill: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+}
+.computer-sub {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.computer-link:hover .computer-part,
+.computer-link:focus-visible .computer-part {
+  fill: var(--accent-soft);
+  stroke-width: 3;
+}
+.computer-link:focus {
+  outline: none;
+}
+.computer-link:focus-visible .computer-part {
+  stroke: var(--focus);
+}
+.computer-planned .computer-part {
+  stroke: var(--border);
+  stroke-dasharray: 4 3;
+}
+.computer-planned .computer-label {
+  fill: var(--muted);
+}
+.basics .levels-legend {
+  margin-bottom: 1.25rem;
+}
+.basics > .section-tiles + p {
+  margin-top: 1.5rem;
+}
+.section-tile.is-planned .tile-all a {
+  color: var(--muted);
+  font-weight: 400;
+}

@@ -6,12 +6,15 @@ import { udpDef } from '../../shared/headers/udp';
 import { arpDef } from '../../shared/headers/arp';
 import { vlanDef, vlanDisplay, vlanSummary } from '../../shared/headers/vlan';
 import { icmpEchoDef, icmpTimeExceededDef, icmpDestUnreachableDef, icmpFragNeededDef } from '../../shared/headers/icmp';
+import { ipv6Def } from '../../shared/headers/ipv6';
+import { icmpv6EchoDef, rsDef, raDef, nsDef, naDef, optSllaDef, optTllaDef, optPrefixDef, optMtuDef, seconds } from '../../shared/headers/icmpv6';
 import { concat, crc32, internetChecksum } from '../../shared/lib/encode';
+import { formatIpv6 } from '../../shared/lib/ipv6';
 
 // The decoder reads real bytes with the header definitions from src/shared/headers:
 // field names, sizes, explanations and sources are the same as in the protocol exchanges.
 
-export type Start = 'auto' | 'ethernet' | 'ipv4';
+export type Start = 'auto' | 'ethernet' | 'ipv4' | 'ipv6';
 
 export interface Issue {
   level: 'error' | 'warning' | 'info';
@@ -27,7 +30,7 @@ export interface Decoded {
   layers: LayerInstance[];
   issues: Issue[];
   checks: Check[];
-  start: 'ethernet' | 'ipv4';
+  start: 'ethernet' | 'ipv4' | 'ipv6';
   octets: number;
 }
 
@@ -61,6 +64,84 @@ const ICMP_ECHO = forInput(icmpEchoDef);
 const ICMP_TIME = forInput(icmpTimeExceededDef);
 const ICMP_UNREACH = forInput(icmpDestUnreachableDef);
 const ICMP_FRAG = forInput(icmpFragNeededDef);
+
+const IPV6 = forInput(ipv6Def);
+const ICMPV6_ECHO = forInput(icmpv6EchoDef);
+const ICMPV6_ND: Record<number, LayerDef> = { 133: forInput(rsDef), 134: forInput(raDef), 135: forInput(nsDef), 136: forInput(naDef) };
+
+const ICMPV6_OTHER: LayerDef = {
+  ...forInput(icmpv6EchoDef),
+  id: 'icmpv6-other',
+  name: 'ICMPv6 message',
+  fields: [
+    ...icmpv6EchoDef.fields.slice(0, 3).map((f) => ({ ...f, about: stripExample(f.about) })),
+    { id: 'rest', name: 'Rest of message', bits: 'variable', compact: true, about: 'The layout of the rest depends on the type. This type is not decoded further here.', source: { rfc: 4443, section: '2.1' } },
+  ],
+};
+
+const ND_OPT_OTHER: StructDef = {
+  id: 'nd-opt-other',
+  name: 'Neighbor Discovery option',
+  about: 'An option this decoder does not know in detail. Every option has Type and Length, so the receiver can skip options it does not understand.',
+  fields: [
+    { id: 'type', name: 'Type', bits: 8, about: 'Option type, assigned by IANA.' },
+    { id: 'length', name: 'Length', bits: 8, about: 'Length of the whole option in units of 8 octets.' },
+    { id: 'data', name: 'Data', bits: 'variable', about: 'Option data.' },
+  ],
+  sources: [{ rfc: 4861, section: '4.6' }, { spec: 'IANA IPv6 Neighbor Discovery Option Formats', url: 'https://www.iana.org/assignments/icmpv6-parameters/' }],
+};
+
+const EXT_SOURCES = (section: string) => [{ rfc: 8200, section }];
+
+/** Hop-by-Hop Options, Routing, Destination Options and the other extension headers with the common length format. */
+const IPV6_EXT: LayerDef = {
+  id: 'ipv6-ext',
+  name: 'IPv6 extension header',
+  short: 'IPv6 ext',
+  osi: [3],
+  tcpip: 'internet',
+  about:
+    'Optional information that IPv4 keeps in header options, IPv6 puts into extension headers between the fixed header and the upper-layer header. They form a chain: each one names the next in its Next Header field. The decoder names this header and skips it by its length; its contents are not decoded.',
+  fields: [
+    { id: 'nextHeader', name: 'Next Header', bits: 8, about: 'Type of the header after this one.', source: { rfc: 8200, section: '4.2' } },
+    { id: 'hdrExtLen', name: 'Hdr Ext Len', bits: 8, about: 'Length of this header in units of 8 octets, not counting the first 8 octets.', source: { rfc: 8200, section: '4.3' } },
+    { id: 'data', name: 'Options or data', bits: 'variable', compact: true, about: 'The contents of the header, not decoded here.' },
+  ],
+  sources: EXT_SOURCES('4'),
+};
+
+const IPV6_FRAG: LayerDef = {
+  id: 'ipv6-frag',
+  name: 'IPv6 Fragment header',
+  short: 'IPv6 frag',
+  osi: [3],
+  tcpip: 'internet',
+  about:
+    'In IPv6 only the source fragments, never a router. A packet that is too big for the next link is dropped and reported with ICMPv6 Packet Too Big; the source then sends smaller packets, or fragments with this header.',
+  fields: [
+    { id: 'nextHeader', name: 'Next Header', bits: 8, about: 'Type of the header that starts the fragmentable part of the original packet.', source: { rfc: 8200, section: '4.5' } },
+    { id: 'reserved', name: 'Reserved', bits: 8, about: 'Zero.', source: { rfc: 8200, section: '4.5' } },
+    { id: 'fragOffset', name: 'Fragment Offset', bits: 13, about: 'Position of this fragment in the original data, in units of 8 octets.', source: { rfc: 8200, section: '4.5' } },
+    { id: 'res', name: 'Res', bits: 2, about: 'Zero.', source: { rfc: 8200, section: '4.5' } },
+    { id: 'm', name: 'M (More Fragments)', short: 'M', bits: 1, about: '1 = more fragments follow, 0 = last fragment.', source: { rfc: 8200, section: '4.5' } },
+    { id: 'identification', name: 'Identification', bits: 32, about: 'Same value in all fragments of one original packet.', source: { rfc: 8200, section: '4.5' } },
+  ],
+  sources: EXT_SOURCES('4.5'),
+};
+
+const IPV6_AH: LayerDef = {
+  ...IPV6_EXT,
+  id: 'ipv6-ah',
+  name: 'Authentication Header',
+  short: 'AH',
+  about: 'IPsec Authentication Header: protects the integrity of the packet. Its length counts in units of 4 octets, unlike the other extension headers. The decoder skips it by its length.',
+  fields: [
+    { id: 'nextHeader', name: 'Next Header', bits: 8, about: 'Type of the header after this one.', source: { rfc: 4302, section: '2.1' } },
+    { id: 'hdrExtLen', name: 'Payload Len', bits: 8, about: 'Length of this header in units of 4 octets, minus 2.', source: { rfc: 4302, section: '2.2' } },
+    { id: 'data', name: 'Rest of header', bits: 'variable', compact: true, about: 'Reserved, Security Parameters Index, Sequence Number and Integrity Check Value; not decoded here.', source: { rfc: 4302, section: '2' } },
+  ],
+  sources: [{ rfc: 4302, section: '2' }],
+};
 
 const ICMP_OTHER: LayerDef = {
   ...forInput(icmpEchoDef),
@@ -110,7 +191,46 @@ const FRAGMENT: LayerDef = {
 // ---- names
 
 const ETHERTYPES: Record<number, string> = { 0x0800: 'IPv4', 0x0806: 'ARP', 0x86dd: 'IPv6', 0x8100: 'VLAN tag, IEEE 802.1Q', 0x88cc: 'LLDP', 0x8847: 'MPLS' };
-const IP_PROTOCOLS: Record<number, string> = { 1: 'ICMP', 2: 'IGMP', 6: 'TCP', 17: 'UDP', 41: 'IPv6 encapsulation', 47: 'GRE', 50: 'ESP', 51: 'AH', 58: 'ICMPv6', 89: 'OSPF', 132: 'SCTP' };
+const IP_PROTOCOLS: Record<number, string> = {
+  0: 'Hop-by-Hop Options',
+  1: 'ICMP',
+  2: 'IGMP',
+  6: 'TCP',
+  17: 'UDP',
+  41: 'IPv6 encapsulation',
+  43: 'Routing header',
+  44: 'Fragment header',
+  47: 'GRE',
+  50: 'ESP',
+  51: 'AH',
+  58: 'ICMPv6',
+  59: 'No Next Header',
+  60: 'Destination Options',
+  89: 'OSPF',
+  132: 'SCTP',
+  135: 'Mobility header',
+  139: 'HIP',
+  140: 'Shim6',
+};
+/** Extension headers with Next Header and Hdr Ext Len in the first two octets (RFC 8200 section 4, RFC 6564). */
+const IPV6_EXT_GENERIC = new Set([0, 43, 60, 135, 139, 140]);
+const ICMPV6_TYPES: Record<number, string> = {
+  1: 'Destination Unreachable',
+  2: 'Packet Too Big',
+  3: 'Time Exceeded',
+  4: 'Parameter Problem',
+  128: 'Echo Request',
+  129: 'Echo Reply',
+  130: 'Multicast Listener Query',
+  131: 'Multicast Listener Report',
+  132: 'Multicast Listener Done',
+  133: 'Router Solicitation',
+  134: 'Router Advertisement',
+  135: 'Neighbor Solicitation',
+  136: 'Neighbor Advertisement',
+  137: 'Redirect',
+  143: 'Version 2 Multicast Listener Report',
+};
 const ECN = ['00 (Not-ECT)', '01 (ECT(1))', '10 (ECT(0))', '11 (CE, congestion experienced)'];
 const ICMP_TYPES: Record<number, string> = { 0: 'Echo Reply', 3: 'Destination Unreachable', 5: 'Redirect', 8: 'Echo Request', 11: 'Time Exceeded', 12: 'Parameter Problem', 13: 'Timestamp', 14: 'Timestamp Reply' };
 const ICMP_UNREACH_CODES: Record<number, string> = {
@@ -129,6 +249,7 @@ const TCP_FLAGS = ['CWR', 'ECE', 'URG', 'ACK', 'PSH', 'RST', 'SYN', 'FIN'] as co
 const hex = (n: number, digits: number) => `0x${n.toString(16).padStart(digits, '0')}`;
 const mac = (b: Uint8Array) => Array.from(b, (x) => x.toString(16).padStart(2, '0')).join(':');
 const ip4 = (b: Uint8Array) => Array.from(b).join('.');
+const bit = (r: Raw) => String(r as number);
 const hexBytes = (b: Uint8Array, max = 32) => Array.from(b.subarray(0, max), (x) => x.toString(16).padStart(2, '0')).join(' ') + (b.length > max ? ` ... (${b.length} octets)` : '');
 
 // ---- generic field slicer
@@ -206,6 +327,15 @@ const num = (r: Raw) => r as number;
 const arr = (r: Raw) => r as Uint8Array;
 
 // ---- decoder state
+
+/** What the network layer tells the layer above: addresses for the pseudo-header, and whether the data is complete. */
+interface Ctx {
+  src: Uint8Array;
+  dst: Uint8Array;
+  complete: boolean;
+  v6: boolean;
+  hopLimit?: number;
+}
 
 class Decoder {
   layers: LayerInstance[] = [];
@@ -290,8 +420,9 @@ class Decoder {
   byType(type: number, body: Uint8Array): number {
     if (type === 0x0800) return this.ipv4(body);
     if (type === 0x0806) return this.arp(body);
+    if (type === 0x86dd) return this.ipv6(body);
     if (type === 0x8100) return this.vlanTag(body);
-    this.issue('info', `EtherType ${hex(type, 4)} (${ETHERTYPES[type] ?? 'unknown'}) is not decoded yet. Supported: IPv4, ARP and 802.1Q VLAN tags.`);
+    this.issue('info', `EtherType ${hex(type, 4)} (${ETHERTYPES[type] ?? 'unknown'}) is not decoded yet. Supported: IPv4, IPv6, ARP and 802.1Q VLAN tags.`);
     this.data(body, `${ETHERTYPES[type] ?? 'Unknown'} payload, not decoded`);
     return body.length;
   }
@@ -409,7 +540,7 @@ class Decoder {
     );
 
     const payload = bytes.subarray(headerLen, end);
-    const ctx = { src: s.bin.src, dst: s.bin.dst, complete: !mf && totalLength <= bytes.length };
+    const ctx: Ctx = { src: s.bin.src, dst: s.bin.dst, complete: !mf && totalLength <= bytes.length, v6: false };
     if (payload.length === 0 && end < totalLength) return end; // cut off right after the header, already reported
     if (frag > 0) {
       this.issue('info', `This is a fragment at offset ${frag * 8}; its data is a piece of the original payload and is not decoded.`);
@@ -427,10 +558,210 @@ class Decoder {
     return end;
   }
 
-  pseudoOk(ctx: { src: Uint8Array; dst: Uint8Array }, protocol: number, segment: Uint8Array): { ok: boolean; expected: number } {
-    const pseudo = concat(ctx.src, ctx.dst, Uint8Array.of(0, protocol, segment.length >> 8, segment.length & 0xff));
+  // ---- IPv6
+
+  /** Returns the number of octets of the packet (40 + Payload Length), the rest is Ethernet padding. */
+  ipv6(bytes: Uint8Array): number {
+    if (!this.need(bytes, 40, 'An IPv6 header')) return bytes.length;
+    const version = bytes[0] >> 4;
+    if (version !== 6) {
+      this.issue('error', `The Version field is ${version}, not 6, so this is not an IPv6 header.`);
+      this.data(bytes, 'Not IPv6');
+      return bytes.length;
+    }
+    const s = slice(IPV6.fields, bytes);
+    const payloadLength = num(s.raw.payloadLength);
+    let end = 40 + payloadLength;
+    if (payloadLength === 0 && num(s.raw.nextHeader) === 0) this.issue('info', 'Payload Length 0 with a Hop-by-Hop header can mean a jumbogram (RFC 2675), which this decoder does not handle.');
+    if (end > bytes.length) {
+      this.issue('warning', `Payload Length says ${payloadLength} octets, but only ${bytes.length - 40} follow the header. The packet is cut off, for example by a capture length limit.`);
+      end = bytes.length;
+    }
+    const tc = num(s.raw.trafficClass);
+    const flow = num(s.raw.flowLabel);
+    const nextHeader = num(s.raw.nextHeader);
+    const hopLimit = num(s.raw.hopLimit);
+    const src = formatIpv6(s.bin.src);
+    const dst = formatIpv6(s.bin.dst);
+    this.layers.push(
+      instance(IPV6, bytes, s, {
+        version: '6',
+        trafficClass: tc ? `${tc} (DSCP ${tc >> 2}, ECN ${ECN[tc & 3]})` : '0',
+        flowLabel: flow ? hex(flow, 5) : '0 (unlabeled)',
+        payloadLength: String(payloadLength),
+        nextHeader: `${nextHeader} (${IP_PROTOCOLS[nextHeader] ?? 'unknown'})`,
+        hopLimit: String(hopLimit),
+        src,
+        dst,
+      }, `${src} to ${dst}, hop limit ${hopLimit}`),
+    );
+    const ctx: Ctx = { src: s.bin.src, dst: s.bin.dst, complete: 40 + payloadLength <= bytes.length, v6: true, hopLimit };
+    this.ipv6Next(nextHeader, bytes.subarray(40, end), ctx);
+    return end;
+  }
+
+  /** Follows the chain of extension headers to the upper-layer protocol. */
+  ipv6Next(nextHeader: number, rest: Uint8Array, ctx: Ctx) {
+    let nh = nextHeader;
+    let bytes = rest;
+    for (let guard = 0; guard < 16; guard++) {
+      if (nh === 6) return this.tcp(bytes, ctx);
+      if (nh === 17) return this.udp(bytes, ctx);
+      if (nh === 58) return this.icmpv6(bytes, ctx);
+      if (nh === 59) {
+        if (bytes.length) this.data(bytes, 'After No Next Header, ignored');
+        return;
+      }
+      if (nh === 44) {
+        if (!this.need(bytes, 8, 'An IPv6 Fragment header')) return;
+        const s = slice(IPV6_FRAG.fields, bytes.subarray(0, 8));
+        const offset = num(s.raw.fragOffset);
+        const m = num(s.raw.m);
+        const next = num(s.raw.nextHeader);
+        this.layers.push(
+          instance(IPV6_FRAG, bytes, s, {
+            nextHeader: `${next} (${IP_PROTOCOLS[next] ?? 'unknown'})`,
+            fragOffset: offset ? `${offset} (${offset * 8} octets)` : '0',
+            m: String(m),
+            identification: `${hex(num(s.raw.identification), 8)}`,
+          }, `fragment at ${offset * 8}${m ? ', more follow' : ', last'}`),
+        );
+        const payload = bytes.subarray(8);
+        if (offset > 0) {
+          this.issue('info', `This is a fragment at offset ${offset * 8}; its data is a piece of the original payload and is not decoded.`);
+          this.layers.push(instance(FRAGMENT, payload, slice(FRAGMENT.fields, payload), { data: hexBytes(payload, 64) }, `${payload.length} octets`));
+          return;
+        }
+        if (m) this.issue('info', 'More Fragments is set: this is the first fragment. The upper-layer checksum covers the whole packet, so it cannot be checked from this fragment alone.');
+        ctx = { ...ctx, complete: ctx.complete && !m };
+        nh = next;
+        bytes = payload;
+        continue;
+      }
+      if (IPV6_EXT_GENERIC.has(nh) || nh === 51) {
+        if (!this.need(bytes, 8, `An IPv6 ${IP_PROTOCOLS[nh]}`)) return;
+        const ah = nh === 51;
+        const len = ah ? (bytes[1] + 2) * 4 : (bytes[1] + 1) * 8;
+        if (!this.need(bytes, len, `This ${IP_PROTOCOLS[nh]} (${len} octets)`)) return;
+        const def = ah ? IPV6_AH : IPV6_EXT;
+        const s = slice(def.fields, bytes.subarray(0, len), { data: len - 2 });
+        const next = bytes[0];
+        this.layers.push(
+          instance({ ...def, name: ah ? def.name : IP_PROTOCOLS[nh] }, bytes, s, {
+            nextHeader: `${next} (${IP_PROTOCOLS[next] ?? 'unknown'})`,
+            hdrExtLen: `${bytes[1]} (${len} octets in total)`,
+            data: `${len - 2} octets: ${hexBytes(bytes.subarray(2, len))}`,
+          }, `${IP_PROTOCOLS[nh]}, ${len} octets`),
+        );
+        nh = next;
+        bytes = bytes.subarray(len);
+        continue;
+      }
+      break;
+    }
+    const name = IP_PROTOCOLS[nh] ?? 'unknown';
+    this.issue('info', nh === 50 ? 'ESP (IPsec) follows: everything after its header is encrypted.' : `Next Header ${nh} (${name}) is not decoded yet. Supported: TCP, UDP, ICMPv6 and skipping extension headers.`);
+    this.data(bytes, `${name} payload, not decoded`);
+  }
+
+  // ---- ICMPv6
+
+  icmpv6(msg: Uint8Array, ctx: Ctx) {
+    if (!this.need(msg, 4, 'An ICMPv6 header')) return;
+    const type = msg[0];
+    const code = msg[1];
+    const transmitted = (msg[2] << 8) | msg[3];
+    const sum = this.pseudoOk(ctx, 58, msg);
+    const checksum = ctx.complete ? this.checksum('ICMPv6 checksum', sum.ok, transmitted, sum.expected) : { display: hex(transmitted, 4), note: 'Not checked: the message is incomplete.' };
+    const typeName = ICMPV6_TYPES[type] ?? 'unknown';
+    const def = type === 128 || type === 129 ? ICMPV6_ECHO : (ICMPV6_ND[type] ?? ICMPV6_OTHER);
+    if (!this.need(msg, fixedOctets(def.fields), `An ICMPv6 ${typeName} message`)) return;
+    const s = slice(def.fields, msg);
+    const display: Display = { type: `${type} (${typeName})`, code: String(code), checksum };
+    let summary = typeName;
+    if (def === ICMPV6_ECHO) {
+      display.identifier = hex(num(s.raw.identifier), 4);
+      display.sequence = String(num(s.raw.sequence));
+      display.data = arr(s.raw.data).length ? `${arr(s.raw.data).length} octets: ${hexBytes(arr(s.raw.data))}` : 'none';
+      summary = `${typeName}, id ${hex(num(s.raw.identifier), 4)}, seq ${num(s.raw.sequence)}`;
+    } else if (def !== ICMPV6_OTHER) {
+      // Neighbor Discovery: RFC 4861 sections 6.1 and 7.1 require Hop Limit 255, proof that no router forwarded the message.
+      if (ctx.hopLimit !== undefined && ctx.hopLimit !== 255) this.issue('warning', `Neighbor Discovery messages must arrive with Hop Limit 255, this one has ${ctx.hopLimit}. Receivers discard it (RFC 4861).`);
+      if (code !== 0) this.issue('warning', `The Code of a Neighbor Discovery message must be 0, it is ${code}.`);
+      if ('reserved' in s.raw) display.reserved = num(s.raw.reserved) ? { display: String(num(s.raw.reserved)), note: 'Should be zero.' } : '0';
+      if ('target' in s.raw) {
+        display.target = formatIpv6(s.bin.target);
+        summary = `${typeName} for ${display.target}`;
+      }
+      for (const f of ['managed', 'other', 'router', 'solicited', 'override']) if (f in s.raw) display[f] = bit(s.raw[f]);
+      if (type === 134) {
+        const reach = num(s.raw.reachableTime);
+        const retrans = num(s.raw.retransTimer);
+        display.curHopLimit = String(num(s.raw.curHopLimit));
+        display.routerLifetime = seconds(num(s.raw.routerLifetime));
+        display.reachableTime = reach ? `${reach} ms` : '0 (unspecified)';
+        display.retransTimer = retrans ? `${retrans} ms` : '0 (unspecified)';
+      }
+      const options = this.ndOptions(arr(s.raw.options));
+      display.options = options.length ? { display: options.map((o) => o.summary).join(', '), items: options } : 'none';
+    } else if ('rest' in s.raw) display.rest = arr(s.raw.rest).length ? `${arr(s.raw.rest).length} octets: ${hexBytes(arr(s.raw.rest))}` : 'none';
+    this.layers.push(instance(def, msg, s, display, summary));
+  }
+
+  ndOptions(bytes: Uint8Array): StructInstance[] {
+    const out: StructInstance[] = [];
+    let i = 0;
+    while (i < bytes.length) {
+      if (bytes.length - i < 2 || bytes[i + 1] === 0 || i + bytes[i + 1] * 8 > bytes.length) {
+        this.issue('error', `Neighbor Discovery option at octet ${i} of the options has an invalid length. Receivers discard the whole message (RFC 4861 section 4.6).`);
+        break;
+      }
+      const type = bytes[i];
+      const len = bytes[i + 1];
+      const b = bytes.subarray(i, i + len * 8);
+      const length = `${len} (${len * 8} octets)`;
+      if ((type === 1 || type === 2) && len === 1) {
+        const s = slice(optSllaDef.fields, b);
+        const address = mac(s.bin.address);
+        out.push(instance(type === 1 ? optSllaDef : optTllaDef, b, s, { type: String(type), length, address }, `${type === 1 ? 'Source' : 'Target'} link-layer address ${address}`));
+      } else if (type === 3 && len === 4) {
+        const s = slice(optPrefixDef.fields, b);
+        const prefix = formatIpv6(s.bin.prefix);
+        const auto = num(s.raw.autonomous);
+        out.push(
+          instance(optPrefixDef, b, s, {
+            type: '3',
+            length,
+            prefixLength: String(num(s.raw.prefixLength)),
+            onLink: bit(s.raw.onLink),
+            autonomous: bit(s.raw.autonomous),
+            reserved1: String(num(s.raw.reserved1)),
+            validLifetime: seconds(num(s.raw.validLifetime)),
+            preferredLifetime: seconds(num(s.raw.preferredLifetime)),
+            reserved2: String(num(s.raw.reserved2)),
+            prefix,
+          }, `Prefix ${prefix}/${num(s.raw.prefixLength)}${auto ? ', SLAAC' : ''}`),
+        );
+      } else if (type === 5 && len === 1) {
+        const s = slice(optMtuDef.fields, b);
+        out.push(instance(optMtuDef, b, s, { type: '5', length, reserved: String(num(s.raw.reserved)), mtu: String(num(s.raw.mtu)) }, `MTU ${num(s.raw.mtu)}`));
+      } else {
+        const s = slice(ND_OPT_OTHER.fields, b, { data: len * 8 - 2 });
+        out.push(instance(ND_OPT_OTHER, b, s, { type: String(type), length }, `Option ${type}`));
+      }
+      i += len * 8;
+    }
+    return out;
+  }
+
+  /** Checks a TCP, UDP or ICMPv6 checksum over the IPv4 or IPv6 pseudo-header. */
+  pseudoOk(ctx: Ctx, protocol: number, segment: Uint8Array): { ok: boolean; expected: number } {
+    const n = segment.length;
+    const pseudo = ctx.v6
+      ? concat(ctx.src, ctx.dst, Uint8Array.of(n >>> 24, (n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff, 0, 0, 0, protocol))
+      : concat(ctx.src, ctx.dst, Uint8Array.of(0, protocol, n >> 8, n & 0xff));
     const ok = internetChecksum(concat(pseudo, segment)) === 0;
-    const at = protocol === 6 ? 16 : 6;
+    const at = protocol === 6 ? 16 : protocol === 17 ? 6 : 2;
     const zeroed = concat(segment.subarray(0, at), Uint8Array.of(0, 0), segment.subarray(at + 2));
     let expected = internetChecksum(concat(pseudo, zeroed));
     if (protocol === 17 && expected === 0) expected = 0xffff;
@@ -444,7 +775,7 @@ class Decoder {
 
   // ---- TCP
 
-  tcp(seg: Uint8Array, ctx: { src: Uint8Array; dst: Uint8Array; complete: boolean }) {
+  tcp(seg: Uint8Array, ctx: Ctx) {
     if (!this.need(seg, 20, 'A TCP header')) return;
     const offset = seg[12] >> 4;
     if (offset < 5) {
@@ -518,7 +849,7 @@ class Decoder {
 
   // ---- UDP
 
-  udp(dgram: Uint8Array, ctx: { src: Uint8Array; dst: Uint8Array; complete: boolean }) {
+  udp(dgram: Uint8Array, ctx: Ctx) {
     if (!this.need(dgram, 8, 'A UDP header')) return;
     const s = slice(UDP.fields, dgram);
     const length = num(s.raw.length);
@@ -532,7 +863,10 @@ class Decoder {
     const srcPort = num(s.raw.srcPort);
     const dstPort = num(s.raw.dstPort);
     let checksum: Display[string];
-    if (transmitted === 0) checksum = { display: '0x0000', note: 'Zero means the sender did not compute a checksum, which UDP over IPv4 allows (RFC 768).' };
+    if (transmitted === 0 && ctx.v6) {
+      checksum = { display: '0x0000', note: 'Zero is not allowed over IPv6: the checksum is mandatory there (RFC 8200 section 8.1).' };
+      this.issue('warning', 'The UDP checksum is zero. Over IPv6 the checksum is mandatory, and receivers discard such datagrams (RFC 8200 section 8.1).');
+    } else if (transmitted === 0) checksum = { display: '0x0000', note: 'Zero means the sender did not compute a checksum, which UDP over IPv4 allows (RFC 768).' };
     else if (!ctx.complete || length !== dgram.length) checksum = { display: hex(transmitted, 4), note: 'Not checked: the datagram is incomplete.' };
     else {
       const r = this.pseudoOk(ctx, 17, dgram);
@@ -581,12 +915,22 @@ function looksLikeIpv4(bytes: Uint8Array): boolean {
   return ihl >= 5 && bytes.length >= ihl * 4 && total >= ihl * 4 && internetChecksum(bytes.subarray(0, ihl * 4)) === 0;
 }
 
+/** Guess: the input starts with an IPv6 header if the version is 6 and Payload Length fits the input. */
+function looksLikeIpv6(bytes: Uint8Array): boolean {
+  if (bytes.length < 40 || bytes[0] >> 4 !== 6) return false;
+  const payload = (bytes[4] << 8) | bytes[5];
+  return 40 + payload === bytes.length;
+}
+
 export function decode(bytes: Uint8Array, start: Start = 'auto'): Decoded {
   const d = new Decoder();
-  const first = start === 'auto' ? (looksLikeIpv4(bytes) ? 'ipv4' : 'ethernet') : start;
+  const first = start === 'auto' ? (looksLikeIpv4(bytes) ? 'ipv4' : looksLikeIpv6(bytes) ? 'ipv6' : 'ethernet') : start;
   if (first === 'ipv4') {
     const used = d.ipv4(bytes);
     if (used < bytes.length) d.issue('info', `${bytes.length - used} octets after the end of the IPv4 packet (Total Length) are ignored.`);
+  } else if (first === 'ipv6') {
+    const used = d.ipv6(bytes);
+    if (used < bytes.length) d.issue('info', `${bytes.length - used} octets after the end of the IPv6 packet (Payload Length) are ignored.`);
   } else d.ethernet(bytes);
   return { layers: d.layers, issues: d.issues, checks: d.checks, start: first, octets: bytes.length };
 }

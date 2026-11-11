@@ -10,6 +10,7 @@ const START_OPTIONS: { id: Start; label: string }[] = [
   { id: 'auto', label: 'Detect' },
   { id: 'ethernet', label: 'Ethernet' },
   { id: 'ipv4', label: 'IPv4' },
+  { id: 'ipv6', label: 'IPv6' },
 ];
 
 interface ByteOwner {
@@ -114,7 +115,7 @@ export default function DecoderTool() {
     <div className="index tool decoder-tool">
       <h1>Header decoder</h1>
       <p className="lead">
-        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet with 802.1Q VLAN tags, ARP, IPv4, TCP, UDP and ICMP, checks the checksums, and shows every field with its meaning.
+        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet with 802.1Q VLAN tags, ARP, IPv4, IPv6 with its extension headers, TCP, UDP, ICMP and ICMPv6 with Neighbor Discovery, checks the checksums, and shows every field with its meaning.
       </p>
 
       <div className="tool-input decoder-input">
@@ -164,7 +165,7 @@ export default function DecoderTool() {
               Summary
             </h2>
             <p>
-              {decoded.octets} octets, read as {decoded.start === 'ipv4' ? 'an IPv4 packet' : 'an Ethernet frame'}: {decoded.layers.map((l) => l.def.short).join(', ')}.
+              {decoded.octets} octets, read as {decoded.start === 'ipv4' ? 'an IPv4 packet' : decoded.start === 'ipv6' ? 'an IPv6 packet' : 'an Ethernet frame'}: {decoded.layers.map((l) => l.def.short).join(', ')}.
             </p>
             {decoded.checks.length > 0 && (
               <ul className="checks">
@@ -200,10 +201,10 @@ export default function DecoderTool() {
         <h2 id="h-how">How it works</h2>
         <div className="prose">
           <p>
-            Every header starts with fields of fixed size, so the decoder cuts the bytes at the bit positions the specifications define and reads the next protocol from a field of the current one: EtherType in Ethernet, Protocol in IPv4. Lengths come from the headers too: IHL and Total Length in IPv4, Data Offset in TCP, Length in UDP. Anything after the IPv4 packet inside an Ethernet frame is padding.
+            Every header starts with fields of fixed size, so the decoder cuts the bytes at the bit positions the specifications define and reads the next protocol from a field of the current one: EtherType in Ethernet, Protocol in IPv4, Next Header in IPv6 and its extension headers. Lengths come from the headers too: IHL and Total Length in IPv4, Payload Length in IPv6, Data Offset in TCP, Length in UDP. Anything after the IP packet inside an Ethernet frame is padding.
           </p>
           <p>
-            Checksums are recomputed from the content. The IPv4 checksum covers only the IPv4 header; TCP and UDP checksums cover a pseudo-header with both IP addresses, their header and the data; the Ethernet FCS is a CRC-32 over the whole frame. Captures from the sending host often show wrong TCP or UDP checksums because the network card fills them in later (checksum offloading).
+            Checksums are recomputed from the content. The IPv4 checksum covers only the IPv4 header, and IPv6 has none; TCP, UDP and ICMPv6 checksums cover a pseudo-header with both IP addresses, their header and the data; the Ethernet FCS is a CRC-32 over the whole frame. Captures from the sending host often show wrong TCP or UDP checksums because the network card fills them in later (checksum offloading).
           </p>
           <p>Field names, explanations and sources are the same as in the protocol pages. Nothing you paste leaves your browser.</p>
         </div>

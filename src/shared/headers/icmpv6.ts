@@ -73,13 +73,13 @@ export const raDef = def(
     codeField,
     checksumField,
     { id: 'curHopLimit', name: 'Cur Hop Limit', bits: 8, about: 'Hop Limit hosts should use for the packets they send. 0 means unspecified.', source: ND('4.2') },
-    { id: 'managed', name: 'M (Managed)', short: 'M', bits: 1, about: 'Set: addresses are available from DHCPv6. Clear here: hosts form their own with SLAAC.', source: ND('4.2') },
-    { id: 'other', name: 'O (Other)', short: 'O', bits: 1, about: 'Set: other configuration, such as DNS servers, is available from DHCPv6. Clear here; the DNS server can also come in an RA option (RFC 8106).', source: ND('4.2') },
+    { id: 'managed', name: 'M (Managed)', short: 'M', bits: 1, about: 'Set: addresses are available from DHCPv6. Clear: hosts form their own with SLAAC.', source: ND('4.2') },
+    { id: 'other', name: 'O (Other)', short: 'O', bits: 1, about: 'Set: other configuration, such as DNS servers, is available from DHCPv6. Clear: no DHCPv6 needed for it; the DNS server can also come in an RA option (RFC 8106).', source: ND('4.2') },
     {
       id: 'reserved',
       name: 'Reserved',
       bits: 6,
-      about: 'Reserved in RFC 4861. Later RFCs use some of these bits, for example the default router preference (RFC 4191). All zero here.',
+      about: 'Reserved in RFC 4861. Later RFCs use some of these bits, for example the default router preference (RFC 4191).',
       source: ND('4.2'),
     },
     {
@@ -180,7 +180,7 @@ export type NdOption =
   | { kind: 'mtu'; mtu: number };
 
 const bit = (b: boolean) => ({ raw: b ? 1 : 0, display: b ? '1' : '0' });
-const seconds = (s: number) => {
+export const seconds = (s: number) => {
   const days = s / 86400;
   return `${s} s${Number.isInteger(days) && days >= 1 ? ` (${days} ${days === 1 ? 'day' : 'days'})` : s >= 60 && s % 60 === 0 ? ` (${s / 60} min)` : ''}`;
 };

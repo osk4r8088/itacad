@@ -18,7 +18,7 @@ export const ipv6Def: LayerDef = {
       id: 'trafficClass',
       name: 'Traffic Class',
       bits: 8,
-      about: 'The same as the IPv4 octet that holds DSCP (6 bits) and ECN (2 bits). 0 here: default forwarding, no ECN.',
+      about: 'The same as the IPv4 octet that holds DSCP (6 bits) and ECN (2 bits). 0 means default forwarding and no ECN.',
       source: R('7'),
     },
     {

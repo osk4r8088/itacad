@@ -1,14 +1,8 @@
 import { href } from './router';
+import { SECTIONS, type Section } from './sections';
 import { SITE_NAME } from '../shared/hub';
 
-export type Section = 'protocols' | 'tools' | 'explore' | 'learn';
-
-const SECTIONS: { id: Section; label: string; href: string }[] = [
-  { id: 'protocols', label: 'Protocols', href: href.protocols },
-  { id: 'tools', label: 'Tools', href: href.tools },
-  { id: 'explore', label: 'Explore', href: href.explore },
-  { id: 'learn', label: 'Learn', href: href.learn },
-];
+export type { Section } from './sections';
 
 /** Site name and section navigation. Exchange pages use their own compact bar instead. */
 export function SiteHeader({ current }: { current?: Section }) {

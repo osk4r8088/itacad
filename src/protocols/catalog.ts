@@ -11,7 +11,6 @@ export interface CatalogEntry {
   summary: string;
   group: string;
   /** Shown on the start page. */
-  featured?: boolean;
   load: () => Promise<Exchange>;
 }
 
@@ -24,7 +23,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'DHCP',
     summary: 'A new client gets an IPv4 address, gateway and DNS resolver: Discover, Offer, Request, Ack.',
     group: 'Application',
-    featured: true,
     load: () => import('./exchanges/dhcp').then((m) => m.dhcpExchange),
   },
   {
@@ -32,7 +30,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'DNS',
     summary: 'A recursive resolver with an empty cache walks from the root to the answer for www.example.com.',
     group: 'Application',
-    featured: true,
     load: () => import('./exchanges/dns').then((m) => m.dnsExchange),
   },
   {
@@ -61,7 +58,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'HTTP/3 and QUIC',
     summary: 'QUIC over UDP sets up transport and TLS 1.3 in one round trip; HTTP/3 then runs on QUIC streams.',
     group: 'Application',
-    featured: true,
     load: () => import('./exchanges/http3').then((m) => m.http3Exchange),
   },
   {
@@ -97,7 +93,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'TLS 1.3',
     summary: 'The full handshake in one round trip: hellos with key shares, the encrypted server flight, Finished, and the first encrypted data.',
     group: 'Security',
-    featured: true,
     load: () => import('./exchanges/tls').then((m) => m.tlsExchange),
   },
   {
@@ -112,7 +107,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'TCP',
     summary: 'Three-way handshake, one request and response, four-way close.',
     group: 'Transport',
-    featured: true,
     load: () => import('./exchanges/tcp').then((m) => m.tcpExchange),
   },
   {
@@ -169,7 +163,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'ARP',
     summary: 'Resolving the MAC address of the default gateway before the first packet can leave.',
     group: 'Link',
-    featured: true,
     load: () => import('./exchanges/arp').then((m) => m.arpExchange),
   },
 ];

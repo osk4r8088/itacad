@@ -16,7 +16,7 @@ The building blocks of IT around the network, from level 1 (no prior knowledge) 
 
 ### Protocols
 
-17 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
+21 protocol exchanges, from ARP to HTTP/3, each stepped through message by message:
 
 - **Network view:** the participants and an animated packet for every message.
 - **Packet flow and sequence diagram:** the whole exchange at a glance, in the style of a packet analyzer.
@@ -66,6 +66,10 @@ Interactive models and references that show how something works inside. A sectio
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
 - **OSI and TCP/IP:** both models side by side. Each layer shows its job, unit of data, addresses, devices, the protocols and tools of this site that belong to it, and typical problems with Linux commands to diagnose them. Picking a protocol shows where it sits (with notes for borderline cases like TLS, QUIC, ICMP and ARP), and one real HTTP request grows from 37 to 115 octets on its way down.
 - **Quizzes:** multiple-choice questions for every protocol; each answer is explained and links to the step that shows it. A protocol page links to its quiz in its header.
+
+### Search
+
+One search field for the whole site, in the header of every page (shortcut `/`). It finds topics, protocols, tools, lessons, single steps, header fields, glossary terms, ports and quiz questions, grouped by kind. A header field opens in the packet view of a step that shows it. The index is built together with the site and loaded when the search is opened; nothing is sent anywhere.
 
 ### Correct by construction
 
@@ -148,6 +152,11 @@ src/basics/
   topics/<category>/      one file per topic
   figures/                diagrams and interactive pieces that topics refer to by id
   BasicsPages.tsx         overview, category, topic and glossary pages
+src/search/
+  build.ts                builds the index from catalogs, registries, exchanges, topics, ports and quizzes
+  built.ts                entry for the plugin in vite.config.ts, which turns the index into a file of its own
+  search.ts               matching and ranking, without React
+  SearchButton.tsx, SearchDialog.tsx
 src/quizzes/
   schema.ts               question format
   catalog.ts              quizzes by exchange id, loaded on demand
@@ -185,6 +194,10 @@ Every topic, protocol, tool and lesson has a `level` (1 Foundations, 2 Practitio
 
 Sources for topics without RFCs: formal standards first (ISO/IEC, IEEE, JEDEC, NIST, vendor-neutral specifications), then official documentation, then established textbooks. Values that vary between machines are given as typical ranges and say so.
 
+## Search index
+
+New protocols, tools, lessons, topics, ports and quizzes appear in the search without extra work: `src/search/build.ts` reads the same lists and data the pages render. `pnpm test` checks that every entry is in the index, that every result links to a place that exists (down to the header field), and that a set of known queries finds the expected page first. A new kind of content needs a few lines in `build.ts` and a label in `src/search/schema.ts`.
+
 ## Adding a quiz
 
 1. Create `src/quizzes/<exchange id>.ts` exporting a `Quiz` (see `src/quizzes/schema.ts`): for each question a prompt, three or four options, the index of the right one, an explanation, the id of the step that shows it, and the source.
@@ -210,6 +223,7 @@ Hash routes work on any static host:
 | `#/` | start page |
 | `#/protocols` | protocol overview |
 | `#/protocols/tcp/3` | step 3 of the TCP exchange |
+| `#/protocols/tcp/3/tcp/window` | the same step with a header (and optionally a field) selected in the packet view |
 | `#/tools`, `#/tools/<id>` | everyday tools, one tool |
 | `#/explore`, `#/explore/<id>` | models and references to explore, one of them |
 | `#/learn`, `#/learn/<id>` | lessons |

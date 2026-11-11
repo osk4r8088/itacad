@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { navGroups } from '../catalog';
 import { href } from '../../app/router';
 
-/** Protocol name in the top bar; opens a menu of all protocols grouped by layer. Shortcut: "/". */
+/** Protocol name in the top bar; opens a menu of all protocols grouped by layer. */
 export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: string; currentTitle: string }) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
@@ -25,18 +25,6 @@ export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: strin
     setFilter('');
     if (focusButton) button.current?.focus();
   };
-
-  // "/" opens the menu from anywhere except text fields.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-      e.preventDefault();
-      setOpen(true);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   // Focus the filter on open; close on outside click.
   useEffect(() => {
@@ -73,7 +61,7 @@ export function ProtocolSwitcher({ currentId, currentTitle }: { currentId: strin
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => (open ? close(false) : setOpen(true))}
-        title="Choose a protocol (shortcut: /)"
+        title="Choose a protocol"
       >
         <h1>{currentTitle}</h1>
         <span className="caret" aria-hidden="true">

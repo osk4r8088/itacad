@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Exchange } from '../shared/schema';
 import { findEntry } from './catalog';
 import { ExchangePage } from './components/ExchangePage';
-import { href } from '../app/router';
+import { href, type Select } from '../app/router';
 import { SiteHeader } from '../app/SiteHeader';
 import { pageTitle } from '../shared/hub';
 
@@ -11,7 +11,7 @@ const cache = new Map<string, Exchange>();
 type State = { status: 'loading' } | { status: 'ready'; exchange: Exchange } | { status: 'missing' } | { status: 'failed' };
 
 /** Loads one exchange on demand and shows its page. Loaded exchanges stay cached. */
-export default function ExchangeRoute({ id, step }: { id: string; step: number }) {
+export default function ExchangeRoute({ id, step, select }: { id: string; step: number; select?: Select }) {
   const [state, setState] = useState<State>(() => {
     const cached = cache.get(id);
     if (cached) return { status: 'ready', exchange: cached };
@@ -41,7 +41,7 @@ export default function ExchangeRoute({ id, step }: { id: string; step: number }
     if (state.status === 'ready') document.title = pageTitle(state.exchange.title);
   }, [state]);
 
-  if (state.status === 'ready') return <ExchangePage key={id} exchange={state.exchange} stepNumber={step} />;
+  if (state.status === 'ready') return <ExchangePage key={id} exchange={state.exchange} stepNumber={step} select={select} />;
 
   return (
     <>

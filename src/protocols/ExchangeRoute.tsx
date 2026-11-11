@@ -4,6 +4,7 @@ import { findEntry } from './catalog';
 import { ExchangePage } from './components/ExchangePage';
 import { href } from '../app/router';
 import { SiteHeader } from '../app/SiteHeader';
+import { pageTitle } from '../shared/hub';
 
 const cache = new Map<string, Exchange>();
 
@@ -37,7 +38,7 @@ export default function ExchangeRoute({ id, step }: { id: string; step: number }
   }, [id]);
 
   useEffect(() => {
-    if (state.status === 'ready') document.title = `${state.exchange.title} | Netkit`;
+    if (state.status === 'ready') document.title = pageTitle(state.exchange.title);
   }, [state]);
 
   if (state.status === 'ready') return <ExchangePage key={id} exchange={state.exchange} stepNumber={step} />;

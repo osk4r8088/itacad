@@ -1,6 +1,6 @@
-# Brief: Netkit (paste into a new Claude Code session)
+# Brief: ITACAD (paste into a new Claude Code session)
 
-You are helping me build Netkit, an interactive learning site for computer networks. Its core is the protocol explorer described below; around it are tools (subnet calculator, header decoder, ...) and learning content, each a section of the same site. See `README.md` for the code structure and how to add a protocol, tool or lesson.
+You are helping me build ITACAD (formerly Netkit), a visual learning site for IT that grows from basic concepts down to the bits of network protocols. Its core is the protocol explorer described below; around it are tools (subnet calculator, header decoder, ...) and learning content, each a section of the same site. See `README.md` for the code structure and how to add a protocol, tool or lesson.
 
 Original brief for the protocol explorer: an interactive learning site for internet protocols. I want to understand them deeply, so correctness matters more than visual effects. Work in this repo with me step by step. Ask before big structural decisions; for small ones, decide and tell me.
 

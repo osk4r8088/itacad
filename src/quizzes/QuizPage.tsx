@@ -5,6 +5,7 @@ import { QUIZZES } from './catalog';
 import { findEntry } from '../protocols/catalog';
 import { href } from '../app/router';
 import { SourceList } from '../shared/components/SourceList';
+import { pageTitle } from '../shared/hub';
 
 type State = { status: 'loading' } | { status: 'ready'; quiz: Quiz; exchange: Exchange } | { status: 'missing' } | { status: 'failed' };
 
@@ -30,7 +31,7 @@ export default function QuizPage({ id }: { id: string }) {
 
   const title = state.status === 'ready' ? `${state.exchange.title} quiz` : 'Quiz';
   useEffect(() => {
-    document.title = `${title} | Netkit`;
+    document.title = pageTitle(title);
   }, [title]);
 
   if (state.status === 'loading') return <p className="notice muted">Loading quiz...</p>;

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { href, replaceHash, useHashRoute, type Route } from './router';
+import { pageTitle } from '../shared/hub';
 import { SiteHeader, type Section } from './SiteHeader';
 import { Home } from './Home';
 import { HubCards } from './HubCards';
@@ -56,7 +57,7 @@ export function App() {
     if (route.page === 'exchange' || route.page === 'quiz') return; // ExchangeRoute and QuizPage set the title once the data is loaded
     if (route.page === 'lesson' && LESSONS.find((l) => l.id === route.id)?.exchange) return; // so does LessonExchange
     const title = titleOf(route);
-    document.title = title ? `${title} | Netkit` : 'Netkit';
+    document.title = pageTitle(title);
   }, [route]);
 
   if (route.page === 'redirect') return null;

@@ -151,6 +151,13 @@ export const CATALOG: CatalogEntry[] = [
     load: () => import('./exchanges/icmp').then((m) => m.icmpExchange),
   },
   {
+    id: 'vlan',
+    title: 'VLAN (802.1Q)',
+    summary: 'Two VLANs on two switches: access ports, a tagged trunk, the native VLAN, and a router on a stick between the VLANs.',
+    group: 'Link',
+    load: () => import('./exchanges/vlan').then((m) => m.vlanExchange),
+  },
+  {
     id: 'arp',
     title: 'ARP',
     summary: 'Resolving the MAC address of the default gateway before the first packet can leave.',
@@ -162,7 +169,6 @@ export const CATALOG: CatalogEntry[] = [
 
 /** Exchanges that are planned but not built yet. Shown greyed out in the navigation. */
 export const PLANNED: { title: string; group: (typeof GROUPS)[number] }[] = [
-  { title: 'VLAN (802.1Q)', group: 'Link' },
   { title: 'Spanning Tree', group: 'Link' },
 ];
 

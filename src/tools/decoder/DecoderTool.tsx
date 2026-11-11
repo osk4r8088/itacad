@@ -114,7 +114,7 @@ export default function DecoderTool() {
     <div className="index tool decoder-tool">
       <h1>Header decoder</h1>
       <p className="lead">
-        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet, ARP, IPv4, TCP, UDP and ICMP, checks the checksums, and shows every field with its meaning.
+        Paste the bytes of a frame, for example copied from Wireshark (Copy as Hex Stream or Hex Dump). The decoder reads Ethernet with 802.1Q VLAN tags, ARP, IPv4, TCP, UDP and ICMP, checks the checksums, and shows every field with its meaning.
       </p>
 
       <div className="tool-input decoder-input">

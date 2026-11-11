@@ -102,16 +102,18 @@ export const ethernetDef: LayerDef = {
   sources: [IEEE8023, { rfc: 894 }],
 };
 
-const ETHERTYPES: Record<number, string> = { 0x0800: 'IPv4', 0x0806: 'ARP', 0x86dd: 'IPv6' };
+export const ETHERTYPES: Record<number, string> = { 0x0800: 'IPv4', 0x0806: 'ARP', 0x86dd: 'IPv6', 0x8100: 'VLAN tag, IEEE 802.1Q' };
 
 export interface EthernetParams extends Annotations {
   dst: string;
   src: string;
   type: number;
+  /** Payload octets below which the frame is padded. 46 normally; a switch that inserts a VLAN tag may keep the original padding (50). */
+  minPayload?: number;
 }
 
 export function ethernet(p: EthernetParams, payload: Uint8Array): LayerInstance {
-  const padLen = Math.max(0, 46 - payload.length);
+  const padLen = Math.max(0, (p.minPayload ?? 46) - payload.length);
   const pad = new Uint8Array(padLen);
   const header = concat(parseMac(p.dst), parseMac(p.src), Uint8Array.of(p.type >> 8, p.type & 0xff));
   const crc = crc32(concat(header, payload, pad));

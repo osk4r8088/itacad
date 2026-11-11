@@ -1,11 +1,27 @@
 import type { Capture, LayerInstance } from '../schema';
 import { concat } from '../lib/encode';
 import { ethernet, physical, type EthernetParams } from './ethernet';
+import { vlan, type VlanTag } from './vlan';
 import { ipv4, type Ipv4Params } from './ipv4';
 import { tcp, type TcpParams } from './tcp';
 import { udp, type UdpParams } from './udp';
 import { ipv6, type Ipv6Params } from './ipv6';
 import { icmpv6, type Icmpv6Message } from './icmpv6';
+
+/** Ethernet parameters of a capture: addresses, and optionally an 802.1Q tag. */
+export type EthParams = Omit<EthernetParams, 'type'> & {
+  /** Adds an 802.1Q tag. insertedBySwitch keeps the padding of the untagged original, so a minimum frame grows to 68 octets. */
+  vlan?: VlanTag & { insertedBySwitch?: boolean };
+};
+
+/** The Ethernet header, and the tag if there is one, around a payload of the given EtherType. */
+function frame(p: EthParams, type: number, payload: Uint8Array): LayerInstance[] {
+  if (!p.vlan) return [ethernet({ ...p, type }, payload)];
+  const { insertedBySwitch, ...tag } = p.vlan;
+  const t = vlan(tag, type);
+  const eth = ethernet({ ...p, type: 0x8100, ...(insertedBySwitch ? { minPayload: 50 } : {}) }, concat(t.bytes, payload));
+  return [eth, t];
+}
 
 /** Bytes of a layer including everything inside it. */
 function wire(layer: LayerInstance, inner: Uint8Array): Uint8Array {
@@ -15,7 +31,7 @@ function wire(layer: LayerInstance, inner: Uint8Array): Uint8Array {
 export interface EthIpv4TcpParams {
   link: string;
   note?: string;
-  eth: Omit<EthernetParams, 'type'>;
+  eth: EthParams;
   ip: Omit<Ipv4Params, 'protocol'>;
   tcp: TcpParams;
   /** Application data: one layer, or several nested in each other (outermost first). */
@@ -30,8 +46,7 @@ export function ethIpv4Tcp(p: EthIpv4TcpParams): Capture {
   const tBytes = wire(t, app);
   const ip = ipv4({ ...p.ip, protocol: 6 }, tBytes);
   const ipBytes = wire(ip, tBytes);
-  const eth = ethernet({ ...p.eth, type: 0x0800 }, ipBytes);
-  const layers = [physical(), eth, ip, t, ...inner];
+  const layers = [physical(), ...frame(p.eth, 0x0800, ipBytes), ip, t, ...inner];
   return { link: p.link, ...(p.note ? { note: p.note } : {}), layers };
 }
 
@@ -44,7 +59,7 @@ export function nestedBytes(layers: LayerInstance[]): Uint8Array {
 export interface EthIpv4Params {
   link: string;
   note?: string;
-  eth: Omit<EthernetParams, 'type'>;
+  eth: EthParams;
   ip: Ipv4Params;
   /** Layers inside IP, already built (transport header, data, or an ICMP message). */
   inner: LayerInstance[];
@@ -54,14 +69,12 @@ export interface EthIpv4Params {
 export function ethIpv4(p: EthIpv4Params): Capture {
   const payload = nestedBytes(p.inner);
   const ip = ipv4(p.ip, payload);
-  const eth = ethernet({ ...p.eth, type: 0x0800 }, wire(ip, payload));
-  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, ip, ...p.inner] };
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), ...frame(p.eth, 0x0800, wire(ip, payload)), ip, ...p.inner] };
 }
 
 /** Ethernet II / ARP. */
-export function ethArp(p: { link: string; note?: string; eth: Omit<EthernetParams, 'type'>; arp: LayerInstance }): Capture {
-  const eth = ethernet({ ...p.eth, type: 0x0806 }, p.arp.bytes);
-  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, p.arp] };
+export function ethArp(p: { link: string; note?: string; eth: EthParams; arp: LayerInstance }): Capture {
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), ...frame(p.eth, 0x0806, p.arp.bytes), p.arp] };
 }
 
 /** The IP datagram of a capture (IP header and everything inside), as a receiver sees it. */
@@ -74,7 +87,7 @@ export function ipDatagram(c: Capture): Uint8Array {
 export interface EthIpv4UdpParams {
   link: string;
   note?: string;
-  eth: Omit<EthernetParams, 'type'>;
+  eth: EthParams;
   ip: Omit<Ipv4Params, 'protocol'>;
   udp: UdpParams;
   /** Application message carried in the datagram. */
@@ -90,7 +103,7 @@ export function ethIpv4Udp(p: EthIpv4UdpParams): Capture {
 export interface EthIpv6Icmpv6Params {
   link: string;
   note?: string;
-  eth: Omit<EthernetParams, 'type'>;
+  eth: EthParams;
   ip: Omit<Ipv6Params, 'nextHeader'>;
   icmp: Icmpv6Message;
 }
@@ -99,6 +112,5 @@ export interface EthIpv6Icmpv6Params {
 export function ethIpv6Icmpv6(p: EthIpv6Icmpv6Params): Capture {
   const msg = icmpv6(p.icmp, { src: p.ip.src, dst: p.ip.dst });
   const ip = ipv6({ ...p.ip, nextHeader: 58 }, msg.bytes);
-  const eth = ethernet({ ...p.eth, type: 0x86dd }, wire(ip, msg.bytes));
-  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), eth, ip, msg] };
+  return { link: p.link, ...(p.note ? { note: p.note } : {}), layers: [physical(), ...frame(p.eth, 0x86dd, wire(ip, msg.bytes)), ip, msg] };
 }

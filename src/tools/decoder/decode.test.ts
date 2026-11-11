@@ -87,6 +87,24 @@ describe('examples', () => {
   });
 });
 
+describe('802.1Q', () => {
+  it('decodes a tagged frame', () => {
+    const d = decode(example('vlan'));
+    expect(ids(d)).toEqual(['ethernet', 'vlan', 'ipv4', 'icmp-echo']);
+    expect(value(d, 'ethernet', 'type').display).toBe('0x8100 (VLAN tag, IEEE 802.1Q)');
+    expect(value(d, 'vlan', 'vid').display).toBe('10');
+    expect(value(d, 'vlan', 'type').display).toBe('0x0800 (IPv4)');
+  });
+
+  it('warns about a second tag right after the first', () => {
+    const b = example('vlan');
+    const double = new Uint8Array([...b.subarray(0, 16), 0x81, 0x00, 0x00, 0x14, ...b.subarray(16)]);
+    const d = decode(double);
+    expect(ids(d).slice(0, 3)).toEqual(['ethernet', 'vlan', 'vlan']);
+    expect(d.issues.some((i) => i.level === 'warning' && i.text.includes('Double tagging'))).toBe(true);
+  });
+});
+
 describe('problems in the input', () => {
   it('reports a wrong IPv4 header checksum with the expected value', () => {
     const b = example('ping');

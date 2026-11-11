@@ -4,6 +4,7 @@ import { ipv4Def } from '../../shared/headers/ipv4';
 import { tcpDef, optEolDef, optNopDef, optMssDef, optWsDef, optSackPermDef, optTsDef } from '../../shared/headers/tcp';
 import { udpDef } from '../../shared/headers/udp';
 import { arpDef } from '../../shared/headers/arp';
+import { vlanDef, vlanDisplay, vlanSummary } from '../../shared/headers/vlan';
 import { icmpEchoDef, icmpTimeExceededDef, icmpDestUnreachableDef, icmpFragNeededDef } from '../../shared/headers/icmp';
 import { concat, crc32, internetChecksum } from '../../shared/lib/encode';
 
@@ -55,6 +56,7 @@ const IPV4 = forInput(ipv4Def);
 const TCP = forInput(tcpDef);
 const UDP = forInput(udpDef);
 const ARP = forInput(arpDef);
+const VLAN = forInput(vlanDef);
 const ICMP_ECHO = forInput(icmpEchoDef);
 const ICMP_TIME = forInput(icmpTimeExceededDef);
 const ICMP_UNREACH = forInput(icmpDestUnreachableDef);
@@ -261,12 +263,7 @@ class Decoder {
       typeDisplay = `${hex(type, 4)} (a length: IEEE 802.3 frame with LLC header)`;
       this.issue('info', 'This is an IEEE 802.3 frame with an LLC header, not Ethernet II. The decoder stops here.');
       this.data(body, 'LLC frame, not decoded');
-    } else if (type === 0x0800) used = this.ipv4(body);
-    else if (type === 0x0806) used = this.arp(body);
-    else {
-      this.issue('info', `EtherType ${hex(type, 4)} (${ETHERTYPES[type] ?? 'unknown'}) is not decoded yet. Supported: IPv4 and ARP.`);
-      this.data(body, `${ETHERTYPES[type] ?? 'Unknown'} payload, not decoded`);
-    }
+    } else used = this.byType(type, body);
 
     const pad = body.subarray(used);
     const trailerBytes = concat(pad, hasFcs ? frame.subarray(frame.length - 4) : new Uint8Array(0));
@@ -284,6 +281,30 @@ class Decoder {
     }
     if (!hasFcs && frame.length < 60) this.issue('info', `The frame has ${frame.length} octets without FCS. On the wire it is padded to at least 60 (64 with FCS); captures on the sending host show it before padding.`);
     this.layers[index] = instance(def, frame, header, display, `${display.src} to ${mac(dst)}`, { bytes: trailerBytes, sliced: trailer });
+  }
+
+  /** Decodes a payload by its EtherType; returns the number of octets used, the rest is padding. */
+  byType(type: number, body: Uint8Array): number {
+    if (type === 0x0800) return this.ipv4(body);
+    if (type === 0x0806) return this.arp(body);
+    if (type === 0x8100) return this.vlanTag(body);
+    this.issue('info', `EtherType ${hex(type, 4)} (${ETHERTYPES[type] ?? 'unknown'}) is not decoded yet. Supported: IPv4, ARP and 802.1Q VLAN tags.`);
+    this.data(body, `${ETHERTYPES[type] ?? 'Unknown'} payload, not decoded`);
+    return body.length;
+  }
+
+  // ---- 802.1Q
+
+  vlanTag(bytes: Uint8Array): number {
+    if (!this.need(bytes, 4, 'An 802.1Q tag')) return bytes.length;
+    const s = slice(VLAN.fields, bytes.subarray(0, 4));
+    const pcp = num(s.raw.pcp);
+    const vid = num(s.raw.vid);
+    const inner = num(s.raw.type);
+    this.layers.push(instance(VLAN, bytes.subarray(0, 4), s, vlanDisplay(pcp, num(s.raw.dei), vid, inner), vlanSummary(vid, pcp)));
+    if (vid === 0 || vid === 4095) this.issue('info', `VLAN ID ${vid} is ${vid === 0 ? 'a priority tag without VLAN' : 'reserved'}.`);
+    if (inner === 0x8100) this.issue('warning', 'A second 802.1Q tag follows directly. Double tagging is used in VLAN hopping attacks; carriers use stacked tags with TPID 0x88a8 (802.1ad) instead.');
+    return 4 + this.byType(inner, bytes.subarray(4));
   }
 
   // ---- ARP

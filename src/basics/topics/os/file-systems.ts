@@ -1,0 +1,173 @@
+import type { Topic } from '../../schema';
+import { MAN, OSTEP, POSIX } from './sources';
+
+export const fileSystems: Topic = {
+  id: 'file-systems',
+  category: 'os',
+  title: 'File systems',
+  level: 1,
+  definition: 'A file system organizes the numbered blocks of a storage device into named files and directories, and keeps track of which blocks belong to which file, who may use it and when it was changed.',
+  why: 'A USB stick that will not take a 5 GB video, a disk that is "full" although space is left, a file that is gone after a power cut, a deleted file that can be recovered: each is explained by how file systems work. Choosing and understanding them is part of setting up any computer.',
+  sections: [
+    {
+      heading: 'From blocks to files',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A drive offers nothing but numbered blocks that can be read and written. It knows no files. The file system is the layout written onto the drive, and the part of the operating system that understands it, which together turn "block 81,234,567" into "/home/ana/report.pdf".',
+        },
+        {
+          kind: 'text',
+          text: 'It stores two kinds of information. The data is the content of the files. The metadata is everything about them: names, sizes, owners, time stamps, and above all which blocks hold the content. A file system works in blocks of its own, typically 4 KiB. A file of one byte still occupies one whole block, which is why "size" and "size on disk" differ.',
+        },
+      ],
+    },
+    {
+      heading: 'Inodes, directories and links',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Unix file systems describe every file by an inode, a small record with a number. The inode holds the type of the file, its size, owner, access rights, time stamps and the location of its data blocks. It does not hold the name.',
+        },
+        {
+          kind: 'text',
+          text: 'Names live in directories. A directory is itself a file, containing a list of entries: this name refers to that inode number. Opening /home/ana/report.pdf means looking up "home" in the root directory, "ana" in that directory, and "report.pdf" in the next, then reading the inode found there.',
+        },
+        {
+          kind: 'text',
+          text: 'Since a name is only an entry pointing to an inode, one file can have several names. Such an additional entry is a hard link. All names are equal, and the data is released only when the last one is removed. A symbolic link is something else: a small file whose content is a path to another file. It can point across file systems and to directories, and it breaks when its target is renamed or removed.',
+        },
+        {
+          kind: 'text',
+          text: 'Other file systems name things differently (NTFS has a master file table with file records), but the separation of names from the record that describes a file is common to them.',
+        },
+      ],
+    },
+    {
+      heading: 'Surviving a crash',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'One change to a file needs several writes: new data blocks, the inode with the new size, the list of free blocks. If power fails between them, the structures no longer agree, for instance a block marked as used that belongs to no file. Older file systems had to scan the whole drive after every crash to repair this.',
+        },
+        {
+          kind: 'text',
+          text: 'A journaling file system first notes in a log, the journal, what it is about to change, and only then changes it. After a crash it reads the journal and completes or discards the interrupted operation, which takes seconds. Most journal only the metadata by default: the structure stays consistent, but a file that was being written may hold old or incomplete content.',
+        },
+        {
+          kind: 'text',
+          text: 'Copy-on-write file systems never overwrite in place. They write changed blocks to free space and then switch one pointer from the old version to the new one. The old version stays valid until that moment, and keeping it around on purpose gives snapshots: the frozen state of the file system at a point in time, at almost no cost.',
+        },
+        {
+          kind: 'text',
+          text: 'Independently of this, writes do not reach the drive immediately. The kernel collects them in memory and writes them out a little later. A program that needs data to be safe asks for it explicitly (fsync), and a removable drive should be ejected before unplugging so that everything is written.',
+        },
+      ],
+    },
+    {
+      heading: 'File systems you will meet',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'Common file systems',
+          columns: ['File system', 'Home', 'Technique', 'Worth knowing'],
+          rows: [
+            ['ext4', 'Linux', 'Journaling', 'The default of many distributions. With 4 KiB blocks a file can be up to 16 TiB, a volume up to 1 EiB'],
+            ['XFS', 'Linux', 'Journaling', 'Common on servers and for very large volumes'],
+            ['Btrfs', 'Linux', 'Copy-on-write', 'Snapshots and checksums for data'],
+            ['NTFS', 'Windows', 'Journaling (metadata)', 'Access control lists, compression; other systems can usually read it, writing varies'],
+            ['APFS', 'macOS, iOS', 'Copy-on-write', 'Snapshots, encryption, built for flash storage'],
+            ['FAT32', 'Everywhere', 'None', 'Understood by nearly every device, but a file can be at most 4 GiB minus one byte, and there are no access rights'],
+            ['exFAT', 'Removable media', 'None', 'The successor of FAT32 for memory cards and USB drives, without the 4 GiB limit'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'How file systems appear differs by system. Unix systems have one directory tree: a file system is mounted at a directory, its mount point, and its content appears below it. Windows gives each file system a drive letter, though it can mount into directories as well.',
+        },
+        {
+          kind: 'text',
+          text: 'Deleting a file removes its name and marks its blocks as free. The content stays on the drive until something else is written there, which is why deleted files can often be recovered, and why a drive must be overwritten or encrypted before it is given away. On SSDs the TRIM command tells the drive which blocks are free, and the drive may then really erase them.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Deleting a file erases its content.', truth: 'It removes the name and frees the blocks for reuse. Until they are overwritten the content can be read with recovery tools. Formatting quickly does not erase it either.' },
+    { myth: 'The name is part of the file.', truth: 'The name is an entry in a directory that points to the record describing the file. A file can have several names (hard links), and renaming changes only a directory.' },
+    { myth: 'A journaling file system protects my data from a power cut.', truth: 'It protects the structure of the file system. With the usual metadata journaling, the content of a file that was being written can still be lost or incomplete. Applications that need more call fsync, and nothing replaces a backup.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'df -hT', shows: 'Every mounted file system with its type, size, used and free space and mount point.' },
+      { os: 'Linux', command: 'lsblk -f', shows: 'Drives and partitions with the file system on each, its label and where it is mounted.' },
+      { os: 'Linux', command: 'ls -li', shows: 'Files with their inode number in the first column and the number of names (hard links) in the third.' },
+      { os: 'Linux', command: 'stat report.pdf', shows: 'The inode of one file: size, blocks used, owner, rights and the three time stamps.' },
+      { os: 'Linux', command: 'df -i', shows: 'Used and free inodes per file system. A file system with free space but no free inodes cannot take new files.' },
+      { os: 'Windows', command: 'Get-Volume', shows: 'All volumes with drive letter, file system (NTFS, FAT32, exFAT), size and free space (PowerShell).' },
+      { os: 'macOS', command: 'diskutil list', shows: 'Drives, partitions and APFS containers with their volumes.' },
+    ],
+    numbers: [
+      { label: 'Typical block size', value: '4 KiB', note: 'set when the file system is created' },
+      { label: 'Largest file on FAT32', value: '4 GiB minus 1 byte', note: 'the size is stored in 32 bits: 2^32 - 1 bytes' },
+      { label: 'Largest file on ext4 with 4 KiB blocks', value: '16 TiB', note: 'calculated: 2^32 blocks of 4 KiB' },
+      { label: 'Largest ext4 volume with 4 KiB blocks', value: '1 EiB', note: 'calculated: 2^48 blocks of 4 KiB' },
+    ],
+    examples: [
+      'Copying a 6 GB video to a USB stick fails with "file too large" although the stick is empty: the stick is formatted with FAT32.',
+      'A server reports "no space left on device" while df shows free space: millions of tiny files have used up all inodes.',
+    ],
+  },
+  terms: [
+    { term: 'File system', definition: 'The structure on a storage device, and the software that maintains it, that organizes blocks into named files and directories.' },
+    { term: 'Metadata', definition: 'Data about data. In a file system: names, sizes, owners, rights, time stamps and the location of the content.' },
+    { term: 'Inode', definition: 'The record that describes a file in Unix file systems: everything about it except its name.' },
+    { term: 'Directory', definition: 'A file that maps names to files; called folder in graphical interfaces.' },
+    { term: 'Hard link', definition: 'An additional directory entry for the same file. The file exists until its last name is removed.' },
+    { term: 'Symbolic link', definition: 'A small file that contains the path of another file and is followed automatically.' },
+    { term: 'Journaling', definition: 'Recording intended changes in a log before making them, so the file system can be made consistent quickly after a crash.' },
+    { term: 'Snapshot', definition: 'The preserved state of a file system at one moment, cheap to make on copy-on-write file systems.' },
+    { term: 'Mount', definition: 'Attaching a file system to the directory tree at a directory, its mount point.' },
+  ],
+  related: [{ topic: 'storage' }, { topic: 'virtual-memory' }, { topic: 'kernel' }, { entry: 'raid' }],
+  sources: [
+    OSTEP('39 (files and directories: inodes, hard and symbolic links, mounting)', 'file-intro.pdf'),
+    OSTEP('40 (file system implementation)', 'file-implementation.pdf'),
+    OSTEP('42 (crash consistency: fsck and journaling)', 'file-journaling.pdf'),
+    { spec: 'The Linux kernel documentation: ext4 data structures and algorithms', url: 'https://docs.kernel.org/filesystems/ext4/', note: 'block sizes, limits of 2^32 blocks per file and 2^48 blocks per file system with extents' },
+    { spec: 'Microsoft Learn: File system functionality comparison', url: 'https://learn.microsoft.com/en-us/windows/win32/fileio/filesystem-functionality-comparison', note: 'NTFS, exFAT and FAT32: maximum file sizes, journaling' },
+    { spec: 'Apple: Apple File System Reference', url: 'https://developer.apple.com/support/downloads/Apple-File-System-Reference.pdf', note: 'copy-on-write, snapshots' },
+    POSIX('link, symlink, rename, fsync'),
+    MAN('inode', 7, 'what an inode stores'),
+  ],
+  quiz: [
+    {
+      id: 'fat',
+      prompt: 'A 5 GiB disk image cannot be copied to an empty 64 GB USB stick. What is the most likely reason?',
+      options: ['The stick is defective', 'The stick uses FAT32, which limits a file to just under 4 GiB', 'USB cannot transfer files that large', 'The file name is too long'],
+      answer: 1,
+      explanation: 'FAT32 stores the file size in 32 bits, so the largest file is 2^32 - 1 bytes. Formatting the stick with exFAT removes the limit.',
+    },
+    {
+      id: 'link',
+      prompt: 'A file has two hard links, a.txt and b.txt. What happens to the content when a.txt is deleted?',
+      options: ['It is gone', 'It is still there and reachable as b.txt', 'b.txt becomes a broken link', 'It moves to the trash'],
+      answer: 1,
+      explanation: 'Both names point to the same inode. The data is released only when the last name is removed.',
+    },
+    {
+      id: 'journal',
+      prompt: 'What does the journal of a file system make possible?',
+      options: ['Restoring deleted files', 'Bringing the file system into a consistent state quickly after a crash', 'Faster reading', 'Encryption'],
+      answer: 1,
+      explanation: 'The journal records operations before they are carried out. After a crash only the journal has to be replayed, not the whole drive checked.',
+    },
+    {
+      id: 'inodes',
+      prompt: 'Where is the name of a file stored in a Unix file system?',
+      options: ['In its inode', 'In the first data block', 'In the directory that contains it', 'In the journal'],
+      answer: 2,
+      explanation: 'A directory maps names to inode numbers. The inode holds everything else about the file, but not its name.',
+    },
+  ],
+};

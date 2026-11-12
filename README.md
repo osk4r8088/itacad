@@ -13,6 +13,7 @@ Static site, Vite + React + TypeScript. Everything runs in the browser: no serve
 The building blocks of IT around the network, from level 1 (no prior knowledge) upwards. Eight categories: hardware, operating systems, virtualization and containers, software development, data and encoding, cloud and operations, security basics, databases. Every topic follows one template: definition and why it matters, the explanation in short sections, misconceptions, commands to try on Linux, Windows and macOS, typical numbers, key terms (collected in a glossary), a quiz, related pages and sources.
 
 - **Hardware:** CPU, RAM and the memory hierarchy (with a latency scale that can stretch nanoseconds to human time), storage (HDD, SSD, SATA, NVMe), GPU, mainboard and buses (PCI Express, USB), the network interface card, switch, router, firewall and access point, server vs desktop, hardware support for virtualization, and power and UPS. An "inside a computer" diagram links each part to its topic.
+- **Operating systems:** kernel and user space, processes and threads, virtual memory, and file systems. Boot process, device drivers, and users and permissions are planned.
 
 ### Protocols
 

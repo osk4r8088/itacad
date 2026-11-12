@@ -270,6 +270,17 @@ main {
   font-size: 0.95rem;
   margin-top: 1rem;
 }
+@media (max-width: 640px) {
+  /* The summary can sit anywhere in the wrapped bar, so the panel is placed against the screen, like the protocol menu. */
+  .about-pop {
+    position: fixed;
+    top: 3.5rem;
+    left: 3vw;
+    right: 3vw;
+    width: auto;
+    max-height: calc(100vh - 4.5rem);
+  }
+}
 
 /* ---------- step controls ---------- */
 .controls {

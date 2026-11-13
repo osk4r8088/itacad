@@ -4093,3 +4093,175 @@ table.compare tbody th {
   display: flex;
   gap: 0.5rem;
 }
+
+/* ---- Basics figures: responsibility matrix and availability calculator ---- */
+.resp-figure,
+.avail-figure {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.resp-models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.resp-model {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.resp-model:hover {
+  border-color: var(--muted);
+}
+.resp-model.is-selected {
+  border-color: var(--accent);
+  border-width: 2px;
+  font-weight: 600;
+}
+.resp-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.resp-table {
+  width: 100%;
+  max-width: 44rem;
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: 0.85rem;
+}
+.resp-table th {
+  padding: 0.3rem 0.4rem;
+  font-weight: 600;
+  text-align: left;
+}
+.resp-table thead th {
+  color: var(--muted);
+  text-align: center;
+}
+.resp-table thead th:first-child {
+  text-align: left;
+}
+.resp-table thead th.is-selected {
+  color: var(--accent);
+}
+.resp-table abbr {
+  text-decoration: none;
+}
+.resp-cell {
+  padding: 0.3rem 0.4rem;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  opacity: 0.8;
+}
+.resp-cell.is-selected {
+  opacity: 1;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.resp-cell.owner-customer {
+  background: var(--k-application);
+}
+.resp-cell.owner-provider {
+  background: var(--k-phy);
+}
+.resp-cell.owner-shared {
+  background: var(--k-internet);
+}
+.resp-about p,
+.resp-about ul,
+.avail-note,
+.avail-error,
+.avail-value {
+  margin: 0;
+}
+.resp-about {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 70ch;
+}
+.resp-about ul {
+  padding-left: 1.2rem;
+}
+.avail-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+.avail-inputs label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.avail-inputs input[type='text'] {
+  font: inherit;
+  font-size: 1.1rem;
+  width: 9rem;
+  padding: 0.4rem 0.6rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+}
+.avail-inputs input[aria-invalid='true'] {
+  border-color: var(--danger, #b3261e);
+}
+.avail-inputs input[type='range'] {
+  width: min(100%, 14rem);
+}
+.avail-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: 0.6rem;
+}
+.avail-card {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding: 0.6rem 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-width: 0;
+}
+.avail-card h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.avail-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.avail-downtime {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.avail-downtime div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.avail-downtime dt {
+  color: var(--muted);
+}
+.avail-downtime dd {
+  margin: 0;
+  text-align: right;
+}
+.avail-note {
+  max-width: 70ch;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

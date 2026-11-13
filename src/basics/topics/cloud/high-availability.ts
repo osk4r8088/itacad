@@ -1,0 +1,167 @@
+import type { Topic } from '../../schema';
+
+export const highAvailability: Topic = {
+  id: 'high-availability',
+  category: 'cloud',
+  title: 'High availability',
+  level: 2,
+  definition: 'Availability is the share of time in which a system does what it should; high availability means designing the system so that the failure of any single part does not interrupt the service.',
+  why: 'Hardware fails, software crashes, people make mistakes and updates have to be installed. A system is available because someone planned for all of that, and the plan has a price. Reading "99.9 percent" correctly, and knowing what a second server really protects against, is the basis for any honest conversation about uptime.',
+  sections: [
+    {
+      heading: 'Measuring availability',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Availability is uptime divided by total time, written as a percentage and often counted in nines. The interesting number is the other side: how much downtime the percentage allows.',
+        },
+        {
+          kind: 'table',
+          caption: 'Availability and the downtime it allows (year of 365 days)',
+          columns: ['Availability', 'Name', 'Downtime per year', 'Downtime per day on average'],
+          rows: [
+            ['99 %', 'two nines', '3.65 days', '14.4 minutes'],
+            ['99.9 %', 'three nines', '8.76 hours', '1.44 minutes'],
+            ['99.99 %', 'four nines', '52.6 minutes', '8.6 seconds'],
+            ['99.999 %', 'five nines', '5.26 minutes', '0.86 seconds'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Each additional nine cuts the allowed downtime by ten and costs far more than the previous one. Three nines leave room for a person to be called and fix things a few times a year. Five nines leave no room for a human at all: every failure must be detected and handled automatically, and planned maintenance must happen without interruption.',
+        },
+        { kind: 'figure', figure: 'availability-calculator', caption: 'Enter an availability and a number of components to see the allowed downtime, and what happens when parts are chained or doubled.' },
+      ],
+    },
+    {
+      heading: 'Chains and spares',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'When a request needs several components one after the other, all must work, and their availabilities multiply. Three parts of 99.9 percent each give 99.7 percent together. A long chain of good parts is a mediocre system.',
+        },
+        {
+          kind: 'text',
+          text: 'When several components can each do the job, the service fails only if all of them fail at once. Two independent parts of 99 percent each give 99.99 percent together. This is the lever of high availability: doubling. It only holds if the failures are independent. Two servers on the same power strip, with the same faulty update or the same expired certificate, fail together.',
+        },
+        {
+          kind: 'text',
+          text: 'A part without a spare whose failure stops everything is a single point of failure. Designing for availability largely means finding them one by one: the one server, the one switch, the one power feed, the one internet line, the one zone, and also the one person who knows the password.',
+        },
+      ],
+    },
+    {
+      heading: 'Failover',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'Two ways to run spares',
+          columns: ['', 'Active-active', 'Active-passive'],
+          rows: [
+            ['How', 'All instances serve traffic; a load balancer spreads it', 'One instance serves, a standby waits and takes over'],
+            ['On failure', 'The load balancer stops using the failed instance', 'A failover promotes the standby'],
+            ['Interruption', 'Barely noticeable', 'Seconds to minutes'],
+            ['Suits', 'Stateless services such as web servers', 'Things with one writer, such as a classic database'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Every failover needs three things: detecting the failure (health checks), deciding who takes over, and redirecting the clients. The decision is the hard part. If two database nodes lose contact with each other, each may believe the other is dead and both accept writes, which is called split brain and corrupts data. Clusters therefore require a majority, a quorum, to act, which is why they have three or five members and not two.',
+        },
+        {
+          kind: 'text',
+          text: 'State is what makes availability difficult. A web server that keeps nothing can be replaced by any other copy. A database must have its data on the spare before the failure, which leads to replication and to the question whether a write waits for the copy.',
+        },
+      ],
+    },
+    {
+      heading: 'What it does not cover',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'Redundancy is not backup. A deleted table is deleted on every replica within milliseconds. Protection against mistakes and attacks needs copies from the past.',
+            'Most outages are not hardware. Changes, configuration errors, overload and expired certificates hit all copies alike, so careful rollouts matter as much as spares.',
+            'An untested failover is a hope. Standbys that were never promoted tend to fail at the moment they are needed; regular switchover exercises find that out earlier.',
+            'A service level agreement (SLA) is a contract. It states what the provider promises and what it pays back if it misses, usually a credit on the bill, not the customer\'s loss.',
+          ],
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'With RAID or a replicated database, a backup is no longer needed.', truth: 'Replication copies every change at once, including deletions and corruption. It protects against failed hardware, not against wrong data.' },
+    { myth: '99.9 percent availability means almost no downtime.', truth: 'It allows 8.76 hours per year, and nothing says they will not come in one piece on the busiest day.' },
+    { myth: 'Two servers make a system highly available.', truth: 'Only if nothing they both depend on can fail alone, the takeover is automatic and tested, and one server can carry the full load.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'uptime', shows: 'How long this system has been running since its last start. A long uptime is not the same as availability of the service, and usually means missing kernel updates.' },
+      { os: 'Linux', command: 'dig +short example.com', shows: 'Several addresses in the answer mean the name is served from more than one place.' },
+      { os: 'Linux', command: 'curl -s -o /dev/null -w "%{http_code}\\n" https://example.com/', shows: 'The simplest health check: does the service answer with a success code?' },
+      { os: 'Linux', command: 'python3 -c "print((1 - 0.999) * 365 * 24)"', shows: 'The downtime in hours per year that 99.9 percent allows: 8.76.' },
+      { os: 'Linux', command: 'kubectl get pods -o wide', shows: 'In a cluster: the copies of each service and the nodes they run on; copies on the same node fail together.' },
+      { os: 'Windows', command: '(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime', shows: 'The time since the last start of the system (PowerShell).' },
+      { os: 'macOS', command: 'uptime', shows: 'The time since the last start, and the load averages.' },
+    ],
+    numbers: [
+      { label: 'Downtime per year at 99.9 %', value: '8.76 hours', note: 'calculated: 0.001 x 8,760 h' },
+      { label: 'Downtime per year at 99.99 %', value: '52.6 minutes', note: 'calculated' },
+      { label: 'Three components of 99.9 % in a chain', value: '99.7 %', note: 'calculated: 0.999 x 0.999 x 0.999' },
+      { label: 'Two independent components of 99 % as spares', value: '99.99 %', note: 'calculated: 1 - 0.01 x 0.01' },
+    ],
+    examples: [
+      'A company doubles its servers and firewalls, and the service still goes down: both firewalls are plugged into the same switch, which had no spare.',
+      'An application depends on a load balancer, two application servers, a database and an external payment service. The payment service promises 99.9 percent; the application as a whole cannot promise more than that.',
+    ],
+  },
+  terms: [
+    { term: 'Availability', definition: 'The share of time in which a system delivers its service, usually given as a percentage.' },
+    { term: 'High availability', definition: 'A design in which the failure of single components does not interrupt the service.' },
+    { term: 'Single point of failure', definition: 'A component without a spare whose failure stops the whole service.' },
+    { term: 'Failover', definition: 'Switching to a spare component when the active one fails.' },
+    { term: 'Load balancer', definition: 'A component that distributes requests over several instances and leaves out those that fail their health check.' },
+    { term: 'Active-passive', definition: 'An arrangement in which one instance serves and a standby takes over on failure; in active-active all instances serve.' },
+    { term: 'Quorum', definition: 'The majority of members a cluster needs in order to make decisions, which prevents two halves from acting on their own.' },
+    { term: 'Split brain', definition: 'A state in which parts of a cluster lose contact and each acts as if it were the only one.' },
+    { term: 'Service level agreement (SLA)', definition: 'A contract that states the promised level of a service, such as availability, and the consequence of missing it.' },
+    { term: 'Mean time to recovery (MTTR)', definition: 'The average time from a failure to the restored service.' },
+  ],
+  related: [{ topic: 'regions-zones' }, { topic: 'backup' }, { topic: 'monitoring' }, { entry: 'raid' }, { topic: 'power' }, { topic: 'orchestration' }, { topic: 'server' }],
+  sources: [
+    { spec: 'Beyer, Jones, Petoff, Murphy (eds.): Site Reliability Engineering, chapter 3: Embracing Risk', url: 'https://sre.google/sre-book/embracing-risk/', note: 'availability as a target, the cost of each additional nine' },
+    { spec: 'IEC 60050-192: International Electrotechnical Vocabulary, Part 192: Dependability', note: 'definitions of availability and related terms; not checked for this page' },
+    { spec: 'Kleppmann: Designing Data-Intensive Applications, chapters 5, 8 and 9', note: 'replication, failover, split brain, quorums' },
+    { spec: 'Gray, Siewiorek: High-Availability Computer Systems. IEEE Computer 24(9), 1991', note: 'availability classes counted in nines' },
+  ],
+  quiz: [
+    {
+      id: 'nines',
+      prompt: 'How much downtime per year does an availability of 99.9 percent allow?',
+      options: ['About 5 minutes', 'About 53 minutes', 'About 8.8 hours', 'About 3.7 days'],
+      answer: 2,
+      explanation: 'A year has 8,760 hours; 0.1 percent of that is 8.76 hours.',
+    },
+    {
+      id: 'chain',
+      prompt: 'A request passes through three components, each available 99.9 percent of the time. How available is the whole?',
+      options: ['99.9 %', 'About 99.7 %', '99.99 %', '33.3 %'],
+      answer: 1,
+      explanation: 'All three must work, so the values multiply: 0.999 x 0.999 x 0.999 is about 0.997.',
+    },
+    {
+      id: 'backup',
+      prompt: 'A database is replicated to a standby in another zone. An administrator deletes a table by mistake. What happens?',
+      options: ['The standby still has the table', 'The deletion is replicated, and the table is gone on both', 'The replication refuses the deletion', 'The table is restored automatically'],
+      answer: 1,
+      explanation: 'Replication carries every change, wanted or not. Getting the table back needs a backup from before the mistake.',
+    },
+    {
+      id: 'quorum',
+      prompt: 'Why do clusters usually have three or five members instead of two?',
+      options: ['Odd numbers are faster', 'So that after a split one side still has a majority and only that side keeps working', 'Licenses require it', 'Two members cannot be connected'],
+      answer: 1,
+      explanation: 'With two members, neither half has a majority after losing contact. An odd number guarantees that at most one side can go on.',
+    },
+  ],
+};

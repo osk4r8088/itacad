@@ -17,6 +17,7 @@ The building blocks of IT around the network, from level 1 (no prior knowledge) 
 - **Virtualization and containers:** hypervisors, virtual machines, containers and virtual machines compared (with both stacks side by side), images and registries, and orchestration basics.
 - **Data and encoding:** number systems, data units, character encoding (ASCII, Unicode, UTF-8, with an encoder that shows the bits of any text typed in), compression and serialization (JSON, XML, YAML).
 - **Software development:** compiler, linker, interpreter, JIT and bytecode, debugger (with a step-through of one function from source text to a linked program), build systems, version control, testing and CI/CD.
+- **Cloud and operations:** cloud service models (with a matrix of who manages which layer), regions and availability zones, high availability (with a downtime calculator), backup and monitoring.
 
 ### Protocols
 

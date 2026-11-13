@@ -41,6 +41,11 @@ export const kernel: Topic = {
           ],
         },
         {
+          kind: 'figure',
+          figure: 'kernel-boundary',
+          caption: 'The boundary, with what sits on each side. Select a part to see what it does.',
+        },
+        {
           kind: 'text',
           text: 'This has nothing to do with user accounts. A program started by the administrator (root) still runs in user mode. The kernel merely grants its requests more often.',
         },

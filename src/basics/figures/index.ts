@@ -7,4 +7,6 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 export const FIGURES: Record<string, LazyExoticComponent<ComponentType>> = {
   latency: lazy(() => import('./LatencyScale')),
   computer: lazy(() => import('./ComputerDiagram')),
+  'kernel-boundary': lazy(() => import('./KernelBoundary')),
+  'container-stacks': lazy(() => import('./ContainerStacks')),
 };

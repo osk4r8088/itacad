@@ -30,6 +30,11 @@ export const containers: Topic = {
           ],
         },
         {
+          kind: 'figure',
+          figure: 'container-stacks',
+          caption: 'The same two applications, run as virtual machines and as containers.',
+        },
+        {
           kind: 'text',
           text: 'A Linux container therefore needs a Linux kernel. Containers on Windows and macOS run in a small Linux virtual machine that the tooling starts in the background, which is why the first start takes a while and why files shared from the host can be slow.',
         },

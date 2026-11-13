@@ -3845,3 +3845,123 @@ table.compare tbody th {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Basics figures: kernel boundary and container stacks ---- */
+.kernel-figure {
+  display: grid;
+  gap: 0.75rem;
+}
+.kernel-stack {
+  display: grid;
+  gap: 0.4rem;
+}
+.kernel-band {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.kernel-band.kind-user {
+  background: var(--k-application);
+}
+.kernel-band.kind-kernel {
+  background: var(--k-internet);
+}
+.kernel-band.kind-hw {
+  background: var(--k-phy);
+}
+.kernel-band-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.kernel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.kernel-box {
+  flex: 1 1 8rem;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.45rem 0.6rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.kernel-box.is-wide {
+  flex-basis: 100%;
+}
+.kernel-box:hover {
+  border-color: var(--muted);
+}
+.kernel-box.is-selected {
+  border-color: var(--accent);
+  border-width: 2px;
+  font-weight: 600;
+}
+.kernel-about {
+  margin: 0;
+  max-width: 70ch;
+}
+.stacks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.stack {
+  /* An explicit block: a wider rule in this file lays sections out in columns. */
+  display: block;
+}
+.stack h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+.stack-units {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.stack-unit {
+  flex: 1 1 5.5rem;
+  min-width: 0;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+}
+.stack-unit-name {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+}
+.stack-layer {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+}
+.stack-layer.is-base {
+  margin-top: 0.25rem;
+  background: var(--panel);
+}
+.stack-layer.is-kernel {
+  background: var(--k-internet);
+  border-color: var(--k-internet-b);
+  font-weight: 600;
+}
+.stack .small {
+  margin: 0.5rem 0 0;
+}

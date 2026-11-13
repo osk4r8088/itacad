@@ -33,6 +33,7 @@ export const linker: Topic = {
             'Output: write an executable file with a header that tells the operating system how to load it and where to start.',
           ],
         },
+        { kind: 'figure', figure: 'source-to-program', caption: 'Steps 5 and 6 show the zero bytes after the call instruction in main.o and the address the linker fills in.' },
         {
           kind: 'table',
           caption: 'Executable and object file formats',

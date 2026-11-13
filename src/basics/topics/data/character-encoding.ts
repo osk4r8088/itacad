@@ -52,6 +52,7 @@ export const characterEncoding: Topic = {
             ['U+10000 to U+10FFFF', '4', '11110xxx 10xxxxxx 10xxxxxx 10xxxxxx', 'U+1F600, an emoji: f0 9f 98 80'],
           ],
         },
+        { kind: 'figure', figure: 'utf8-encoder', caption: 'Type a text: the fixed bits of each byte and the bits that come from the code point are marked apart.' },
         {
           kind: 'text',
           text: 'This design has useful properties. Plain ASCII text is already valid UTF-8, byte for byte. A byte below 0x80 is always an ASCII character and never part of another one, so old software that looks for a slash or a line feed keeps working. And a reader that lands in the middle of a stream finds the next character start by skipping the bytes that begin with 10. UTF-8 is the encoding of the web, of Linux and macOS, and of nearly every file format and protocol defined today.',

@@ -9,4 +9,6 @@ export const FIGURES: Record<string, LazyExoticComponent<ComponentType>> = {
   computer: lazy(() => import('./ComputerDiagram')),
   'kernel-boundary': lazy(() => import('./KernelBoundary')),
   'container-stacks': lazy(() => import('./ContainerStacks')),
+  'utf8-encoder': lazy(() => import('./Utf8Encoder')),
+  'source-to-program': lazy(() => import('./SourceToProgram')),
 };

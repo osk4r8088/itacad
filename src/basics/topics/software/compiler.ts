@@ -35,6 +35,12 @@ export const compiler: Topic = {
       ],
     },
     {
+      heading: 'One function, step by step',
+      blocks: [
+        { kind: 'figure', figure: 'source-to-program', caption: 'From source text to a linked program. The last two steps belong to the assembler and the linker.' },
+      ],
+    },
+    {
       heading: 'What the compiler catches, and what it does not',
       blocks: [
         {

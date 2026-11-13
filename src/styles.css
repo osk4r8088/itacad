@@ -3965,3 +3965,131 @@ table.compare tbody th {
 .stack .small {
   margin: 0.5rem 0 0;
 }
+
+/* ---- Basics figures: UTF-8 encoder and source-to-program steps ---- */
+.utf8-figure,
+.stp-figure {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.utf8-input {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.utf8-input input {
+  font: inherit;
+  font-size: 1.1rem;
+  width: min(100%, 22rem);
+  padding: 0.4rem 0.6rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+}
+.utf8-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.utf8-table {
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.utf8-table th,
+.utf8-table td {
+  padding: 0.3rem 0.75rem 0.3rem 0;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.utf8-table th {
+  font-weight: 600;
+  color: var(--muted);
+}
+.utf8-char {
+  font-size: 1.1rem;
+}
+.utf8-bits {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+.utf8-prefix {
+  color: var(--muted);
+}
+.utf8-payload {
+  font-weight: 700;
+  color: var(--accent);
+}
+.utf8-none {
+  color: var(--muted);
+  white-space: normal;
+}
+.utf8-total,
+.stp-tool,
+.stp-about {
+  margin: 0;
+}
+.stp-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stp-step,
+.stp-button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.stp-step:hover,
+.stp-button:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+.stp-step.is-selected {
+  border-color: var(--accent);
+  border-width: 2px;
+  font-weight: 600;
+}
+.stp-number {
+  color: var(--muted);
+}
+.stp-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.stp-stage {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.stp-tool {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.stp-code {
+  margin: 0;
+  padding: 0.75rem;
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.stp-about {
+  max-width: 70ch;
+}
+.stp-nav {
+  display: flex;
+  gap: 0.5rem;
+}

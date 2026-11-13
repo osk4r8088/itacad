@@ -1,0 +1,155 @@
+import type { Topic } from '../../schema';
+
+export const versionControl: Topic = {
+  id: 'version-control',
+  category: 'software',
+  title: 'Version control',
+  level: 1,
+  definition: 'A version control system records every change to a set of files as a step in a history, with who made it, when and why, so that any earlier state can be brought back and several people can work on the same files without overwriting each other.',
+  why: 'Code, configuration, documentation and infrastructure descriptions all live in version control today, almost always in Git. It is the answer to "what changed since it last worked", "who knows about this line" and "how do two people edit the same project". Much of modern operations, from reviews to automatic deployment, starts from a commit.',
+  sections: [
+    {
+      heading: 'Commits: the history as data',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'The unit of history is the commit: a snapshot of all tracked files at one moment, together with the author, the time, a message that says why, and a pointer to the commit before it. Following those pointers back gives the full history of the project.',
+        },
+        {
+          kind: 'text',
+          text: 'In Git every commit is identified by a hash computed from its content, written as 40 hexadecimal digits and usually shortened to the first seven or so. Because the hash covers the snapshot and the parent, changing anything in the past would change every later hash, so history cannot be altered unnoticed. Files that did not change between two commits are stored once and shared.',
+        },
+        {
+          kind: 'text',
+          text: 'A repository is the project folder plus this history. Git is distributed: every clone holds the complete history, so looking at old versions, comparing and committing all work offline, and no single server holds the only copy.',
+        },
+      ],
+    },
+    {
+      heading: 'Working tree, staging area, repository',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'The three places a change passes through in Git',
+          columns: ['Place', 'What it is', 'Command that moves a change onward'],
+          rows: [
+            ['Working tree', 'The files as they are on disk, edited freely', 'git add'],
+            ['Staging area (index)', 'The changes picked for the next commit', 'git commit'],
+            ['Repository', 'The recorded history', 'git push, to share it'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'The step in the middle lets a commit contain exactly one logical change, even if several things were edited at once. Small commits with a clear message are what make a history useful later.',
+        },
+      ],
+    },
+    {
+      heading: 'Branches and merges',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A branch is a named line of development. Technically it is nothing more than a movable pointer to a commit; creating one costs nothing. Work on a feature or a fix happens on its own branch and leaves the main branch untouched until it is ready.',
+        },
+        {
+          kind: 'text',
+          text: 'Merging brings two lines together. Git compares both sides with their common ancestor and combines the changes automatically where they touch different places. Where both sides changed the same lines differently, it cannot decide: it reports a merge conflict, marks both versions in the file, and a person chooses the result.',
+        },
+        {
+          kind: 'text',
+          text: 'Teams exchange work through a shared remote repository on a server: push uploads commits, fetch and pull download them. On hosting platforms a change is proposed as a pull request (or merge request): the branch is shown with its differences, others review it, automatic checks run, and only then is it merged. Many projects keep the main branch protected so that this is the only way in.',
+        },
+      ],
+    },
+    {
+      heading: 'What belongs in a repository',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'In: source code, configuration, build descriptions, lock files, documentation, infrastructure definitions. Everything needed to rebuild the project from scratch.',
+            'Out: build results, downloaded dependencies, editor files, logs. A .gitignore file lists the patterns to leave out.',
+            'Never: passwords, keys and tokens. A secret that was committed once stays in the history even after the file is deleted, and must be treated as leaked and replaced.',
+            'With care: large binary files. Every version is kept forever, so repositories grow; extensions such as Git LFS store them outside.',
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'Version control is not a backup. It protects against losing earlier states of tracked files, as long as the repository itself exists in more than one place. Uncommitted work and ignored files are not covered.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Git and GitHub are the same thing.', truth: 'Git is the version control program, which runs locally and needs no server. GitHub, GitLab and others are hosting services built around it that add pull requests, issues and automation.' },
+    { myth: 'A commit stores the difference to the previous version.', truth: 'A Git commit refers to a complete snapshot. Differences are computed when they are shown. Unchanged files are shared between snapshots, which keeps this small.' },
+    { myth: 'Deleting a file in a new commit removes it from the repository.', truth: 'It removes it from the current state. Every earlier commit still contains it, which matters most for secrets.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'git status', shows: 'The current branch and which files are changed, staged or untracked.' },
+      { os: 'Linux', command: 'git log --oneline --graph --all', shows: 'The history as a graph: one line per commit with its short hash, branches and merges drawn as lines.' },
+      { os: 'Linux', command: 'git diff; git diff --staged', shows: 'What changed in the working tree, and what is staged for the next commit.' },
+      { os: 'Linux', command: 'git switch -c fix-typo', shows: 'Creates a branch and switches to it.' },
+      { os: 'Linux', command: 'git blame README.md', shows: 'For each line of a file: the commit, author and date that last changed it.' },
+      { os: 'Linux', command: 'git cat-file -p HEAD', shows: 'The raw commit object: the hash of its tree (the snapshot), its parent, author, committer and message.' },
+      { os: 'Windows', command: 'git log -3 --stat', shows: 'The last three commits with the files each one touched. Git works the same in PowerShell.' },
+      { os: 'macOS', command: 'git remote -v', shows: 'The remote repositories this clone exchanges commits with.' },
+    ],
+    numbers: [
+      { label: 'Length of a Git commit hash', value: '40 hexadecimal digits', note: 'SHA-1, 160 bits; newer repositories can use SHA-256' },
+    ],
+    examples: [
+      'A service fails after an update. git log shows the three commits since the last good release; reverting the one that touched the connection settings restores it.',
+      'Two people change the same paragraph of a document on different branches. The second merge stops with a conflict, and the file shows both versions between marker lines.',
+    ],
+  },
+  terms: [
+    { term: 'Version control system', definition: 'Software that records the history of changes to files and lets earlier states be restored and compared.' },
+    { term: 'Repository', definition: 'A project together with its recorded history.' },
+    { term: 'Commit', definition: 'A recorded state of all tracked files with author, time, message and a pointer to its predecessor.' },
+    { term: 'Branch', definition: 'A named line of development; in Git a movable pointer to a commit.' },
+    { term: 'Merge', definition: 'Combining the changes of two branches into one state.' },
+    { term: 'Merge conflict', definition: 'A place where two branches changed the same lines differently, so that a person must decide the result.' },
+    { term: 'Working tree', definition: 'The files of a repository as checked out on disk, where editing happens.' },
+    { term: 'Staging area', definition: 'The set of changes selected for the next commit; also called the index.' },
+    { term: 'Remote', definition: 'Another copy of the repository, usually on a server, with which commits are exchanged by push and fetch.' },
+    { term: 'Pull request', definition: 'A proposal to merge a branch, shown with its changes for review and automatic checks; also called merge request.' },
+  ],
+  related: [{ topic: 'ci-cd' }, { topic: 'build-systems' }, { topic: 'testing' }, { topic: 'file-systems' }],
+  sources: [
+    { spec: 'Chacon, Straub: Pro Git, 2nd edition, chapters 1 to 3 and 10', url: 'https://git-scm.com/book/en/v2', note: 'snapshots instead of differences, the three states, branches, Git objects' },
+    { spec: 'Git reference manual', url: 'https://git-scm.com/docs', note: 'the commands used on this page' },
+    { spec: 'gitglossary(7)', url: 'https://git-scm.com/docs/gitglossary', note: 'commit, branch, index, working tree, remote' },
+  ],
+  quiz: [
+    {
+      id: 'commit',
+      prompt: 'What does a commit record?',
+      options: ['Only the lines that changed', 'A snapshot of the tracked files with author, time, message and parent', 'A copy of the whole disk', 'The commands that were typed'],
+      answer: 1,
+      explanation: 'A commit is a full state of the project plus the information who, when, why and what came before.',
+    },
+    {
+      id: 'conflict',
+      prompt: 'When does a merge conflict occur?',
+      options: ['Whenever two people work on the same repository', 'When both branches changed the same lines in different ways', 'When a branch is older than a week', 'When a file was renamed'],
+      answer: 1,
+      explanation: 'Changes in different places are combined automatically. Only overlapping, differing changes need a human decision.',
+    },
+    {
+      id: 'secret',
+      prompt: 'A password was committed and pushed by mistake. What is the right reaction?',
+      options: ['Delete the file in a new commit', 'Change the password, because it remains readable in the history', 'Rename the repository', 'Nothing, the history is private'],
+      answer: 1,
+      explanation: 'Earlier commits still contain it, and so does every clone. The secret has to be considered leaked and replaced.',
+    },
+    {
+      id: 'branch',
+      prompt: 'What is a branch in Git, technically?',
+      options: ['A full copy of all files', 'A movable pointer to a commit', 'A separate repository on the server', 'A compressed archive'],
+      answer: 1,
+      explanation: 'A branch is a name that points to a commit and moves forward with each new commit, which is why branches are cheap.',
+    },
+  ],
+};

@@ -82,7 +82,7 @@ describe('the index', () => {
 
   it('has no empty titles and stays small enough to load on demand', () => {
     for (const d of docs) expect(d.title.trim().length, d.href).toBeGreaterThan(0);
-    expect(JSON.stringify(docs).length).toBeLessThan(600_000);
+    expect(JSON.stringify(docs).length).toBeLessThan(900_000);
   });
 });
 

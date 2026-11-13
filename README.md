@@ -15,6 +15,7 @@ The building blocks of IT around the network, from level 1 (no prior knowledge) 
 - **Hardware:** CPU, RAM and the memory hierarchy (with a latency scale that can stretch nanoseconds to human time), storage (HDD, SSD, SATA, NVMe), GPU, mainboard and buses (PCI Express, USB), the network interface card, switch, router, firewall and access point, server vs desktop, hardware support for virtualization, and power and UPS. An "inside a computer" diagram links each part to its topic.
 - **Operating systems:** kernel and user space (with a diagram of the boundary, one explanation per part), processes and threads, virtual memory, file systems, the boot process, device drivers, and users and permissions.
 - **Virtualization and containers:** hypervisors, virtual machines, containers and virtual machines compared (with both stacks side by side), images and registries, and orchestration basics.
+- **Data and encoding:** number systems, data units, character encoding (ASCII, Unicode, UTF-8), compression and serialization (JSON, XML, YAML).
 
 ### Protocols
 

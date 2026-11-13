@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import type { OsiLayer, TcpIpLayer } from '../../shared/schema';
 import { OSI_LAYERS, TCPIP_LAYERS, TCPIP_ORDER } from '../../shared/layers';
 import { CATALOG } from '../../protocols/catalog';
@@ -17,9 +17,26 @@ const EXAMPLE = tcpExchange.steps[EXAMPLE_STEP].captures[0].layers;
 const sizeOf = (i: number) => EXAMPLE[i].bytes.length + (EXAMPLE[i].trailerBytes?.length ?? 0);
 const WIRE = EXAMPLE.reduce((n, _l, i) => n + sizeOf(i), 0);
 
+/** The layer a link such as #/learn/layers/4 names, if any. */
+function layerInLink(): OsiLayer | undefined {
+  const n = Number(/^#\/learn\/layers\/([1-7])$/.exec(window.location.hash)?.[1]);
+  return n ? (n as OsiLayer) : undefined;
+}
+
 /** OSI and TCP/IP side by side; every layer with what belongs to it on this site. */
 export default function LayersPage() {
-  const [layer, setLayer] = useState<OsiLayer>(7);
+  const [layer, setLayer] = useState<OsiLayer>(() => layerInLink() ?? 7);
+
+  // A link to another layer while the page is open, for example from the search.
+  useEffect(() => {
+    const onChange = () => {
+      const n = layerInLink();
+      if (n) setLayer(n);
+    };
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+
   const [protocol, setProtocol] = useState<string | null>(null);
   const placed = protocol ? placementOf(protocol) : null;
 
@@ -46,7 +63,7 @@ export default function LayersPage() {
     <div className="index layers">
       <h1>OSI and TCP/IP</h1>
       <p className="lead">
-        Two ways to cut networking into layers: the seven layers of the OSI reference model, and the four layers the Internet protocols are actually built on. Pick a layer to see its job, its addresses, and the protocols and tools of this site that belong to it.
+        Two ways to cut networking into layers: the seven layers of the OSI reference model, and the four layers the Internet protocols are actually built on. Pick a layer to see its job, its addresses, and the protocols and tools of this site that belong to it. <a href={href.quiz('layers')}>Quiz</a>
       </p>
 
       <section aria-label="Find a protocol" className="layers-find">

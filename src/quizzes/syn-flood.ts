@@ -1,0 +1,61 @@
+import type { Quiz } from './schema';
+
+export const synFloodQuiz: Quiz = {
+  id: 'syn-flood',
+  questions: [
+    {
+      id: 'resource',
+      prompt: 'What does a SYN flood exhaust on the server?',
+      options: ['Its bandwidth', 'Its CPU', 'The table of half-open connections', 'Its disk space'],
+      answer: 2,
+      explanation: 'Every SYN takes a slot in the queue of half-open connections for tens of seconds. A modest stream of small packets keeps that table full.',
+      step: 'flood-syn-2',
+      source: { rfc: 4987, section: '2' },
+    },
+    {
+      id: 'state',
+      prompt: 'Why does the server keep an entry after answering a SYN?',
+      options: ['To recognize the final ACK of the handshake', 'To log the client', 'To retransmit the SYN', 'To check the source address'],
+      answer: 0,
+      explanation: 'The entry holds addresses, ports, both sequence numbers and the options. It is allocated before the client has proven anything, which is what the attack uses.',
+      step: 'normal-syn',
+      source: { rfc: 9293, section: '3.5' },
+    },
+    {
+      id: 'forged',
+      prompt: 'Why does the attacker choose forged source addresses that do not answer?',
+      options: ['They are cheaper', 'A live host would answer the unexpected SYN-ACK with RST, which frees the slot at once', 'The server prefers them', 'They pass firewalls more easily'],
+      answer: 1,
+      explanation: 'A host that receives a SYN-ACK it never asked for resets the connection. A silent address leaves the entry waiting through all retransmissions.',
+      step: 'flood-synack-1',
+      source: { rfc: 4987, section: '2.2' },
+    },
+    {
+      id: 'rto',
+      prompt: 'The laptop\'s SYN gets no answer. After how long does it retransmit for the first time?',
+      options: ['200 ms', '3 seconds', '1 second', '30 seconds'],
+      answer: 2,
+      explanation: 'RFC 6298 sets the initial retransmission timeout to one second, and the wait doubles with every further try.',
+      step: 'victim-retry',
+      source: { rfc: 6298, section: '2' },
+    },
+    {
+      id: 'cookie',
+      prompt: 'Where does a server with SYN cookies keep the state of a half-open connection?',
+      options: ['In a larger queue', 'On disk', 'In a second server', 'In its initial sequence number, which the client returns in the ACK'],
+      answer: 3,
+      explanation: 'The cookie packs a time counter, an MSS index and a keyed hash over addresses and ports into the 32-bit sequence number. The server stores nothing.',
+      step: 'cookie-synack',
+      source: { rfc: 4987, section: '3.6' },
+    },
+    {
+      id: 'proof',
+      prompt: 'What does a valid ACK with a cookie prove to the server?',
+      options: ['That the client is not an attacker', 'That the client really received the SYN-ACK, so its source address is real', 'That the client supports SYN cookies', 'That the connection is encrypted'],
+      answer: 1,
+      explanation: 'Only someone who received the SYN-ACK knows the cookie, and only the server can compute it. Forged sources never send that ACK and never cost any memory.',
+      step: 'cookie-ack',
+      source: { rfc: 4987, section: '3.6' },
+    },
+  ],
+};

@@ -1,6 +1,6 @@
 import type { Quiz } from './schema';
 
-/** Quizzes by exchange id, loaded when opened. Every quiz must match an exchange in the protocol catalog. */
+/** Quizzes by the id of their protocol or lesson, loaded when opened. */
 export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   tcp: () => import('./tcp').then((m) => m.tcpQuiz),
   dns: () => import('./dns').then((m) => m.dnsQuiz),
@@ -23,6 +23,13 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   ipv6: () => import('./ipv6').then((m) => m.ipv6Quiz),
   vlan: () => import('./vlan').then((m) => m.vlanQuiz),
   stp: () => import('./stp').then((m) => m.stpQuiz),
+  // ---- lessons
+  layers: () => import('./layers').then((m) => m.layersQuiz),
+  'url-to-page': () => import('./url-to-page').then((m) => m.urlToPageQuiz),
+  'arp-spoofing': () => import('./arp-spoofing').then((m) => m.arpSpoofingQuiz),
+  'syn-flood': () => import('./syn-flood').then((m) => m.synFloodQuiz),
+  'dns-poisoning': () => import('./dns-poisoning').then((m) => m.dnsPoisoningQuiz),
+  'rogue-dhcp': () => import('./rogue-dhcp').then((m) => m.rogueDhcpQuiz),
 };
 
 export const hasQuiz = (id: string): boolean => id in QUIZZES;

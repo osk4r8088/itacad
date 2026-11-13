@@ -119,7 +119,6 @@ export const virtualizationHardware: Topic = {
     ],
   },
   terms: [
-    { term: 'Hypervisor', definition: 'The software that creates and runs virtual machines and keeps them apart; also called virtual machine monitor.' },
     { term: 'Trap and emulate', definition: 'Running a guest without privilege and letting every privileged instruction trap into the hypervisor, which performs its effect on the virtual machine.' },
     { term: 'VM exit', definition: 'The switch from a running guest to the hypervisor, caused by an event the hypervisor has to handle; the way back is the VM entry.' },
     { term: 'Nested paging', definition: 'Address translation in two stages done by the CPU: guest page tables, then tables of the hypervisor. Intel: EPT, AMD: NPT.' },

@@ -19,6 +19,12 @@ import { natQuiz } from './nat';
 import { ipv6Quiz } from './ipv6';
 import { vlanQuiz } from './vlan';
 import { stpQuiz } from './stp';
+import { layersQuiz } from './layers';
+import { urlToPageQuiz } from './url-to-page';
+import { arpSpoofingQuiz } from './arp-spoofing';
+import { synFloodQuiz } from './syn-flood';
+import { dnsPoisoningQuiz } from './dns-poisoning';
+import { rogueDhcpQuiz } from './rogue-dhcp';
 
 /** All quizzes, loaded at once. Used by the tests; the site loads each through the catalog. */
-export const allQuizzes = [tcpQuiz, dnsQuiz, dhcpQuiz, arpQuiz, icmpQuiz, tlsQuiz, udpQuiz, ipv4Quiz, http1Quiz, http2Quiz, http3Quiz, ntpQuiz, smtpQuiz, imapQuiz, ftpQuiz, websocketQuiz, sshQuiz, natQuiz, ipv6Quiz, vlanQuiz, stpQuiz];
+export const allQuizzes = [tcpQuiz, dnsQuiz, dhcpQuiz, arpQuiz, icmpQuiz, tlsQuiz, udpQuiz, ipv4Quiz, http1Quiz, http2Quiz, http3Quiz, ntpQuiz, smtpQuiz, imapQuiz, ftpQuiz, websocketQuiz, sshQuiz, natQuiz, ipv6Quiz, vlanQuiz, stpQuiz, layersQuiz, urlToPageQuiz, arpSpoofingQuiz, synFloodQuiz, dnsPoisoningQuiz, rogueDhcpQuiz];

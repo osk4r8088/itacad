@@ -121,7 +121,7 @@ export async function buildIndex(): Promise<SearchDoc[]> {
     const ex = lessonExchanges.find((e) => e.id === l.id);
     docs.push({ kind: 'lesson', title: l.title, text: plain(`${l.summary} ${ex?.scenario ?? ''} ${ex?.intro ?? ''}`), href: l.exchange ? href.lesson(l.id, 1) : href.lesson(l.id) });
   }
-  docs.push({ kind: 'lesson', title: 'Quizzes', text: 'Multiple-choice questions for every protocol.', href: href.quizzes });
+  docs.push({ kind: 'lesson', title: 'Quizzes', text: 'Multiple-choice questions for every protocol and lesson.', href: href.quizzes });
 
   // ---- steps and header fields
   const places: Place[] = [
@@ -148,7 +148,7 @@ export async function buildIndex(): Promise<SearchDoc[]> {
     docs.push({ kind: 'port', title: `Port ${p.port}`, context: `${p.title}, ${p.transports.join(' and ')}`, keywords: `${p.service} ${p.port}/${p.transports.join(` ${p.port}/`).toLowerCase()}`, text: p.about, href: entryHref('ports') });
   }
   for (const quiz of allQuizzes) {
-    const title = CATALOG.find((c) => c.id === quiz.id)?.title ?? quiz.id;
+    const title = CATALOG.find((c) => c.id === quiz.id)?.title ?? LESSONS.find((l) => l.id === quiz.id)?.title ?? quiz.id;
     for (const q of quiz.questions) docs.push({ kind: 'question', title: q.prompt, context: `${title} quiz`, href: href.quiz(quiz.id) });
   }
   return docs;

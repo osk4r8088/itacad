@@ -1,0 +1,65 @@
+import type { Quiz } from './schema';
+import { OSI_SOURCE, TCPIP_SOURCE } from '../shared/layers';
+
+export const layersQuiz: Quiz = {
+  id: 'layers',
+  questions: [
+    {
+      id: 'ports',
+      prompt: 'Port numbers such as 443 are the addresses of which layer?',
+      options: ['Layer 2, Data Link', 'Layer 3, Network', 'Layer 4, Transport', 'Layer 7, Application'],
+      answer: 2,
+      explanation: 'The transport layer connects processes on two hosts and tells them apart by 16-bit port numbers. IP addresses name hosts, one layer below.',
+      layer: 4,
+      source: TCPIP_SOURCE,
+    },
+    {
+      id: 'router',
+      prompt: 'By which address does a router decide where to send a packet?',
+      options: ['The IP address, layer 3', 'The MAC address, layer 2', 'The port number, layer 4', 'The host name, layer 7'],
+      answer: 0,
+      explanation: 'Routing is the job of the network layer: packets are forwarded hop by hop by their destination IP address. A switch, in contrast, forwards frames by MAC address.',
+      layer: 3,
+      source: OSI_SOURCE,
+    },
+    {
+      id: 'unit',
+      prompt: 'What is the unit of data called at the data link layer?',
+      options: ['Segment', 'Packet', 'Message', 'Frame'],
+      answer: 3,
+      explanation: 'Layer 2 delivers frames between interfaces on the same link and detects damaged ones with a checksum. Packets belong to layer 3, segments to TCP on layer 4.',
+      layer: 2,
+      source: OSI_SOURCE,
+    },
+    {
+      id: 'tls',
+      prompt: 'Where does encryption with TLS belong in the OSI model, and what is true on the Internet?',
+      options: [
+        'Layer 4; TLS replaces TCP',
+        'Closest to layer 6, Presentation; the Internet protocols have no separate layer for it',
+        'Layer 2; it is done by the switch',
+        'Layer 3; it is part of IP',
+      ],
+      answer: 1,
+      explanation: 'How data is represented, including encryption, is the presentation layer in OSI. The Internet model has no such layer of its own: it is part of the application protocol or of TLS.',
+      layer: 6,
+      source: TCPIP_SOURCE,
+    },
+    {
+      id: 'no-link',
+      prompt: 'ip link shows NO-CARRIER for the network interface. At which layer is the problem?',
+      options: ['Layer 1, Physical', 'Layer 3, Network', 'Layer 4, Transport', 'Layer 7, Application'],
+      answer: 0,
+      explanation: 'No carrier means no signal: a cable unplugged or broken, or the port at the other end disabled. Nothing above can work until that is fixed.',
+      layer: 1,
+    },
+    {
+      id: 'refused',
+      prompt: 'A connection attempt fails at once with "connection refused". What happened, and at which layer?',
+      options: ['The name did not resolve, layer 7', 'A router had no route, layer 3', 'The host answered with a TCP reset because nothing listens on the port, layer 4', 'The cable is unplugged, layer 1'],
+      answer: 2,
+      explanation: 'The packet reached the host, so layers 1 to 3 work. TCP on the host answered with RST. A firewall that drops packets silently would show as a timeout instead.',
+      layer: 4,
+    },
+  ],
+};

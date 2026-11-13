@@ -2,20 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { allQuizzes } from './all';
 import { QUIZZES } from './catalog';
 import { CATALOG } from '../protocols/catalog';
-import { exchanges } from '../protocols/exchanges';
+import { exchanges as protocolExchanges } from '../protocols/exchanges';
+import { lessonExchanges } from '../learn/exchanges';
+import { LESSONS } from '../learn/registry';
+
+const exchanges = [...protocolExchanges, ...lessonExchanges];
+/** Lessons that are a page of their own, without steps: their questions link to a layer. */
+const withoutSteps = (id: string) => LESSONS.some((l) => l.id === id && !l.exchange);
 
 describe('quiz catalog', () => {
-  it('lists every quiz once, and each quiz belongs to an exchange', async () => {
+  it('lists every quiz once, and each quiz belongs to a protocol or a lesson', async () => {
     expect(Object.keys(QUIZZES).sort()).toEqual(allQuizzes.map((q) => q.id).sort());
     for (const [id, load] of Object.entries(QUIZZES)) {
       expect((await load()).id).toBe(id);
-      expect(CATALOG.some((e) => e.id === id), id).toBe(true);
+      expect(CATALOG.some((e) => e.id === id) || LESSONS.some((l) => l.id === id && l.status === 'ready'), id).toBe(true);
     }
   });
 });
 
 describe.each(allQuizzes.map((q) => [q.id, q] as const))('quiz %s', (_id, quiz) => {
-  const exchange = exchanges.find((e) => e.id === quiz.id)!;
+  const exchange = exchanges.find((e) => e.id === quiz.id);
 
   it('has well-formed questions', () => {
     expect(quiz.questions.length).toBeGreaterThanOrEqual(5);
@@ -29,9 +35,20 @@ describe.each(allQuizzes.map((q) => [q.id, q] as const))('quiz %s', (_id, quiz) 
     }
   });
 
-  it('links every question to a step of its exchange', () => {
+  it('links every question to a step of its exchange, or to a layer where there are no steps', () => {
+    if (!exchange) {
+      expect(withoutSteps(quiz.id), quiz.id).toBe(true);
+      for (const q of quiz.questions) {
+        expect(q.step, q.id).toBeUndefined();
+        expect(q.layer !== undefined && q.layer >= 1 && q.layer <= 7, `${q.id} -> layer ${q.layer}`).toBe(true);
+      }
+      return;
+    }
     const steps = new Set(exchange.steps.map((s) => s.id));
-    for (const q of quiz.questions) expect(steps.has(q.step), `${q.id} -> ${q.step}`).toBe(true);
+    for (const q of quiz.questions) {
+      expect(q.layer, q.id).toBeUndefined();
+      expect(q.step !== undefined && steps.has(q.step), `${q.id} -> ${q.step}`).toBe(true);
+    }
   });
 
   it('does not always put the right answer in the same place', () => {
@@ -46,5 +63,14 @@ describe.each(allQuizzes.map((q) => [q.id, q] as const))('quiz %s', (_id, quiz) 
 describe('quiz coverage', () => {
   it('every protocol exchange has a quiz', () => {
     expect(CATALOG.map((e) => e.id).filter((id) => !(id in QUIZZES))).toEqual([]);
+  });
+
+  it('every lesson has a quiz, except the quiz list itself', () => {
+    const lessons = LESSONS.filter((l) => l.status === 'ready' && l.id !== 'quizzes').map((l) => l.id);
+    expect(lessons.filter((id) => !(id in QUIZZES))).toEqual([]);
+  });
+
+  it('protocols and lessons never share an id', () => {
+    expect(CATALOG.map((e) => e.id).filter((id) => LESSONS.some((l) => l.id === id))).toEqual([]);
   });
 });

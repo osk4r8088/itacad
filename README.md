@@ -67,7 +67,7 @@ Interactive models and references that show how something works inside. A sectio
 - **Attack: DNS cache poisoning:** an off-path attacker triggers lookups of random names and races the real name server with forged answers (Kaminsky), plants a false delegation, and receives every question about the zone; random source ports and DNSSEC stop it.
 - **Attack: rogue DHCP server:** a host in the LAN answers DHCP first and configures itself as gateway and DNS server; DHCP snooping drops server messages from untrusted ports.
 - **OSI and TCP/IP:** both models side by side. Each layer shows its job, unit of data, addresses, devices, the protocols and tools of this site that belong to it, and typical problems with Linux commands to diagnose them. Picking a protocol shows where it sits (with notes for borderline cases like TLS, QUIC, ICMP and ARP), and one real HTTP request grows from 37 to 115 octets on its way down.
-- **Quizzes:** multiple-choice questions for every protocol; each answer is explained and links to the step that shows it. A protocol page links to its quiz in its header.
+- **Quizzes:** multiple-choice questions for every protocol and every lesson; each answer is explained and links to the step that shows it (for the OSI and TCP/IP overview: to the layer). Protocol and lesson pages link to their quiz in the header.
 
 ### Search
 
@@ -162,7 +162,7 @@ src/search/
   SearchButton.tsx, SearchDialog.tsx
 src/quizzes/
   schema.ts               question format
-  catalog.ts              quizzes by exchange id, loaded on demand
+  catalog.ts              quizzes by protocol or lesson id, loaded on demand
   all.ts                  all quizzes, for the tests
   tcp.ts                  one file per protocol
   QuizIndex.tsx, QuizPage.tsx
@@ -203,11 +203,11 @@ New protocols, tools, lessons, topics, ports and quizzes appear in the search wi
 
 ## Adding a quiz
 
-1. Create `src/quizzes/<exchange id>.ts` exporting a `Quiz` (see `src/quizzes/schema.ts`): for each question a prompt, three or four options, the index of the right one, an explanation, the id of the step that shows it, and the source.
+1. Create `src/quizzes/<protocol or lesson id>.ts` exporting a `Quiz` (see `src/quizzes/schema.ts`): for each question a prompt, three or four options, the index of the right one, an explanation, the id of the step that shows it, and the source.
 2. Add it to `QUIZZES` in `src/quizzes/catalog.ts` and to `src/quizzes/all.ts`.
-3. `pnpm test` checks the format, that every step id exists in the exchange, and that the right answers are not all in the same position. It also fails if a protocol has no quiz, so a new protocol needs one.
+3. `pnpm test` checks the format, that every step id exists in the exchange, and that the right answers are not all in the same position. It also fails if a protocol or a lesson has no quiz, so a new one needs its quiz.
 
-Answers follow the exchange and its RFCs; a question that needs a fact the exchange does not show should cite its own source.
+Answers follow the exchange and its RFCs; a question that needs a fact the exchange does not show should cite its own source. A lesson without steps sets `layer` instead of `step`: that is the OSI and TCP/IP overview, whose questions link to `#/learn/layers/<layer>`.
 
 ## Conventions
 
@@ -231,7 +231,8 @@ Hash routes work on any static host:
 | `#/explore`, `#/explore/<id>` | models and references to explore, one of them |
 | `#/learn`, `#/learn/<id>` | lessons |
 | `#/learn/url-to-page/7` | step 7 of a lesson that is an exchange |
-| `#/learn/quizzes/tcp` | the quiz of one protocol |
+| `#/learn/layers/4` | the OSI and TCP/IP overview with layer 4 selected |
+| `#/learn/quizzes/tcp`, `#/learn/quizzes/syn-flood` | the quiz of one protocol or lesson |
 | `#/basics`, `#/basics/<category>` | Basics & Concepts, one category |
 | `#/basics/<category>/<topic>` | one topic |
 | `#/basics/glossary` | all key terms |

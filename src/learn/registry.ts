@@ -65,7 +65,7 @@ export const LESSONS: HubEntry[] = [
   {
     id: 'quizzes',
     title: 'Quizzes',
-    summary: 'Check your understanding of a protocol, with every answer explained and linked to its step.',
+    summary: 'Check your understanding of a protocol or a lesson, with every answer explained and linked to its step.',
     status: 'ready',
     level: 2,
     issue: 7,

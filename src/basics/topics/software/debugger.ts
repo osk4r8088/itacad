@@ -1,0 +1,161 @@
+import type { Topic } from '../../schema';
+
+export const debugger_: Topic = {
+  id: 'debugger',
+  category: 'software',
+  title: 'Debugger',
+  level: 2,
+  definition: 'A debugger is a tool that runs another program under its control: it can stop the program at chosen places, show the values of variables and the chain of function calls, and continue one step at a time.',
+  why: 'When a program misbehaves, the question is what it actually did, as opposed to what its author believes it does. A debugger answers that directly, in the running program or in the remains of a crashed one. Knowing what it can show, and what it needs for that, is useful far beyond programming: for reading a stack trace in a ticket, or for deciding whether a core dump is worth keeping.',
+  sections: [
+    {
+      heading: 'What a debugger lets you do',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'Breakpoint: stop the program when it reaches a certain line or function.',
+            'Stepping: continue one line at a time, either over a function call or into it.',
+            'Inspection: show and change variables, memory and processor registers while the program is stopped.',
+            'Call stack: show which function called which to get here, with the arguments of each call.',
+            'Watchpoint: stop when a certain variable or memory location changes, whoever changes it.',
+            'Conditional breakpoint: stop only if an expression is true, such as in pass 5000 of a loop.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'The usual way of working is to form a guess where things go wrong, stop just before that point, and compare what the variables hold with what they should hold. The first place where the two differ is close to the bug.',
+        },
+      ],
+    },
+    {
+      heading: 'How it works',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A debugger is an ordinary process, and so is the program it examines. Processes cannot look into each other, so the operating system provides an interface for it. On Linux this is the ptrace system call: one process, the tracer, may observe and control another, the tracee, and read and change its memory and registers. Windows and macOS have their own equivalents. Because this is a powerful right, systems restrict who may attach to which process.',
+        },
+        {
+          kind: 'text',
+          text: 'To set a breakpoint, the debugger overwrites the instruction at that address with a special trap instruction and remembers the original. When the processor reaches it, the program is stopped and the kernel notifies the debugger. To continue, the debugger puts the original instruction back, lets the processor execute that single instruction, and inserts the trap again. Processors also offer a few hardware breakpoints in debug registers, which need no change to the code and can watch data, which is how watchpoints are fast.',
+        },
+        {
+          kind: 'note',
+          text: 'On x86 the trap instruction is the one-byte int3, 0xCC, and Linux reports it to the debugger as the signal SIGTRAP. This detail is stated from the processor and kernel documentation without a check in this project; treat it as unverified.',
+        },
+      ],
+    },
+    {
+      heading: 'Debug information',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'The processor knows addresses and registers; people think in files, lines and variable names. The bridge is debug information that the compiler writes on request: a table from instruction addresses to source lines, the names and types of variables and where each one lives, and how to walk the call stack. On Linux the format is DWARF, stored in extra sections of the ELF file; on Windows it is a separate PDB file.',
+        },
+        {
+          kind: 'text',
+          text: 'Without this information a debugger still works and shows only addresses and assembly code. Release builds are often shipped stripped of it, to save space and reveal less, while the matching debug files are kept on a symbol server so that crashes from the field can still be read. With optimization switched on, the mapping gets loose: lines run out of order and some variables are reported as optimized out.',
+        },
+        {
+          kind: 'text',
+          text: 'For interpreted and bytecode languages the principle is the same and the mechanism simpler: the interpreter or virtual machine itself offers hooks to stop at a line and look at variables, and the debugger talks to it.',
+        },
+      ],
+    },
+    {
+      heading: 'After the crash, and without a debugger',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'When a process crashes, the system can write its memory and registers to a file, the core dump. A debugger opens it together with the executable and shows the state at the moment of death: the call stack, the variables, the faulting address. Nothing can be stepped, but for a crash that happens once a week in production this is often the only evidence.',
+        },
+        {
+          kind: 'table',
+          caption: 'Related tools and what they answer',
+          columns: ['Tool', 'Question'],
+          rows: [
+            ['Stack trace in a log', 'Where was the program when the error occurred?'],
+            ['Logging', 'What happened over time, across many requests?'],
+            ['System call tracer (strace, Process Monitor)', 'What did the program ask the operating system for: files, network, permissions?'],
+            ['Profiler', 'Where does the time or memory go?'],
+            ['Debugger', 'What exactly is the state at this point, and how does it change step by step?'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Stopping a program changes its timing. Bugs that depend on timing, such as race conditions, may vanish under a debugger, and a service stopped at a breakpoint answers no requests. That is why production problems are mostly analyzed with logs, traces and dumps, and the debugger is used on a reproduction.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'A debugger finds bugs.', truth: 'It shows what the program does. Noticing that this differs from what it should do, and why, remains the work of the person using it.' },
+    { myth: 'A debugger needs the source code.', truth: 'It can attach to any process it is allowed to and show machine instructions and memory. Source lines and variable names need debug information and the source files in addition.' },
+    { myth: 'A stack trace shows where the bug is.', truth: 'It shows where the program was when the failure became visible. The cause, such as a wrong value stored earlier, is often elsewhere.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'gcc -g -O0 -o app main.c square.c', shows: 'Builds with debug information (-g) and without optimization, the usual debug build.' },
+      { os: 'Linux', command: 'gdb ./app', shows: 'Starts the debugger. Inside: break square, run, bt (call stack), print x, next, step, continue, quit.' },
+      { os: 'Linux', command: 'gdb -batch -ex "break square" -ex run -ex bt -ex "print x" ./app', shows: 'The same session without typing: stops in square, prints the call stack (square called from main) and the argument x = 7.' },
+      { os: 'Linux', command: 'strace -e trace=openat ./app', shows: 'Not a debugger, but built on the same kernel interface: every file the program tries to open, with the result.' },
+      { os: 'Linux', command: 'python3 -m pdb script.py', shows: 'The Python debugger: b for breakpoint, n for next, s for step, p to print, w for the stack.' },
+      { os: 'Linux', command: 'coredumpctl list', shows: 'On systems with systemd: the crashes for which a core dump was stored; coredumpctl gdb opens one in the debugger.' },
+      { os: 'Windows', command: 'Get-Process notepad | Select-Object Id', shows: 'The process ID to attach a debugger such as WinDbg or Visual Studio to (PowerShell).' },
+      { os: 'macOS', command: 'lldb ./app', shows: 'The LLVM debugger: breakpoint set --name square, run, bt, frame variable, next, step.' },
+    ],
+    examples: [
+      'A service crashes once a night. With core dumps enabled, the next crash leaves a file; its call stack shows a null pointer in the function that parses a rarely used message type.',
+      'A program "cannot find its configuration". A system call trace shows it tries to open the file in a different directory than everyone assumed.',
+    ],
+  },
+  terms: [
+    { term: 'Debugger', definition: 'A tool that controls the execution of another program and shows its state.' },
+    { term: 'Breakpoint', definition: 'A place in a program at which the debugger stops execution.' },
+    { term: 'Watchpoint', definition: 'A breakpoint on data: execution stops when a given variable or memory location is read or changed.' },
+    { term: 'Call stack', definition: 'The chain of function calls that are active at a moment, each with its arguments and local variables.' },
+    { term: 'Stack trace', definition: 'A printed call stack, usually written to a log when an error occurs.' },
+    { term: 'Core dump', definition: 'A file with the memory and registers of a process at the moment it crashed.' },
+    { term: 'Debug information', definition: 'Data from the compiler that maps machine code back to source lines, variables and types, such as DWARF or PDB.' },
+    { term: 'Stripped binary', definition: 'An executable from which symbols and debug information have been removed.' },
+    { term: 'ptrace', definition: 'The Linux system call by which one process observes and controls another; the basis of debuggers and system call tracers.' },
+  ],
+  related: [{ topic: 'compiler' }, { topic: 'linker' }, { topic: 'interpreter' }, { topic: 'processes' }, { topic: 'kernel' }, { topic: 'virtual-memory' }],
+  sources: [
+    { spec: 'ptrace(2), Linux manual page', url: 'https://man7.org/linux/man-pages/man2/ptrace.2.html', note: 'tracer and tracee; used for breakpoint debugging and system call tracing' },
+    { spec: 'DWARF Debugging Information Format, Version 5', url: 'https://dwarfstd.org/dwarf5std.html', note: 'line number table, variable locations, call frame information' },
+    { spec: 'Debugging with GDB (GDB manual)', url: 'https://sourceware.org/gdb/current/onlinedocs/gdb.html/', note: 'breakpoints, watchpoints, stepping, core files' },
+    { spec: 'Intel 64 and IA-32 Architectures Software Developer\'s Manual, Volume 3, chapter "Debug, Branch Profile, TSC, and Intel Resource Director Technology Features"', note: 'breakpoint exception and debug registers; not checked for this page' },
+    { spec: 'core(5), Linux manual page', note: 'core dump files' },
+  ],
+  quiz: [
+    {
+      id: 'bp',
+      prompt: 'How does a debugger usually make a program stop at a certain line?',
+      options: ['It slows the processor down', 'It replaces the instruction at that address with a trap instruction', 'It deletes the rest of the program', 'It asks the compiler to add a pause'],
+      answer: 1,
+      explanation: 'The trap makes the processor hand control to the kernel, which stops the program and informs the debugger. The original instruction is restored to continue.',
+    },
+    {
+      id: 'info',
+      prompt: 'A debugger shows only addresses and assembly code for a program. What is missing?',
+      options: ['Administrator rights', 'Debug information for the executable', 'A newer processor', 'The linker'],
+      answer: 1,
+      explanation: 'The mapping from addresses to source lines and variable names is debug information, which a stripped release build does not contain.',
+    },
+    {
+      id: 'core',
+      prompt: 'What can be done with a core dump?',
+      options: ['Continue the program where it crashed', 'Inspect the call stack and variables at the moment of the crash', 'Recompile the program', 'Recover deleted files'],
+      answer: 1,
+      explanation: 'A core dump is a snapshot of a dead process. It can be examined but not resumed.',
+    },
+    {
+      id: 'watch',
+      prompt: 'A variable ends up with a wrong value, and it is unclear which code changes it. Which feature helps most?',
+      options: ['A breakpoint on main', 'A watchpoint on the variable', 'A static build', 'Stepping through the whole program'],
+      answer: 1,
+      explanation: 'A watchpoint stops execution at the moment the variable is written, wherever that happens, and the call stack then shows who did it.',
+    },
+  ],
+};

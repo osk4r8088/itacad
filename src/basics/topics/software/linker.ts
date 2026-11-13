@@ -1,0 +1,161 @@
+import type { Topic } from '../../schema';
+
+export const linker: Topic = {
+  id: 'linker',
+  category: 'software',
+  title: 'Linker',
+  level: 3,
+  definition: 'A linker combines object files and libraries into one executable program: it decides where every piece of code and data goes and replaces each use of a name with the address of the thing the name stands for.',
+  why: 'Programs are built from many source files and from libraries other people wrote. The linker is what makes them one program, and it is the source of some of the most confusing messages in software: "undefined reference", "multiple definition", and at start time "cannot open shared object file". Each of them is simple once it is clear what the linker does.',
+  sections: [
+    {
+      heading: 'Object files and symbols',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'The compiler translates each source file on its own and writes an object file. It contains machine code and data in sections: .text for the instructions, .data for initialized variables, .rodata for constants, .bss for variables that start as zero. The code is not yet runnable, because it does not know where it will sit in memory and it refers to things defined elsewhere.',
+        },
+        {
+          kind: 'text',
+          text: 'Those references go by name. Every function and global variable is a symbol. An object file has a symbol table that lists the symbols it defines and the ones it needs. In the example of two files, main.o defines main and needs square and printf; square.o defines square.',
+        },
+      ],
+    },
+    {
+      heading: 'What the linker does',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'Symbol resolution: for every needed symbol, find exactly one definition among the object files and libraries. None gives "undefined reference"; two give "multiple definition".',
+            'Layout: merge the sections of the same kind from all inputs and assign addresses.',
+            'Relocation: the compiler left placeholders wherever code uses an address it could not know, together with a list of them, the relocation entries. The linker fills in the real addresses.',
+            'Output: write an executable file with a header that tells the operating system how to load it and where to start.',
+          ],
+        },
+        {
+          kind: 'table',
+          caption: 'Executable and object file formats',
+          columns: ['System', 'Format', 'Typical files'],
+          rows: [
+            ['Linux, BSD', 'ELF', '.o, .so, executables without extension'],
+            ['Windows', 'PE (COFF)', '.obj, .dll, .exe'],
+            ['macOS', 'Mach-O', '.o, .dylib, executables without extension'],
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'Static and dynamic linking',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A library is a collection of object code meant to be used by many programs. With static linking the linker copies the needed parts of the library into the executable. The file is larger and stands alone: it runs without the library being installed, and it keeps the library version it was built with, including that version\'s bugs.',
+        },
+        {
+          kind: 'text',
+          text: 'With dynamic linking the executable only records the names of the shared libraries it needs. At every start, the dynamic linker of the operating system loads them into the process and resolves the symbols then. The library exists once on disk and once in memory for all programs, and an update fixes all of them at once. In exchange, the program depends on the right versions being present on every machine it runs on.',
+        },
+        {
+          kind: 'text',
+          text: 'Much of packaging exists to manage this dependency: package managers install the libraries a program names, and a container image carries the exact shared libraries along with the program.',
+        },
+      ],
+    },
+    {
+      heading: 'Reading the error messages',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'Typical linker and loader errors',
+          columns: ['Message', 'When', 'Meaning'],
+          rows: [
+            ['undefined reference to `square`', 'Build', 'Something uses square, and no input defines it: a file or library is missing from the link, or the name is misspelled.'],
+            ['multiple definition of `count`', 'Build', 'Two object files both define the symbol, often a variable defined in a header.'],
+            ['cannot find -lfoo', 'Build', 'The library file itself was not found in the search paths.'],
+            ['error while loading shared libraries: libfoo.so.1', 'Start', 'The dynamic linker cannot find a shared library the program names.'],
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'A compiler error names a source line. A linker error names a symbol and an object file, because the linker never sees the source.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'The compiler produces the program.', truth: 'The compiler produces object files. The linker makes the executable, and the usual compiler command only calls it as its last step.' },
+    { myth: 'An "undefined reference" means a header file is missing.', truth: 'A header only declares that something exists, which satisfies the compiler. The linker needs the definition, which lives in an object file or library that has to be part of the link.' },
+    { myth: 'A dynamically linked program contains its libraries.', truth: 'It contains their names. The code is loaded from the system at each start, which is why the program fails on a machine where the library is absent.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'nm main.o', shows: 'The symbol table of an object file: T marks a function defined here, U a symbol that is needed and undefined.' },
+      { os: 'Linux', command: 'gcc -o app main.o', shows: 'Linking without square.o fails with: undefined reference to `square`.' },
+      { os: 'Linux', command: 'ldd app', shows: 'The shared libraries an executable needs and where the dynamic linker finds them.' },
+      { os: 'Linux', command: 'readelf -h main.o', shows: 'The ELF header: the magic bytes 7f 45 4c 46, the type (REL for a relocatable file) and the machine.' },
+      { os: 'Linux', command: 'readelf -r main.o', shows: 'The relocation entries: the places the linker still has to patch, and for which symbol.' },
+      { os: 'Linux', command: 'gcc -static -o app-static main.o square.o && ls -l app app-static', shows: 'The same program linked statically is many times larger, and ldd reports that it is not a dynamic executable.' },
+      { os: 'macOS', command: 'otool -L app', shows: 'The dynamic libraries a Mach-O executable is linked against.' },
+      { os: 'Windows', command: 'dumpbin /dependents app.exe', shows: 'The DLLs an executable needs, in a developer command prompt.' },
+    ],
+    numbers: [
+      { label: 'First bytes of an ELF file', value: '7f 45 4c 46', note: 'the byte 0x7f and the letters ELF' },
+      { label: 'ELF file types', value: 'relocatable, executable, shared object, core' },
+    ],
+    examples: [
+      'A program runs on the developer\'s machine and fails on a server with "libssl.so.3: cannot open shared object file": the server has another version of the library.',
+      'A tool is shipped as one statically linked file so that it can be copied to any Linux machine and run without installing anything.',
+    ],
+  },
+  terms: [
+    { term: 'Linker', definition: 'The program that combines object files and libraries into an executable or a library.' },
+    { term: 'Object file', definition: 'The output of compiling one source file: machine code and data in sections, plus a symbol table and relocation entries.' },
+    { term: 'Symbol', definition: 'A named function or variable that object files can define or refer to.' },
+    { term: 'Relocation', definition: 'Patching the addresses in code and data once the linker or loader has decided where everything goes.' },
+    { term: 'Executable', definition: 'A file the operating system can load and start as a program.' },
+    { term: 'Static library', definition: 'An archive of object files from which the linker copies the needed ones into the executable.' },
+    { term: 'Shared library', definition: 'A library that is loaded into a process at start or run time and shared by many programs (.so, .dll, .dylib).' },
+    { term: 'Dynamic linker', definition: 'The part of the system that loads the shared libraries of a program at start and resolves its symbols.' },
+    { term: 'ELF', definition: 'Executable and Linking Format: the format of object files, executables and shared libraries on Linux and most Unix systems.' },
+    { term: 'Application binary interface (ABI)', definition: 'The conventions at machine level that separately compiled code must share: how arguments are passed, how data is laid out, how files are formatted.' },
+  ],
+  related: [{ topic: 'compiler' }, { topic: 'debugger' }, { topic: 'processes' }, { topic: 'virtual-memory' }, { topic: 'images' }],
+  sources: [
+    { spec: 'System V Application Binary Interface, chapter 4: Object Files', note: 'ELF header, sections, symbol table, relocation' },
+    { spec: 'elf(5), Linux manual page', url: 'https://man7.org/linux/man-pages/man5/elf.5.html', note: 'file types ET_REL, ET_EXEC, ET_DYN, ET_CORE' },
+    { spec: 'ld.so(8), Linux manual page', note: 'the dynamic linker and its search order' },
+    { spec: 'Levine: Linkers and Loaders', note: 'symbol resolution, relocation, static and dynamic linking' },
+    { spec: 'Bryant, O\'Hallaron: Computer Systems: A Programmer\'s Perspective, chapter 7: Linking' },
+  ],
+  quiz: [
+    {
+      id: 'undef',
+      prompt: 'A build ends with "undefined reference to `parse`". What is the most likely cause?',
+      options: ['A syntax error in parse', 'The object file or library that defines parse is not part of the link', 'The header that declares parse is missing', 'parse was optimized away'],
+      answer: 1,
+      explanation: 'The compiler was satisfied by the declaration. The linker looked for the definition among its inputs and found none.',
+    },
+    {
+      id: 'dynamic',
+      prompt: 'When are the symbols of a shared library resolved?',
+      options: ['When the source is compiled', 'When the program is started or while it runs', 'When the library is installed', 'Never; they are copied into the executable'],
+      answer: 1,
+      explanation: 'The executable only names the library. The dynamic linker loads it and binds the symbols at start, or at first use.',
+    },
+    {
+      id: 'static',
+      prompt: 'What is an advantage of static linking?',
+      options: ['Smaller executables', 'Library updates reach the program automatically', 'The program runs without the library being installed', 'Faster compilation'],
+      answer: 2,
+      explanation: 'The needed library code is inside the executable. The price is size, and that a fixed library requires a new build.',
+    },
+    {
+      id: 'nm',
+      prompt: 'nm shows "U printf" for an object file. What does it mean?',
+      options: ['printf is unused', 'printf is used here and defined somewhere else', 'printf is defined here', 'printf is a user function'],
+      answer: 1,
+      explanation: 'U marks an undefined symbol: a reference that the linker has to resolve from another object file or a library.',
+    },
+  ],
+};

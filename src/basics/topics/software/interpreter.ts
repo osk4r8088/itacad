@@ -1,0 +1,145 @@
+import type { Topic } from '../../schema';
+
+export const interpreter: Topic = {
+  id: 'interpreter',
+  category: 'software',
+  title: 'Interpreter',
+  level: 2,
+  definition: 'An interpreter is a program that executes source code directly, statement by statement, instead of translating it into a machine code file first.',
+  why: 'Shell scripts, Python, JavaScript, PowerShell, SQL: most of the code written in operations and on the web is run by an interpreter. That explains how such programs are shipped (as source, plus the right interpreter on the machine), why an error in line 300 appears only when line 300 runs, and why they are slower in loops than compiled programs.',
+  sections: [
+    {
+      heading: 'Run the source, not a translation',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A compiler translates once and leaves a program that runs on its own. An interpreter is itself the running program: it reads the source, works out what each statement means and does it. The processor executes the interpreter\'s machine code, never the script\'s.',
+        },
+        {
+          kind: 'table',
+          caption: 'Compiled and interpreted, in their plain forms',
+          columns: ['', 'Compiled', 'Interpreted'],
+          rows: [
+            ['What is shipped', 'A binary for one target', 'The source text'],
+            ['Needed to run it', 'The operating system and libraries', 'The interpreter, in a fitting version'],
+            ['Errors found', 'Many at build time', 'Most only when the line runs'],
+            ['Start', 'Immediately', 'After reading and preparing the source'],
+            ['Speed in loops', 'Fast', 'Often 10 to 100 times slower'],
+            ['Change and try again', 'Rebuild first', 'Run again'],
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'The factor of 10 to 100 is a rule of thumb for tight loops in pure interpreted code. Programs that spend their time in libraries, in the database or waiting for the network are hardly affected.',
+        },
+      ],
+    },
+    {
+      heading: 'What happens inside',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'An interpreter begins like a compiler: it splits the text into tokens and builds a syntax tree, which is why a syntax error is reported before anything runs. Then, instead of generating machine code, it walks through the program and carries out each step with its own code: look up the variable, check what type the value has, pick the right kind of addition, store the result.',
+        },
+        {
+          kind: 'text',
+          text: 'That checking at every step is where the time goes. Almost all current interpreters therefore do not walk the tree. They first compile the source to bytecode, a compact list of simple instructions, and interpret that. Python, Ruby, PHP and JavaScript engines all work this way.',
+        },
+      ],
+    },
+    {
+      heading: 'What comes with it',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'Dynamic typing: a variable can hold a value of any type, and whether an operation fits is checked when it runs. Less to write, and a class of errors moves from build time to run time.',
+            'Automatic memory management: the runtime frees objects that are no longer reachable (garbage collection), so memory is not freed by hand.',
+            'A read-eval-print loop (REPL): typing one line and seeing its result at once, the quickest way to explore a language or a system.',
+            'Portability: the same script runs wherever the interpreter exists, on any processor.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'The dependency moves to the interpreter and the installed packages. "It needs Python 3.11 and these twelve packages" is the interpreted counterpart of a missing shared library, and virtual environments, lock files and container images exist to pin it down.',
+        },
+      ],
+    },
+    {
+      heading: 'How a script is started',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A script is a text file, and the operating system cannot execute text. Either the interpreter is called with the file as argument (python3 script.py), or, on Unix systems, the file is marked executable and its first line names the interpreter after the characters #!, the shebang. The kernel reads that line and starts the named program with the script as input. On Windows the file extension is associated with a program instead.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Interpreted languages are not compiled at all.', truth: 'Nearly every interpreter compiles the source to an internal form first, usually bytecode. What it does not produce is a machine code file ahead of time.' },
+    { myth: 'An interpreted program is always too slow for real work.', truth: 'Most programs wait for input, the network or a database. Where the computing itself is heavy, the work is done by compiled libraries that the script only calls.' },
+    { myth: 'A script that starts without error has no errors.', truth: 'Only the syntax was checked. A misspelled function name in a branch that rarely runs fails on the day that branch is taken.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'python3 -c "print(2 ** 10)"', shows: 'Runs one line of source directly: 1024. No build step and no file.' },
+      { os: 'Linux', command: 'head -1 /usr/bin/pip3; file /usr/bin/pip3', shows: 'A command that is a script: the first line is a shebang, and file reports a text executable.' },
+      { os: 'Linux', command: 'python3 -c "import sys; print(sys.version)"; which python3', shows: 'Which interpreter runs, and where it comes from.' },
+      { os: 'Linux', command: 'printf "print(1)\\nprint(undefined_name)\\n" > t.py; python3 t.py', shows: 'The first line runs and prints 1; the error in the second line is found only when it is reached.' },
+      { os: 'Linux', command: 'bash -n script.sh', shows: 'Checks the syntax of a shell script without running it.' },
+      { os: 'Windows', command: 'Get-Command python, pwsh | Select-Object Name, Source', shows: 'Where the interpreters are installed (PowerShell).' },
+      { os: 'macOS', command: 'python3', shows: 'Starts the REPL: each line typed is evaluated and its result printed.' },
+    ],
+    examples: [
+      'A backup script works for months and then fails with a name error: the branch for "disk full" had a typo and had never run before.',
+      'A script written for Python 3.12 fails on a server with Python 3.8 with a syntax error on a line that is perfectly correct in the newer version.',
+    ],
+  },
+  terms: [
+    { term: 'Interpreter', definition: 'A program that executes source code or bytecode directly instead of translating it into a machine code file.' },
+    { term: 'Script', definition: 'A program kept as source text and run by an interpreter.' },
+    { term: 'Dynamic typing', definition: 'Checking the types of values while the program runs, at each operation.' },
+    { term: 'Runtime', definition: 'The software a program needs while running: interpreter or virtual machine, memory management and standard library. Also the time during which the program runs.' },
+    { term: 'Garbage collection', definition: 'Automatic freeing of memory that the program can no longer reach.' },
+    { term: 'REPL', definition: 'Read-eval-print loop: an interactive prompt that executes each entered line and shows the result.' },
+    { term: 'Shebang', definition: 'The first line of a script, starting with #!, that names the interpreter to run it with.' },
+    { term: 'Syntax error', definition: 'A violation of the grammar of the language, found before the program runs.' },
+  ],
+  related: [{ topic: 'compiler' }, { topic: 'jit-bytecode' }, { topic: 'debugger' }, { topic: 'processes' }, { topic: 'images' }],
+  sources: [
+    { spec: 'Aho, Lam, Sethi, Ullman: Compilers: Principles, Techniques, and Tools, 2nd edition, section 1.1', note: 'compilers and interpreters compared' },
+    { spec: 'Nystrom: Crafting Interpreters', url: 'https://craftinginterpreters.com/', note: 'tree-walking and bytecode interpreters' },
+    { spec: 'The Python Language Reference: Execution model', url: 'https://docs.python.org/3/reference/executionmodel.html' },
+    { spec: 'execve(2), Linux manual page: Interpreter scripts', url: 'https://man7.org/linux/man-pages/man2/execve.2.html', note: 'how the kernel handles the #! line' },
+  ],
+  quiz: [
+    {
+      id: 'ship',
+      prompt: 'What has to be on a machine to run a Python script there?',
+      options: ['Only the script', 'The script and a fitting Python interpreter with the packages it imports', 'A C compiler', 'The object files of the script'],
+      answer: 1,
+      explanation: 'The script is text. The interpreter executes it, and the imported packages must be installed too.',
+    },
+    {
+      id: 'when',
+      prompt: 'A script calls a function whose name is misspelled, inside an if branch. When does the error show?',
+      options: ['When the file is saved', 'When the script starts', 'When that branch is executed', 'Never'],
+      answer: 2,
+      explanation: 'The syntax is fine, so the script starts. The name is looked up only when the line runs.',
+    },
+    {
+      id: 'shebang',
+      prompt: 'What does the line #!/usr/bin/env python3 at the top of a file do?',
+      options: ['It is a comment without effect', 'It tells the kernel which program to start to run the file', 'It imports the environment variables', 'It compiles the file'],
+      answer: 1,
+      explanation: 'When the file is executed, the kernel reads the line after #! and starts that program, passing it the script.',
+    },
+    {
+      id: 'slow',
+      prompt: 'Why is a tight loop slower in a plain interpreter than in compiled code?',
+      options: ['The interpreter runs on a slower processor', 'Every step is decoded and type-checked again by the interpreter instead of being a few machine instructions', 'Scripts may not use the cache', 'The source file is read from disk in every pass'],
+      answer: 1,
+      explanation: 'For each operation the interpreter looks up names, checks types and dispatches. Compiled code has done all that once, at build time.',
+    },
+  ],
+};

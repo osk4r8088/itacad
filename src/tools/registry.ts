@@ -131,7 +131,7 @@ export type Purpose = 'use' | 'understand';
 
 /** The two sections built from this registry: everyday tools, and models to explore. */
 export const SECTION_INFO: Record<Purpose, { title: string; about: string }> = {
-  use: { title: 'Tools', about: 'For real tasks: calculate, decode, plan, generate.' },
+  use: { title: 'Tools', about: 'Calculators, decoders and generators for everyday network work.' },
   understand: { title: 'Explore and understand', about: 'Interactive models and references that show how something works inside.' },
 };
 

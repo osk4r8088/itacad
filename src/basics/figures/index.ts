@@ -14,4 +14,5 @@ export const FIGURES: Record<string, LazyExoticComponent<ComponentType>> = {
   'responsibility-matrix': lazy(() => import('./ResponsibilityMatrix')),
   'availability-calculator': lazy(() => import('./AvailabilityCalculator')),
   'hash-explorer': lazy(() => import('./HashExplorer')),
+  'index-lookup': lazy(() => import('./IndexLookup')),
 };

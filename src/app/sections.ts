@@ -2,7 +2,7 @@ import { CATALOG } from '../protocols/catalog';
 import { LESSONS } from '../learn/registry';
 import { SECTION_INFO, TOOLS, entryHref, toolsFor } from '../tools/registry';
 import { href } from './router';
-import { CATEGORIES, findTopic, readyTopics } from '../basics/catalog';
+import { findTopic, readyTopics } from '../basics/catalog';
 
 export type Section = 'basics' | 'protocols' | 'tools' | 'explore' | 'learn';
 
@@ -47,9 +47,7 @@ export const SECTIONS: SiteSection[] = [
     id: 'basics',
     label: 'Basics',
     title: 'Basics & Concepts',
-    about: `The building blocks of IT, starting from zero: ${CATEGORIES.slice(0, 4)
-      .map((c) => c.title.toLowerCase())
-      .join(', ')} and more.`,
+    about: 'The building blocks of IT explained from zero, from hardware and operating systems to security and databases.',
     href: href.basics,
     count: () => readyTopics().length,
     unit: 'topics',
@@ -59,7 +57,7 @@ export const SECTIONS: SiteSection[] = [
     id: 'protocols',
     label: 'Protocols',
     title: 'Protocols',
-    about: 'Real exchanges step by step: who sends what, the sequence, and every header field of every packet.',
+    about: 'Follow a real exchange message by message and open every packet down to its header fields.',
     href: href.protocols,
     count: () => CATALOG.length,
     unit: 'protocols',
@@ -89,7 +87,7 @@ export const SECTIONS: SiteSection[] = [
     id: 'learn',
     label: 'Learn',
     title: 'Learn',
-    about: 'Lessons that connect the pieces: the layer models, a whole page load from start to finish, attacks and their defenses, quizzes.',
+    about: 'Lessons that tie the topics together, from the layer models to a complete page load, attacks and their defenses, with a quiz for each.',
     href: href.learn,
     count: () => ready(LESSONS).length,
     unit: 'lessons',

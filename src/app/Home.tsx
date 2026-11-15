@@ -10,7 +10,7 @@ export function Home() {
   return (
     <div className="index home">
       <p className="lead">
-        Learn how IT really works, at your own depth: from what is inside a computer, through the protocols every network runs on, down to every header field.
+        A visual guide to how computers and networks work, from the parts inside a machine to every field of a packet header.
       </p>
 
       <section className="start-here" aria-labelledby="h-start">

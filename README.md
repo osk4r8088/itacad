@@ -18,6 +18,8 @@ The building blocks of IT around the network, from level 1 (no prior knowledge) 
 - **Data and encoding:** number systems, data units, character encoding (ASCII, Unicode, UTF-8, with an encoder that shows the bits of any text typed in), compression and serialization (JSON, XML, YAML).
 - **Software development:** compiler, linker, interpreter, JIT and bytecode, debugger (with a step-through of one function from source text to a linked program), build systems, version control, testing and CI/CD.
 - **Cloud and operations:** cloud service models (with a matrix of who manages which layer), regions and availability zones, high availability (with a downtime calculator), backup and monitoring.
+- **Security basics:** the CIA triad, authentication and authorization, hashing and encryption (with a hash explorer that shows how one changed letter changes the hash), symmetric and asymmetric cryptography, certificates and PKI, and least privilege in practice.
+- **Databases:** relational and NoSQL databases, SQL basics, transactions and ACID, and indexes (with a comparison of a full scan and an index lookup as the table grows).
 
 ### Protocols
 

@@ -52,7 +52,7 @@ export const CATEGORIES: Category[] = [
   { id: 'data', title: 'Data and encoding', about: 'Number systems, data units, character encoding, compression and serialization.', issue: 63, figure: { id: 'utf8-encoder', caption: 'Text as bytes: each character, its Unicode code point and its UTF-8 encoding.' } },
   { id: 'cloud', title: 'Cloud and operations', about: 'IaaS, PaaS, SaaS and who is responsible for what; regions and zones, availability, backup and monitoring.', issue: 64, figure: { id: 'responsibility-matrix', caption: 'Who manages which layer: on your own premises and in the three cloud service models.' } },
   { id: 'security', title: 'Security basics', about: 'Confidentiality, integrity, availability; authentication, hashing, encryption, certificates and least privilege.', issue: 65, figure: { id: 'hash-explorer', caption: 'A hash is a fingerprint: change one letter and about half of the 256 bits of SHA-256 change.' } },
-  { id: 'databases', title: 'Databases', about: 'Relational and NoSQL databases, SQL, transactions and indexes.', issue: 66, figure: { id: 'index-lookup', caption: 'Why an index matters: pages read by a full scan and by an index lookup as the table grows.' } },
+  { id: 'databases', title: 'Databases', about: 'Relational and NoSQL databases, SQL, transactions and indexes.', issue: 66 },
 ];
 
 export const TOPICS: TopicEntry[] = [
@@ -518,45 +518,6 @@ export const TOPICS: TopicEntry[] = [
     prereqs: [{ topic: 'authn-authz' }, { topic: 'permissions' }],
     status: 'ready',
     load: () => import('./topics/security/least-privilege').then((m) => m.leastPrivilege),
-  },
-  {
-    id: 'relational-nosql',
-    category: 'databases',
-    title: 'Relational and NoSQL databases',
-    summary: 'Tables, keys and schemas; key-value, document and other stores; and what changes when data is spread over many machines.',
-    level: 1,
-    status: 'ready',
-    load: () => import('./topics/databases/relational-nosql').then((m) => m.relationalNosql),
-  },
-  {
-    id: 'sql-basics',
-    category: 'databases',
-    title: 'SQL basics',
-    summary: 'SELECT, joins and aggregates, changing data, and the two classic traps: NULL and SQL injection.',
-    level: 1,
-    prereqs: [{ topic: 'relational-nosql' }],
-    status: 'ready',
-    load: () => import('./topics/databases/sql-basics').then((m) => m.sqlBasics),
-  },
-  {
-    id: 'transactions',
-    category: 'databases',
-    title: 'Transactions and ACID',
-    summary: 'All or nothing: the four guarantees, isolation levels and their anomalies, locks and deadlocks.',
-    level: 2,
-    prereqs: [{ topic: 'sql-basics' }],
-    status: 'ready',
-    load: () => import('./topics/databases/transactions').then((m) => m.transactions),
-  },
-  {
-    id: 'indexes',
-    category: 'databases',
-    title: 'Indexes',
-    summary: 'Finding rows without reading the whole table: B-trees, composite indexes, what an index costs and how to read a query plan.',
-    level: 2,
-    prereqs: [{ topic: 'sql-basics' }],
-    status: 'ready',
-    load: () => import('./topics/databases/indexes').then((m) => m.indexes),
   },
 ];
 

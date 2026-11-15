@@ -51,7 +51,7 @@ function BasicsHome() {
     <div className="index basics">
       <h1>Basics & Concepts</h1>
       <p className="lead">
-        The building blocks of IT around the network: hardware, operating systems, virtualization, software, data, cloud, security and databases. Each topic starts with a one-sentence definition, explains the idea in short sections, and ends with commands to try, key terms, a quiz and its sources.
+        The building blocks of IT explained from zero, from hardware and operating systems to security and databases. Each topic starts with a one-sentence definition, explains the idea in short sections, and ends with commands to try, key terms, a quiz and its sources.
       </p>
       <p className="levels-legend">
         {([1, 2, 3] as Level[]).map((l) => (

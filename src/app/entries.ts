@@ -64,7 +64,7 @@ export interface PathStep {
 
 export const PATHS: Record<Level, { about: string; steps: PathStep[] }> = {
   1: {
-    about: 'New to IT: what is inside a computer and a network, and how to count in bits and bytes.',
+    about: 'What is inside a computer and a network, and how to count in bits and bytes.',
     steps: [
       { ref: { topic: 'cpu' }, why: 'What a processor does, and what cores, threads and GHz mean.' },
       { ref: { topic: 'memory' }, why: 'Why fast memory is small, and how much a cache miss costs.' },
@@ -76,7 +76,7 @@ export const PATHS: Record<Level, { about: string; steps: PathStep[] }> = {
     ],
   },
   2: {
-    about: 'Apprentices and admins: the protocols every network runs on, and the tools to work with them.',
+    about: 'The protocols every network runs on, and the tools to work with them.',
     steps: [
       { ref: { topic: 'nic' }, why: 'Where a computer meets the network: MAC addresses and link speed.' },
       { ref: { protocol: 'arp' }, why: 'How an IP address becomes a MAC address on the local network.' },
@@ -89,7 +89,7 @@ export const PATHS: Record<Level, { about: string; steps: PathStep[] }> = {
     ],
   },
   3: {
-    about: 'Deep dive: bits, state machines, encryption and attacks.',
+    about: 'Bits, state machines, encryption and attacks.',
     steps: [
       { ref: { entry: 'decoder' }, why: 'Paste the bytes of a frame and read every field.' },
       { ref: { entry: 'tcp-states' }, why: 'Every TCP state and the segment that moves it.' },

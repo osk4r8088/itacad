@@ -1,0 +1,156 @@
+import type { Topic } from '../../schema';
+
+export const leastPrivilege: Topic = {
+  id: 'least-privilege',
+  category: 'security',
+  title: 'Least privilege in practice',
+  level: 2,
+  definition: 'Applying least privilege means giving every user, program and service only the rights its task needs, for only as long as it needs them, so that a mistake or a break-in can damage only what those rights reach.',
+  why: 'Attackers rarely break in where the valuable data is. They get a foothold somewhere unimportant, a phished account, a vulnerable web application, and then use whatever rights that foothold has to move on. How far they get is decided long before the attack, by how rights were handed out. The same limit protects against honest mistakes, which are more frequent than attacks.',
+  sections: [
+    {
+      heading: 'The principle and its relatives',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'The principle was stated in 1975 by Saltzer and Schroeder: every program and every user should operate with the least set of privileges necessary for the job. It limits the damage from accidents and errors and reduces the number of places where a privilege can be misused.',
+        },
+        {
+          kind: 'table',
+          caption: 'Design principles that work together',
+          columns: ['Principle', 'Says', 'Example'],
+          rows: [
+            ['Least privilege', 'Only the rights the task needs', 'A reporting tool gets read access to three tables, not the database owner role'],
+            ['Default deny', 'Whatever is not explicitly allowed is forbidden', 'A firewall that blocks everything except listed ports'],
+            ['Separation of duties', 'No single person can complete a critical action alone', 'One person requests a payment, another approves it'],
+            ['Need to know', 'Access to information only for those whose work requires it', 'Support staff see the order, not the card number'],
+            ['Complete mediation', 'Every access is checked, every time', 'An API verifies rights on each request, not only at login'],
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'Where it applies',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'People: daily work happens in a normal account. Administrator rights are a separate account or a temporary elevation (sudo, a consent prompt), used for the single task.',
+            'Programs and services: each runs under its own account with access to its own files only. A web server has no reason to read the home directories or to write its own program files.',
+            'Processes: beyond the account, capabilities, system call filters, containers and sandboxes cut down what a process can do even if it is taken over.',
+            'Networks: segments and firewall rules allow only the connections that are needed. The database accepts connections from the application servers, not from the office network.',
+            'Credentials: keys and tokens are scoped (one repository, read only) and short-lived. A key that can do everything forever will eventually leak.',
+            'Cloud: roles and policies name the exact actions and resources. Wildcards such as "all actions on all resources" are the cloud form of working as administrator.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'What a compromised component can reach is sometimes called its blast radius. Least privilege is the practice of keeping that radius small everywhere, and assuming that some component will be compromised at some point.',
+        },
+      ],
+    },
+    {
+      heading: 'How rights grow, and how to cut them back',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'In practice rights only ever increase. Someone changes teams and keeps the old access. A service gets broad rights "for now" because finding the exact ones takes time. A project ends and its accounts stay. This slow accumulation is called privilege creep.',
+        },
+        {
+          kind: 'list',
+          items: [
+            'Grant rights to roles or groups, not to individuals, so that a change of job is a change of group.',
+            'Review access regularly, and remove what was not used. Most platforms can show when a right was last exercised.',
+            'Give powerful rights just in time: requested for a task, approved, logged, and expired automatically after hours.',
+            'Remove accounts of people who left, and service accounts and keys nobody can explain.',
+            'Log the use of privileged access, and look at the logs.',
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'Privilege escalation',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'An attacker who has limited rights tries to gain more. Vertical escalation means going from a normal user to administrator or root, through a software flaw or a misconfiguration: a program that runs with elevated rights and can be tricked, a script owned by root that a normal user may edit, a password in a readable file. Horizontal escalation means reaching another user\'s data at the same level, usually through a missing authorization check.',
+        },
+        {
+          kind: 'text',
+          text: 'The newer term zero trust applies the same thinking to networks: being inside the company network grants nothing by itself. Every request is authenticated and authorized on its own, based on user, device and context, as if it came from the open internet.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Least privilege is about not trusting employees.', truth: 'It is about limiting damage, whoever causes it. An administrator who opens a malicious attachment in a normal account loses a workstation; in an administrator session, possibly the domain.' },
+    { myth: 'Inside our own network, services can trust each other.', truth: 'Most serious incidents involve an attacker who is already inside. Internal systems need authentication and limited rights just like external ones.' },
+    { myth: 'Broad rights save time.', truth: 'They save minutes when setting up and cost days when something goes wrong, because nobody can tell what a compromised account could have touched.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'ps -eo user,comm | sort | uniq -c | sort -rn | head', shows: 'Under which accounts the processes run. Services under their own accounts instead of root are least privilege at work.' },
+      { os: 'Linux', command: 'sudo -l', shows: 'Exactly which commands this user may run with elevated rights; "ALL" is the opposite of least privilege.' },
+      { os: 'Linux', command: 'find / -perm -4000 -type f 2>/dev/null', shows: 'Programs that run with the rights of their owner, usually root, whoever starts them: each one is a possible path for escalation.' },
+      { os: 'Linux', command: 'systemctl show nginx -p User -p NoNewPrivileges -p ProtectSystem -p CapabilityBoundingSet', shows: 'How a service is confined by its unit file: account, capabilities and file system protection.' },
+      { os: 'Linux', command: 'getcap -r /usr/bin 2>/dev/null', shows: 'Programs that hold single capabilities instead of full root rights.' },
+      { os: 'Windows', command: 'net localgroup Administrators', shows: 'Who is a local administrator on this machine.' },
+      { os: 'Windows', command: 'whoami /priv', shows: 'The privileges of the current session; in a normal session most powerful ones are absent or disabled.' },
+      { os: 'macOS', command: 'dscl . -read /Groups/admin GroupMembership', shows: 'The accounts that may administer this Mac.' },
+    ],
+    examples: [
+      'A web application is taken over through a flaw. It runs as its own user and its database account may only read and write its own tables; the attackers cannot read other databases or install software on the host.',
+      'A deployment token stored in a pipeline can push to one repository and expires after an hour. When a log file leaks it a day later, it is already worthless.',
+    ],
+  },
+  terms: [
+    { term: 'Privilege', definition: 'A right to perform an action or access a resource.' },
+    { term: 'Privilege escalation', definition: 'Gaining rights beyond those granted: vertically to a more powerful level, or horizontally to another user\'s resources.' },
+    { term: 'Privilege creep', definition: 'The gradual accumulation of rights that are no longer needed.' },
+    { term: 'Default deny', definition: 'The rule that everything not explicitly permitted is refused.' },
+    { term: 'Separation of duties', definition: 'Dividing a critical task so that no single person can carry it out alone.' },
+    { term: 'Need to know', definition: 'Granting access to information only where the work requires it.' },
+    { term: 'Service account', definition: 'An account used by a program instead of a person.' },
+    { term: 'Just-in-time access', definition: 'Granting elevated rights on request for a limited time instead of permanently.' },
+    { term: 'Attack surface', definition: 'Everything of a system that an attacker can reach and try to misuse.' },
+    { term: 'Blast radius', definition: 'The extent of what can be damaged when one component or account is compromised.' },
+    { term: 'Zero trust', definition: 'An approach in which no request is trusted because of its network location; each is authenticated and authorized individually.' },
+  ],
+  related: [{ topic: 'permissions' }, { topic: 'authn-authz' }, { topic: 'cia-triad' }, { topic: 'containers' }, { topic: 'kernel' }, { topic: 'ci-cd' }, { topic: 'service-models' }],
+  sources: [
+    { spec: 'Saltzer, Schroeder: The Protection of Information in Computer Systems. Proceedings of the IEEE 63(9), 1975', note: 'least privilege, fail-safe defaults, complete mediation, separation of privilege' },
+    { spec: 'NIST Special Publication 800-53, revision 5: control AC-6, Least Privilege', url: 'https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final', note: 'also AC-5, separation of duties; not checked for this page' },
+    { spec: 'NIST Special Publication 800-207: Zero Trust Architecture', url: 'https://csrc.nist.gov/pubs/sp/800/207/final', note: 'not checked for this page' },
+    { spec: 'capabilities(7) and systemd.exec(5), Linux manual pages', note: 'confining processes and services' },
+  ],
+  quiz: [
+    {
+      id: 'web',
+      prompt: 'A web server process is taken over by an attacker. What limits the damage most?',
+      options: ['A long administrator password', 'That the process runs under its own account with access only to its own files', 'A faster processor', 'A newer monitor'],
+      answer: 1,
+      explanation: 'The attacker inherits the rights of the process. If those are small, so is what the attacker can reach.',
+    },
+    {
+      id: 'creep',
+      prompt: 'An employee has moved through three departments and can still access the systems of all three. What is this called?',
+      options: ['Privilege escalation', 'Privilege creep', 'Separation of duties', 'Default deny'],
+      answer: 1,
+      explanation: 'Rights were added with each move and never removed. Regular access reviews and role-based rights prevent it.',
+    },
+    {
+      id: 'deny',
+      prompt: 'What does "default deny" mean for a firewall?',
+      options: ['Everything is allowed unless listed as forbidden', 'Everything is blocked unless explicitly allowed', 'Nothing is ever allowed', 'Rules are applied in random order'],
+      answer: 1,
+      explanation: 'Only the listed connections pass. A forgotten rule then blocks something, which is noticed, instead of exposing something, which is not.',
+    },
+    {
+      id: 'duties',
+      prompt: 'Which arrangement is an example of separation of duties?',
+      options: ['One administrator with two passwords', 'A developer writes a change, and a different person must approve it before it is deployed', 'Every user is an administrator', 'A shared team account'],
+      answer: 1,
+      explanation: 'No single person can bring a change into production alone, so one mistake or one compromised account is not enough.',
+    },
+  ],
+};

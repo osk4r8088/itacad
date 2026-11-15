@@ -1,0 +1,186 @@
+import type { Topic } from '../../schema';
+
+export const symmetricAsymmetric: Topic = {
+  id: 'symmetric-asymmetric',
+  category: 'security',
+  title: 'Symmetric and asymmetric cryptography',
+  level: 2,
+  definition: 'Symmetric cryptography uses one shared secret key for both encrypting and decrypting; asymmetric cryptography uses a key pair, a public key that anyone may know and a private key that only its owner holds.',
+  why: 'Symmetric encryption is fast and has one hard problem: both sides need the same secret before they can talk securely. Asymmetric cryptography solves exactly that and adds digital signatures. Every TLS connection, SSH login and signed software update combines the two, and reading a cipher suite or choosing a key type requires knowing which part does what.',
+  sections: [
+    {
+      heading: 'One key or two',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'The two families',
+          columns: ['', 'Symmetric', 'Asymmetric'],
+          rows: [
+            ['Keys', 'One secret key, shared by both sides', 'A pair: public key and private key'],
+            ['Speed', 'Very fast, suited to any amount of data', 'Hundreds to thousands of times slower'],
+            ['Typical key sizes', '128 or 256 bits', '256 bits (elliptic curves), 2048 to 4096 bits (RSA)'],
+            ['Hard problem', 'Getting the key to the other side safely', 'Knowing that a public key really belongs to its claimed owner'],
+            ['Used for', 'Encrypting the actual data', 'Agreeing on keys, signatures, proving identity'],
+            ['Examples', 'AES, ChaCha20', 'RSA, ECDH, ECDSA, Ed25519'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'With a symmetric key, everyone who can decrypt can also encrypt, and ten people who each want to talk privately with each other need 45 different keys. With key pairs, each of them needs only one pair and publishes the public half.',
+        },
+      ],
+    },
+    {
+      heading: 'What a key pair can do',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'Encrypt to someone: anything encrypted with a public key can be decrypted only with the matching private key.',
+            'Agree on a secret: two sides exchange public values and each computes the same shared secret from its own private value and the other\'s public one. An eavesdropper who saw both public values cannot compute it. This is the Diffie-Hellman key exchange.',
+            'Sign: the owner computes a signature over a message with the private key. Anyone can check it with the public key. A valid signature proves that the message is unchanged and that the holder of the private key produced it.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'A signature is not "encryption with the private key", although it is often explained that way. It is a separate operation, the message is first hashed, and nothing is kept secret by it.',
+        },
+        {
+          kind: 'text',
+          text: 'The security rests on mathematical problems that are easy in one direction and infeasible in the other: multiplying two large primes versus factoring the product (RSA), or computing a point on an elliptic curve versus finding the number that led to it. That is why asymmetric keys are so much longer than symmetric ones for the same strength.',
+        },
+        {
+          kind: 'table',
+          caption: 'Key sizes of comparable strength (NIST SP 800-57 Part 1)',
+          columns: ['Security strength', 'Symmetric', 'RSA', 'Elliptic curve'],
+          rows: [
+            ['112 bits', '(none in current use)', '2048 bits', '224 bits'],
+            ['128 bits', 'AES-128', '3072 bits', '256 bits'],
+            ['192 bits', 'AES-192', '7680 bits', '384 bits'],
+            ['256 bits', 'AES-256', '15360 bits', '512 bits and more'],
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'Used together: hybrid encryption',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Real protocols use each family for what it is good at. Asymmetric cryptography runs once at the start to authenticate the other side and to agree on a fresh secret; from that secret, symmetric keys are derived, and all data flows under fast symmetric encryption.',
+        },
+        {
+          kind: 'table',
+          caption: 'The parts of a TLS 1.3 connection',
+          columns: ['Job', 'Family', 'Typical algorithm'],
+          rows: [
+            ['Agree on a shared secret', 'Asymmetric (key exchange)', 'ECDHE with X25519 or P-256'],
+            ['Prove the server\'s identity', 'Asymmetric (signature)', 'ECDSA or RSA, with a certificate'],
+            ['Derive the session keys', 'Hash-based', 'HKDF with SHA-256'],
+            ['Encrypt and authenticate the data', 'Symmetric', 'AES-GCM or ChaCha20-Poly1305'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Because the key exchange uses fresh, temporary values for every connection, recording traffic today and stealing the server\'s long-term private key later does not reveal the old sessions. This property is called forward secrecy, and TLS 1.3 always has it.',
+        },
+      ],
+    },
+    {
+      heading: 'Keys in practice',
+      blocks: [
+        {
+          kind: 'list',
+          items: [
+            'A private key never leaves its owner. It is protected by file permissions and a passphrase, or kept in hardware (a security key, a TPM, a hardware security module) that uses it without revealing it.',
+            'The public key can be given to anyone. The open question is always whether a given public key is the right one; certificates and fingerprints answer it.',
+            'Keys come from good randomness. Predictable random numbers have broken more systems than weak algorithms.',
+            'Nobody should design their own cipher or protocol. The safe path is a well-known library with its default settings.',
+            'Large quantum computers would break today\'s RSA and elliptic-curve methods, while symmetric ciphers and hashes are far less affected. Standardized post-quantum algorithms exist and are being introduced, usually combined with a classical exchange.',
+          ],
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Asymmetric encryption is more secure, so everything should use it.', truth: 'It is far slower and solves a different problem. Bulk data is always encrypted symmetrically; asymmetric methods set up and authenticate the keys.' },
+    { myth: 'A 2048-bit RSA key is much stronger than a 256-bit AES key.', truth: 'Bit counts of different families cannot be compared. RSA-2048 is rated at about 112 bits of strength, below AES-128.' },
+    { myth: 'If I have someone\'s public key, I can impersonate them.', truth: 'The public key only lets others encrypt to its owner and check the owner\'s signatures. Acting as the owner needs the private key.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'ssh-keygen -t ed25519', shows: 'Creates a key pair: a private key file and a .pub file that can be handed out.' },
+      { os: 'Linux', command: 'ssh-keygen -lf ~/.ssh/id_ed25519.pub', shows: 'The fingerprint of a public key, a hash short enough to compare by eye or by phone.' },
+      { os: 'Linux', command: 'openssl genpkey -algorithm ed25519 -out key.pem; openssl pkey -in key.pem -pubout -out pub.pem', shows: 'A private key and the public key derived from it.' },
+      { os: 'Linux', command: 'openssl pkeyutl -sign -inkey key.pem -rawin -in msg.txt -out msg.sig; openssl pkeyutl -verify -pubin -inkey pub.pem -rawin -in msg.txt -sigfile msg.sig', shows: 'Signs a file with the private key and checks the signature with the public key: Signature Verified Successfully.' },
+      { os: 'Linux', command: 'openssl s_client -connect example.com:443 -brief </dev/null', shows: 'The protocol version, the cipher suite and the key exchange group a server negotiates.' },
+      { os: 'Linux', command: 'openssl speed -evp aes-256-gcm rsa2048', shows: 'Measures both families on this machine: symmetric encryption in gigabytes per second, RSA in operations per second.' },
+      { os: 'Windows', command: 'ssh-keygen -t ed25519', shows: 'The same tool ships with Windows; the keys land in the .ssh folder of the user profile.' },
+      { os: 'macOS', command: 'ssh-add -l', shows: 'The keys the SSH agent currently holds, by fingerprint.' },
+    ],
+    numbers: [
+      { label: 'AES key sizes', value: '128, 192 or 256 bits', note: 'FIPS 197; the block size is always 128 bits' },
+      { label: 'Strength of RSA-2048', value: 'about 112 bits', note: 'NIST SP 800-57 Part 1' },
+      { label: 'RSA size comparable to AES-128 and a 256-bit curve', value: '3072 bits', note: 'NIST SP 800-57 Part 1' },
+      { label: 'Keys for 10 people talking pairwise, symmetric', value: '45', note: 'calculated: 10 x 9 / 2' },
+    ],
+    examples: [
+      'An administrator puts a public SSH key on fifty servers. The private key stays on a hardware token; a server that is broken into holds nothing that opens the other forty-nine.',
+      'A software update arrives over an untrusted mirror. The updater checks its signature with the vendor\'s public key built into the system, so the mirror cannot alter it unnoticed.',
+    ],
+  },
+  terms: [
+    { term: 'Symmetric encryption', definition: 'Encryption in which the same secret key encrypts and decrypts.' },
+    { term: 'Asymmetric cryptography', definition: 'Cryptography with key pairs, in which what one key does only the other can undo or verify; also called public-key cryptography.' },
+    { term: 'Public key', definition: 'The half of a key pair that may be given to anyone; it encrypts to the owner and verifies the owner\'s signatures.' },
+    { term: 'Private key', definition: 'The half of a key pair that only the owner holds; it decrypts and signs.' },
+    { term: 'Key exchange', definition: 'A method by which two parties derive a shared secret over an open channel, such as Diffie-Hellman.' },
+    { term: 'Digital signature', definition: 'A value computed with a private key over a message that anyone can verify with the public key.' },
+    { term: 'Hybrid encryption', definition: 'Using asymmetric cryptography to establish a key and symmetric encryption for the data.' },
+    { term: 'Forward secrecy', definition: 'The property that past sessions stay secret even if a long-term private key is stolen later.' },
+    { term: 'AES', definition: 'The Advanced Encryption Standard, the most widely used symmetric cipher, with keys of 128, 192 or 256 bits.' },
+    { term: 'RSA', definition: 'An asymmetric algorithm for encryption and signatures based on the difficulty of factoring large numbers.' },
+    { term: 'Elliptic-curve cryptography (ECC)', definition: 'Asymmetric cryptography based on elliptic curves, with much shorter keys than RSA for the same strength.' },
+    { term: 'Post-quantum cryptography', definition: 'Asymmetric algorithms designed to resist attacks by quantum computers.' },
+  ],
+  related: [{ topic: 'hashing-encryption' }, { topic: 'certificates-pki' }, { protocol: 'tls' }, { protocol: 'ssh' }, { protocol: 'http3' }, { topic: 'number-systems' }],
+  sources: [
+    { spec: 'NIST Special Publication 800-57 Part 1, revision 5: Recommendation for Key Management', url: 'https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final', note: 'comparable security strengths of symmetric, RSA and elliptic-curve keys' },
+    { spec: 'FIPS PUB 197: Advanced Encryption Standard (AES)', note: 'key sizes 128, 192, 256 bits; block size 128 bits' },
+    { rfc: 8446, note: 'TLS 1.3: ephemeral key exchange, signatures, AEAD ciphers, HKDF' },
+    { rfc: 7748, note: 'X25519 key exchange' },
+    { rfc: 8032, note: 'Ed25519 signatures' },
+    { spec: 'Diffie, Hellman: New Directions in Cryptography. IEEE Transactions on Information Theory 22(6), 1976' },
+    { spec: 'FIPS 203, 204: Module-Lattice-Based Key-Encapsulation and Digital Signature Standards, 2024', note: 'post-quantum algorithms; not checked for this page' },
+  ],
+  quiz: [
+    {
+      id: 'bulk',
+      prompt: 'Which kind of cryptography encrypts the page content in an HTTPS connection?',
+      options: ['Asymmetric, with the server\'s public key', 'Symmetric, with keys agreed during the handshake', 'A hash function', 'None, HTTPS only signs'],
+      answer: 1,
+      explanation: 'Asymmetric methods authenticate the server and establish a shared secret. The data itself is encrypted with a fast symmetric cipher.',
+    },
+    {
+      id: 'sign',
+      prompt: 'Which key is used to create a digital signature, and which to check it?',
+      options: ['Public to sign, private to check', 'Private to sign, public to check', 'The same shared key for both', 'No key is needed'],
+      answer: 1,
+      explanation: 'Only the owner can sign, with the private key. Everyone can verify with the public key.',
+    },
+    {
+      id: 'size',
+      prompt: 'Which pair offers roughly the same security strength?',
+      options: ['AES-128 and RSA-128', 'AES-128 and RSA-3072', 'AES-256 and RSA-2048', 'AES-128 and RSA-1024'],
+      answer: 1,
+      explanation: 'About 128 bits of strength need a 3072-bit RSA key or a 256-bit elliptic curve. RSA-2048 is rated at about 112 bits.',
+    },
+    {
+      id: 'fs',
+      prompt: 'An attacker records encrypted TLS 1.3 traffic and a year later steals the server\'s private key. What can be decrypted?',
+      options: ['All recorded traffic', 'Nothing of the recorded traffic, because each session used temporary keys', 'Only the first packet of each connection', 'Only traffic of logged-in users'],
+      answer: 1,
+      explanation: 'That is forward secrecy. The long-term key only signed the handshake; the session secrets came from an ephemeral exchange and are gone.',
+    },
+  ],
+};

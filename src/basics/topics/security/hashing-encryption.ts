@@ -1,0 +1,174 @@
+import type { Topic } from '../../schema';
+
+export const hashingEncryption: Topic = {
+  id: 'hashing-encryption',
+  category: 'security',
+  title: 'Hashing and encryption',
+  level: 2,
+  definition: 'Encryption turns data into an unreadable form that can be turned back with a key; hashing computes a short, fixed-size fingerprint of data that cannot be turned back at all.',
+  why: 'The two are confused all the time, with consequences: passwords stored "encrypted" that leak with their key, files "protected" by a hash, data called secure because it is Base64. Knowing which tool gives secrecy, which gives proof of integrity, and which gives neither is the foundation for everything else in cryptography.',
+  sections: [
+    {
+      heading: 'Three things that look alike',
+      blocks: [
+        {
+          kind: 'table',
+          caption: 'Encoding, hashing, encryption',
+          columns: ['', 'Encoding', 'Hashing', 'Encryption'],
+          rows: [
+            ['Purpose', 'Represent data in another form', 'Fingerprint data', 'Keep data secret'],
+            ['Reversible', 'Yes, by anyone', 'No', 'Yes, with the key'],
+            ['Key', 'None', 'None', 'Required'],
+            ['Output size', 'Grows with the input', 'Fixed', 'About the size of the input'],
+            ['Examples', 'Base64, UTF-8, hexadecimal', 'SHA-256, SHA-3, BLAKE2', 'AES, ChaCha20, RSA'],
+            ['Protects', 'Nothing', 'Integrity, when the hash itself is trustworthy', 'Confidentiality'],
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'Hash functions',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A cryptographic hash function takes input of any length and returns a value of fixed length: SHA-256 always gives 256 bits, written as 64 hexadecimal digits. The same input always gives the same hash. Changing a single bit of the input changes about half of the output bits, in a way that looks random.',
+        },
+        { kind: 'figure', figure: 'hash-explorer', caption: 'Type two texts and compare their SHA-256 hashes. Change one letter and count how many of the 256 bits flip.' },
+        {
+          kind: 'list',
+          items: [
+            'One-way: from a hash it is not feasible to find an input that produces it.',
+            'Collision resistant: it is not feasible to find two different inputs with the same hash. Collisions must exist, since there are more inputs than outputs, but finding one should be out of reach.',
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Uses are everywhere: checking that a download arrived unchanged, identifying a commit in Git or a container image by its digest, detecting duplicate files, and as the first step of every digital signature. MD5 and SHA-1 are broken in the sense that collisions can be produced, and must not be used where an attacker could profit from one; SHA-256 and newer functions are the standard.',
+        },
+        {
+          kind: 'note',
+          text: 'A plain hash proves integrity only against accidents, or when the hash comes from a trusted place. An attacker who can change the file can usually change the hash next to it too. Protection against deliberate change needs a key: a message authentication code (MAC), computed from data and a shared secret, or a digital signature.',
+        },
+      ],
+    },
+    {
+      heading: 'Passwords: a special case',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A server must check passwords without storing them. It stores a hash, hashes what the user types at login, and compares. A stolen database then contains no passwords.',
+        },
+        {
+          kind: 'text',
+          text: 'Ordinary hash functions are wrong for this, because they are built to be fast, and an attacker with the stolen hashes can try billions of guesses per second. Two things fix it. A salt, a random value stored with each hash and mixed into it, makes equal passwords give different hashes and makes precomputed tables useless. And a deliberately slow, memory-hungry password hashing function, Argon2id first, otherwise scrypt, bcrypt or PBKDF2, makes each guess expensive.',
+        },
+        {
+          kind: 'text',
+          text: 'Passwords are hashed, not encrypted, because nobody ever needs them back. Encrypted passwords can all be decrypted the moment the key leaks, and the key lives on the same server.',
+        },
+      ],
+    },
+    {
+      heading: 'Encryption',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Encryption combines the readable data, the plaintext, with a key to produce ciphertext, which looks like random bytes. Only someone with the right key can reverse it. The method itself is public; all the secrecy lies in the key. That principle, named after Auguste Kerckhoffs, is why algorithms that many experts have tried to break in the open are trusted and home-made secret ones are not.',
+        },
+        {
+          kind: 'table',
+          caption: 'Where data is encrypted',
+          columns: ['State', 'Protects against', 'Examples'],
+          rows: [
+            ['In transit', 'Reading and changing on the network', 'TLS for web and mail, SSH, VPN'],
+            ['At rest', 'A lost or stolen disk, a discarded drive, a copied backup', 'Full-disk encryption, encrypted backups and databases'],
+            ['End to end', 'Everyone between the two ends, including the service provider', 'Messengers with end-to-end encryption, encrypted mail'],
+          ],
+        },
+        {
+          kind: 'text',
+          text: 'Encryption alone keeps a secret and does not notice changes: an attacker who cannot read the ciphertext may still be able to alter it. Modern methods therefore encrypt and authenticate in one step, which is called authenticated encryption. And encryption moves the problem to the key: who has it, where it is stored, and what happens when it is lost.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'Base64 is a kind of encryption.', truth: 'It is an encoding that anyone can reverse without a key. It makes binary data printable and hides nothing.' },
+    { myth: 'A hash can be decrypted.', truth: 'There is nothing to decrypt; the input is not contained in the hash. What attackers do is guess inputs and compare, which works for short or common passwords.' },
+    { myth: 'Passwords should be stored encrypted.', truth: 'They should be stored as salted hashes from a slow password hashing function. Encryption can be undone with the key, and the key is stolen along with the database.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'printf "hello" | sha256sum; printf "hellp" | sha256sum', shows: 'Two inputs that differ in one letter give completely different hashes: 2cf24dba... and fdd7585e...' },
+      { os: 'Linux', command: 'sha256sum -c SHA256SUMS', shows: 'Checks downloaded files against a list of expected hashes.' },
+      { os: 'Linux', command: 'printf "hello" | base64; printf "aGVsbG8=" | base64 -d', shows: 'Encoding and decoding without any key: aGVsbG8= and back to hello.' },
+      { os: 'Linux', command: 'openssl enc -aes-256-cbc -pbkdf2 -in notes.txt -out notes.enc', shows: 'Encrypts a file with a key derived from a passphrase; -d with the same passphrase decrypts it.' },
+      { os: 'Linux', command: 'printf "hello" | openssl dgst -sha256 -hmac "secret"', shows: 'A message authentication code: a hash that only someone who knows the secret can compute or check.' },
+      { os: 'Linux', command: 'lsblk -f', shows: 'Block devices with their file systems; an entry of type crypto_LUKS is an encrypted volume.' },
+      { os: 'Windows', command: 'Get-FileHash .\\file.zip -Algorithm SHA256', shows: 'The SHA-256 hash of a file (PowerShell).' },
+      { os: 'Windows', command: 'manage-bde -status', shows: 'Whether the drives are encrypted with BitLocker.' },
+      { os: 'macOS', command: 'fdesetup status', shows: 'Whether FileVault disk encryption is on.' },
+    ],
+    numbers: [
+      { label: 'Output of SHA-256', value: '256 bits, 64 hexadecimal digits', note: 'whatever the size of the input' },
+      { label: 'Bits that differ between the hashes of "hello" and "hellp"', value: '131 of 256', note: 'calculated; about half is expected' },
+      { label: 'Possible SHA-256 values', value: '2^256, about 1.2 x 10^77' },
+    ],
+    examples: [
+      'A leaked database contains user names and unsalted fast hashes. Within hours most passwords are recovered by guessing, because the same common passwords give the same hashes for thousands of users.',
+      'A laptop with full-disk encryption is stolen while switched off. The thief has the hardware and no data.',
+    ],
+  },
+  terms: [
+    { term: 'Hash function', definition: 'A function that maps input of any size to a fixed-size value; a cryptographic one is one-way and collision resistant.' },
+    { term: 'Collision', definition: 'Two different inputs that produce the same hash value.' },
+    { term: 'Salt', definition: 'A random value stored with a password hash and mixed into it, so that equal passwords give different hashes.' },
+    { term: 'Password hashing function', definition: 'A deliberately slow and memory-hungry hash function for storing passwords, such as Argon2id, scrypt or bcrypt.' },
+    { term: 'Encryption', definition: 'Transforming data with a key so that it can be read only by someone who has the right key.' },
+    { term: 'Plaintext', definition: 'Data in readable form, before encryption or after decryption; the encrypted form is the ciphertext.' },
+    { term: 'Cryptographic key', definition: 'The secret value that controls encryption, decryption or signing.' },
+    { term: 'Message authentication code (MAC)', definition: 'A value computed from a message and a shared secret key that proves the message is unchanged and comes from a key holder.' },
+    { term: 'Authenticated encryption', definition: 'Encryption that also detects any change to the ciphertext.' },
+    { term: 'End-to-end encryption', definition: 'Encryption in which only the communicating endpoints hold the keys, and no server in between can read the content.' },
+  ],
+  related: [{ topic: 'symmetric-asymmetric' }, { topic: 'certificates-pki' }, { topic: 'authn-authz' }, { entry: 'passwords' }, { topic: 'character-encoding' }, { topic: 'images' }, { protocol: 'tls' }],
+  sources: [
+    { spec: 'FIPS PUB 180-4: Secure Hash Standard (SHS)', note: 'SHA-256 and the other SHA-2 functions' },
+    { spec: 'OWASP Password Storage Cheat Sheet', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html', note: 'hash and salt passwords; Argon2id, scrypt, bcrypt, PBKDF2' },
+    { rfc: 9106, note: 'Argon2' },
+    { rfc: 2104, note: 'HMAC' },
+    { rfc: 4648, section: '4', note: 'Base64, an encoding' },
+    { spec: 'Stevens, Bursztein, Karpman, Albertini, Markov: The First Collision for Full SHA-1, 2017', note: 'practical collision in SHA-1' },
+    { spec: 'Ferguson, Schneier, Kohno: Cryptography Engineering, 2010', note: 'hash functions, MACs, encryption modes' },
+  ],
+  quiz: [
+    {
+      id: 'reverse',
+      prompt: 'Which of these can be reversed by anyone without a key?',
+      options: ['SHA-256', 'AES', 'Base64', 'Argon2id'],
+      answer: 2,
+      explanation: 'Base64 is an encoding. AES needs the key, and the two hash functions cannot be reversed at all.',
+    },
+    {
+      id: 'pw',
+      prompt: 'How should a server store user passwords?',
+      options: ['Encrypted with AES', 'As plain SHA-256 hashes', 'As salted hashes from a slow password hashing function', 'Base64 encoded'],
+      answer: 2,
+      explanation: 'Hashing means nothing can be decrypted, the salt defeats precomputed tables, and the slow function makes guessing expensive.',
+    },
+    {
+      id: 'avalanche',
+      prompt: 'One character of a long document is changed. What happens to its SHA-256 hash?',
+      options: ['One digit changes', 'It stays the same', 'About half of its bits change', 'It gets longer'],
+      answer: 2,
+      explanation: 'A good hash function spreads every change over the whole output. The length is always 256 bits.',
+    },
+    {
+      id: 'mac',
+      prompt: 'A file and its SHA-256 hash are offered on the same server. An attacker who controls the server replaces the file. What does the hash prove?',
+      options: ['That the file is genuine', 'Nothing, because the attacker can replace the hash as well', 'That the file is encrypted', 'That the server is secure'],
+      answer: 1,
+      explanation: 'A plain hash guards against accidental damage. Against an attacker it must come from a trusted place or be replaced by a signature or MAC.',
+    },
+  ],
+};

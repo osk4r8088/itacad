@@ -1,0 +1,157 @@
+import type { Topic } from '../../schema';
+
+export const indexes: Topic = {
+  id: 'indexes',
+  category: 'databases',
+  title: 'Indexes',
+  level: 2,
+  definition: 'An index is an additional, sorted data structure that a database maintains for one or more columns of a table, so that it can find rows by their values without reading the whole table.',
+  why: 'The difference between a query that takes two milliseconds and one that takes twenty seconds is, most of the time, an index. "The application got slow as the data grew" almost always means a query that reads every row. Indexes are also not free, so knowing when one helps and what it costs is the core skill of database performance.',
+  sections: [
+    {
+      heading: 'Scan or seek',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'A table is stored as rows in no particular order. To find the orders of customer 4711 without help, the database has to read every row and test it: a full table scan. Its cost grows in step with the table, so what was instant with a thousand rows takes seconds with ten million.',
+        },
+        {
+          kind: 'text',
+          text: 'An index on customer_id works like the index at the back of a book: a sorted list of the values, each with a pointer to the row it came from. Finding a value in a sorted structure takes a handful of steps however large the table is, and the pointers lead straight to the matching rows.',
+        },
+        { kind: 'figure', figure: 'index-lookup', caption: 'Choose a table size: the number of pages a full scan reads against the number an index lookup reads. The page sizes are illustrative assumptions.' },
+      ],
+    },
+    {
+      heading: 'The B-tree',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'The standard index structure is the B-tree. It is a tree of pages, the unit in which databases read from disk. The top page holds a few hundred key values that divide the whole range into sections, each pointing to a page one level down, which divides its section further. The bottom level, the leaves, holds all keys in sorted order with pointers to the rows, and the leaves are linked to their neighbors.',
+        },
+        {
+          kind: 'text',
+          text: 'Because every page fans out to hundreds of children, the tree stays very flat: three or four levels are enough for hundreds of millions of rows. A lookup reads one page per level. And since the leaves are sorted and linked, the same index answers ranges (dates between two days), prefixes (names starting with "Sch"), and ORDER BY, without sorting anything.',
+        },
+        {
+          kind: 'table',
+          caption: 'What a B-tree index on a column can and cannot speed up',
+          columns: ['Condition', 'Uses the index', 'Why'],
+          rows: [
+            ['customer_id = 4711', 'yes', 'Direct lookup'],
+            ["placed BETWEEN '2026-01-01' AND '2026-01-31'", 'yes', 'A range of neighboring leaves'],
+            ["name LIKE 'Sch%'", 'yes', 'A prefix is a range in sort order'],
+            ["name LIKE '%mann'", 'no', 'Endings are scattered across the sort order'],
+            ['LOWER(name) = \'ada\'', 'no, unless the index is on LOWER(name)', 'The index holds the original values, not the computed ones'],
+            ['status = \'active\', true for 95 % of rows', 'not worth it', 'Reading most of the table through an index is slower than scanning it'],
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'More than one column, and other kinds',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'An index can cover several columns, sorted by the first, then by the second within equal first values, like a phone book sorted by family name and then given name. Such an index on (customer_id, placed) serves queries on customer_id alone and on both together. It does not serve a query on placed alone, just as a phone book is no help for finding everyone called Maria. The order of the columns is therefore part of the design.',
+        },
+        {
+          kind: 'list',
+          items: [
+            'The primary key always has an index, and so does every UNIQUE constraint; that is how uniqueness is checked quickly.',
+            'Foreign key columns are often not indexed automatically and usually should be, since joins and deletes look rows up by them.',
+            'A covering index contains every column a query needs, so the table itself is not read at all.',
+            'Hash indexes serve only equality. Other specialized kinds exist for full-text search, geographic data and JSON documents.',
+          ],
+        },
+      ],
+    },
+    {
+      heading: 'The price, and how to check',
+      blocks: [
+        {
+          kind: 'text',
+          text: 'Every index is a second copy of some of the data that must be kept in step. Each INSERT, DELETE and UPDATE of an indexed column changes every affected index too, and the indexes take space on disk and in memory. A table with ten indexes writes far slower than one with two. The goal is the few indexes that the important queries need, and no others.',
+        },
+        {
+          kind: 'text',
+          text: 'Whether an index is used is the decision of the query planner, which estimates the cost of each possible way from statistics about the data. It can be asked: EXPLAIN shows the chosen plan, and its variants also run the query and report real times. A plan that says "scan" on a large table with a selective condition is the usual finding. Measuring before and after is the only reliable method; adding indexes on a guess mostly adds cost.',
+        },
+      ],
+    },
+  ],
+  misconceptions: [
+    { myth: 'More indexes make a database faster.', truth: 'They make some reads faster and every write slower. Unused indexes are pure cost.' },
+    { myth: 'If an index exists on a column, queries on that column use it.', truth: 'Only if the condition fits the index and the planner expects it to be cheaper. A function around the column, a leading wildcard or a condition matching most rows all prevent it.' },
+    { myth: 'An index on (a, b) is the same as one on (b, a).', truth: 'The index is sorted by its first column. The first serves queries on a, or on a and b; the second serves b, or b and a.' },
+  ],
+  practice: {
+    commands: [
+      { os: 'Linux', command: 'sqlite3 shop.db "EXPLAIN QUERY PLAN SELECT * FROM orders WHERE customer_id = 1;"', shows: 'Without an index the plan says SCAN orders: every row is read.' },
+      { os: 'Linux', command: 'sqlite3 shop.db "CREATE INDEX orders_customer ON orders(customer_id);"', shows: 'Creates an index on one column.' },
+      { os: 'Linux', command: 'sqlite3 shop.db "EXPLAIN QUERY PLAN SELECT * FROM orders WHERE customer_id = 1;"', shows: 'The same query now says SEARCH orders USING INDEX orders_customer.' },
+      { os: 'Linux', command: 'psql shop -c "EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 4711;"', shows: 'The plan PostgreSQL chose, with estimated and actual rows and times: Seq Scan or Index Scan.' },
+      { os: 'Linux', command: 'psql shop -c "\\d orders"', shows: 'A table with its columns and, at the bottom, all its indexes.' },
+      { os: 'Linux', command: 'psql shop -c "SELECT indexrelname, idx_scan FROM pg_stat_user_indexes ORDER BY idx_scan;"', shows: 'How often each index was used; those with zero are candidates for removal.' },
+      { os: 'Windows', command: 'sqlcmd -Q "SET SHOWPLAN_TEXT ON" ', shows: 'Makes SQL Server print the plan of the following statements instead of running them.' },
+      { os: 'macOS', command: 'sqlite3 shop.db ".indexes orders"', shows: 'The indexes of a table in SQLite.' },
+    ],
+    numbers: [
+      { label: 'Levels of a B-tree for 1 billion keys at 200 keys per page', value: '4', note: 'calculated: 200^4 is 1.6 billion; the fan-out is an illustrative assumption' },
+      { label: 'Levels for 1 million keys at 200 keys per page', value: '3', note: 'calculated: 200^3 is 8 million' },
+    ],
+    examples: [
+      'An order list page takes eight seconds. The plan shows a sequential scan of 30 million orders to find one customer\'s forty. An index on customer_id brings it to milliseconds.',
+      'A bulk import of ten million rows crawls. Dropping the secondary indexes first and rebuilding them after the import makes it several times faster.',
+    ],
+  },
+  terms: [
+    { term: 'Index (database)', definition: 'A sorted auxiliary structure over one or more columns that lets the database find rows by value without reading the whole table.' },
+    { term: 'Full table scan', definition: 'Reading every row of a table to find those that match; also called sequential scan.' },
+    { term: 'B-tree', definition: 'A balanced tree of pages with many keys each, kept sorted, in which every lookup reads one page per level.' },
+    { term: 'Composite index', definition: 'An index over several columns, sorted by the first and then by the following ones.' },
+    { term: 'Covering index', definition: 'An index that contains all columns a query needs, so that the table is not read.' },
+    { term: 'Selectivity', definition: 'The share of rows a condition matches; the smaller it is, the more an index helps.' },
+    { term: 'Query planner', definition: 'The part of a database that chooses how to execute a statement, based on cost estimates; also called optimizer.' },
+    { term: 'Query plan', definition: 'The sequence of scans, lookups, joins and sorts a database uses to execute a statement.' },
+    { term: 'Unique index', definition: 'An index that also guarantees that no two rows have the same value in its columns.' },
+  ],
+  related: [{ topic: 'sql-basics' }, { topic: 'relational-nosql' }, { topic: 'transactions' }, { topic: 'storage' }, { topic: 'memory' }, { topic: 'file-systems' }],
+  sources: [
+    { spec: 'Bayer, McCreight: Organization and Maintenance of Large Ordered Indexes. Acta Informatica 1, 1972', note: 'the B-tree' },
+    { spec: 'Comer: The Ubiquitous B-Tree. ACM Computing Surveys 11(2), 1979' },
+    { spec: 'PostgreSQL documentation: Chapter 11, Indexes', url: 'https://www.postgresql.org/docs/current/indexes.html', note: 'index types, multicolumn indexes, indexes on expressions, index-only scans' },
+    { spec: 'PostgreSQL documentation: 14.1 Using EXPLAIN', url: 'https://www.postgresql.org/docs/current/using-explain.html', note: 'reading query plans' },
+    { spec: 'SQLite documentation: EXPLAIN QUERY PLAN', url: 'https://www.sqlite.org/eqp.html', note: 'SCAN and SEARCH in the plans shown here' },
+  ],
+  quiz: [
+    {
+      id: 'scan',
+      prompt: 'A query on a table of 50 million rows filters on a column without an index. What does the database do?',
+      options: ['It refuses the query', 'It reads all 50 million rows and tests each', 'It guesses the result', 'It builds an index automatically'],
+      answer: 1,
+      explanation: 'Without an index the only way is a full scan. It works and is slow in proportion to the table.',
+    },
+    {
+      id: 'composite',
+      prompt: 'There is an index on (customer_id, placed). Which query can it not serve efficiently?',
+      options: ['WHERE customer_id = 7', "WHERE customer_id = 7 AND placed > '2026-01-01'", "WHERE placed > '2026-01-01'", 'WHERE customer_id = 7 ORDER BY placed'],
+      answer: 2,
+      explanation: 'The index is sorted by customer first. Rows of one date are spread over all customers, so the index gives no shortcut.',
+    },
+    {
+      id: 'cost',
+      prompt: 'What is the price of adding an index?',
+      options: ['Queries return fewer rows', 'Writes get slower and more storage is used', 'The table can no longer be backed up', 'Transactions are disabled'],
+      answer: 1,
+      explanation: 'Every insert, delete and change of an indexed column must update the index as well, and the index occupies space.',
+    },
+    {
+      id: 'like',
+      prompt: "Why can a normal index on name not help with the condition name LIKE '%son'?",
+      options: ['LIKE never uses indexes', 'The index is sorted from the first character, and names with the same ending are scattered across it', 'The percent sign is not allowed', 'Indexes only store numbers'],
+      answer: 1,
+      explanation: 'A sorted list helps for beginnings, which form a contiguous range, and not for endings.',
+    },
+  ],
+};

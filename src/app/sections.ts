@@ -41,6 +41,9 @@ const lesson = (id: string): Highlight => {
   return { title: e.title, href: e.exchange ? href.lesson(id, 1) : href.lesson(id) };
 };
 
+/** The description of a section, shown on the start page tile and as the lead of the section page. */
+export const sectionAbout = (id: Section): string => SECTIONS.find((s) => s.id === id)!.about;
+
 /** The sections of the site, in header order. The start page shows one tile per section. */
 export const SECTIONS: SiteSection[] = [
   {

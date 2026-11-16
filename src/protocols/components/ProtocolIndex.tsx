@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { navGroups } from '../catalog';
 import { href } from '../../app/router';
+import { sectionAbout } from '../../app/sections';
 import type { Level } from '../../shared/levels';
 import { LevelBadge } from '../../shared/components/LevelBadge';
 import { LevelFilter } from '../../shared/components/LevelFilter';
@@ -13,9 +14,7 @@ export function ProtocolIndex() {
     .filter((g) => g.entries.length > 0);
   return (
     <div className="index">
-      <p className="lead">
-        Step through real protocol exchanges. Each step shows the message on the network, in a packet flow table and a sequence diagram, and as a packet with every header field, layer by layer.
-      </p>
+      <p className="lead">{sectionAbout('protocols')}</p>
       <LevelFilter value={level} onChange={setLevel} />
       <div className="layer-map">
         {groups.map((g) => (

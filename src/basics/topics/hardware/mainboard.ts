@@ -38,7 +38,7 @@ export const mainboard: Topic = {
         },
         {
           kind: 'text',
-          text: 'The width of a link is written x1, x2, x4, x8 or x16: the number of lanes. More lanes carry proportionally more data. An NVMe SSD normally uses x4, a graphics card x16. Each generation of the standard doubled the rate of a lane.',
+          text: 'The width of a link is written x1, x2, x4, x8 or x16: the number of lanes. More lanes carry proportionally more data. An NVMe SSD normally uses x4, a graphics card x16. Each generation of the standard roughly doubled the data rate of a lane.',
         },
         {
           kind: 'table',
@@ -126,7 +126,8 @@ export const mainboard: Topic = {
   related: [{ topic: 'cpu' }, { topic: 'storage' }, { topic: 'gpu' }, { topic: 'nic' }, { entry: 'bandwidth' }],
   sources: [
     { ...PCIE, note: 'lanes and links, transfer rates and encodings per generation, link training' },
-    { spec: 'USB Implementers Forum: USB 3.2 and USB4 specifications, and the USB data performance language guidelines', url: 'https://www.usb.org/documents', note: 'speeds and names' },
+    { spec: 'USB Implementers Forum: USB 3.2 and USB4 specifications', url: 'https://www.usb.org/documents', note: 'speeds per generation' },
+    { spec: 'USB Implementers Forum: USB4, with the USB Data Performance Language Usage Guidelines', url: 'https://usb.org/usb4', note: 'the names in use for each speed' },
     { spec: 'UEFI Forum: Unified Extensible Firmware Interface (UEFI) Specification', url: 'https://uefi.org/specifications' },
     { spec: 'DMTF: System Management BIOS (SMBIOS) Reference Specification, DSP0134', url: 'https://www.dmtf.org/standards/smbios', note: 'baseboard information read by dmidecode' },
   ],

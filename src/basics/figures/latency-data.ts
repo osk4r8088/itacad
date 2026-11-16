@@ -23,7 +23,7 @@ export const LATENCIES: LatencyLevel[] = [
   { id: 'nvme', name: 'NVMe SSD, random read', seconds: 60e-6, note: 'tens to about 100 microseconds', size: 'hundreds of GB to TB' },
   { id: 'lan', name: 'Round trip in a local network', seconds: 300e-6, note: 'a few hundred microseconds', size: '' },
   { id: 'hdd', name: 'Hard disk, random read', seconds: 8e-3, note: 'seek plus half a rotation; at 7200 rpm the half rotation alone is 4.2 ms', size: 'TB' },
-  { id: 'wan', name: 'Round trip Frankfurt to New York', seconds: 80e-3, note: 'light in fibre needs at least about 62 ms for the roughly 6,200 km there and back; real paths are longer', size: '' },
+  { id: 'wan', name: 'Round trip Frankfurt to New York', seconds: 80e-3, note: 'light in fibre needs at least about 62 ms for the roughly 6,200 km each way, there and back; real paths are longer', size: '' },
 ];
 
 /** Human time: one nanosecond becomes one second. */

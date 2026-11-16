@@ -3,6 +3,7 @@ import { href, replaceHash, useHashRoute, type Route } from './router';
 import { pageTitle } from '../shared/hub';
 import { SiteHeader, type Section } from './SiteHeader';
 import { Home } from './Home';
+import { sectionAbout } from './sections';
 import { HubCards } from './HubCards';
 import { HubEntryPage } from './HubEntryPage';
 import { ProtocolIndex } from '../protocols/components/ProtocolIndex';
@@ -98,6 +99,7 @@ export function App() {
         {route.page === 'learn' && (
           <div className="index">
             <h1>Learn</h1>
+            <p className="lead">{sectionAbout('learn')}</p>
             <HubCards entries={LESSONS} link={href.lesson} />
           </div>
         )}

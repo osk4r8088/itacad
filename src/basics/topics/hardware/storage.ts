@@ -125,7 +125,7 @@ export const storage: Topic = {
     { spec: 'NVM Express Base Specification', url: 'https://nvmexpress.org/specifications/', note: 'queue model, Dataset Management (Deallocate)' },
     { spec: 'NVM Express: What makes NVMe architecture so efficient?', url: 'https://nvmexpress.org/?p=4721', note: '65,535 I/O queues with 65,535 commands each; the queue numbers on this page were checked against this answer of the standards body' },
     { spec: 'Serial ATA International Organization: Serial ATA Revision 3.0', note: '6 Gb/s link, 8b/10b encoding' },
-    { spec: 'Intel: Serial ATA AHCI 1.3.1 Specification', note: 'command list with up to 32 commands per port' },
+    { spec: 'Intel: Serial ATA AHCI 1.3.1 Specification', url: 'https://www.intel.com/content/www/us/en/io/serial-ata/serial-ata-ahci-spec-rev1-3-1.html', note: 'command list of up to 32 entries per port for Native Command Queuing' },
     { spec: 'PCI-SIG: PCI Express Base Specification', note: 'transfer rates per generation, 128b/130b encoding since 3.0' },
     { spec: 'PCI-SIG: PCI Express M.2 Specification', note: 'form factor carrying SATA or PCIe' },
   ],

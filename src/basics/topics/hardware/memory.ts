@@ -124,7 +124,7 @@ export const memory: Topic = {
   related: [{ topic: 'cpu' }, { topic: 'storage' }, { topic: 'server' }, { entry: 'bandwidth' }],
   sources: [
     { ...HP, section: 'Chapter 2 (memory hierarchy design) and Appendix B (review of memory hierarchy)' },
-    OSTEP('18 to 22 (paging, translation lookaside buffers, swapping)', 'vm-paging.pdf'),
+    OSTEP('18 (paging: introduction); chapters 19 to 22 of the same book cover translation lookaside buffers and swapping', 'vm-paging.pdf'),
     { spec: 'JEDEC JESD79-5C, DDR5 SDRAM standard (2024)', url: 'https://www.jedec.org/standards-documents/docs/jesd79-5c' },
   ],
   quiz: [

@@ -121,6 +121,7 @@ export const nic: Topic = {
     { rfc: 9542, section: '2.1', note: 'MAC address structure, group and local bits, documentation addresses' },
     { spec: 'Linux kernel documentation: Scaling in the Linux Networking Stack', url: 'https://docs.kernel.org/networking/scaling.html', note: 'RSS, receive queues' },
     { spec: 'Linux kernel documentation: Segmentation Offloads', url: 'https://docs.kernel.org/networking/segmentation-offloads.html', note: 'TSO, GSO, GRO' },
+    { spec: 'Linux kernel mailing list: tcp: BIG TCP implementation (cover letter, 2022)', url: 'https://lore.kernel.org/netdev/20220203015140.3022854-1-eric.dumazet@gmail.com/', note: 'the standard TSO and GRO packet limit of 64 KB, and how BIG TCP lifts it' },
     { spec: 'Wireshark User\'s Guide: Checksums', url: 'https://www.wireshark.org/docs/wsug_html_chunked/ChAdvChecksums.html', note: 'why captures on the sender show wrong checksums' },
   ],
   quiz: [

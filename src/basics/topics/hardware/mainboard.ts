@@ -125,7 +125,9 @@ export const mainboard: Topic = {
   ],
   related: [{ topic: 'cpu' }, { topic: 'storage' }, { topic: 'gpu' }, { topic: 'nic' }, { entry: 'bandwidth' }],
   sources: [
-    { ...PCIE, note: 'lanes and links, transfer rates and encodings per generation, link training' },
+    { ...PCIE, note: 'lanes and links, transfer rates and encodings per generation, link training; members only, so the table was checked against the two sources below' },
+    { spec: 'Das Sharma: PCI Express 6.0 Specification at 64.0 GT/s with PAM-4 signaling (IEEE presentation, 2021)', url: 'https://ewh.ieee.org/r6/san_diego/sscs/events/slides/2021_08_27_PCIe6.0_IEEE_CAS_iDLP_Debendra.pdf', note: 'transfer rate and encoding of every generation from 1.0 to 6.0' },
+    { spec: 'PCI-SIG: PCIe 6.0 specification release (press release, January 2022)', url: 'https://businesswire.com/news/home/20220111005011/en/PCI-SIG%C2%AE-Releases-PCIe%C2%AE-6.0-Specification-Delivering-Record-Performance-to-Power-Big-Data-Applications', note: '64 GT/s, PAM4 signaling, forward error correction and flit mode' },
     { spec: 'USB Implementers Forum: USB 3.2 and USB4 specifications', url: 'https://www.usb.org/documents', note: 'speeds per generation' },
     { spec: 'USB Implementers Forum: USB4, with the USB Data Performance Language Usage Guidelines', url: 'https://usb.org/usb4', note: 'the names in use for each speed' },
     { spec: 'UEFI Forum: Unified Extensible Firmware Interface (UEFI) Specification', url: 'https://uefi.org/specifications' },

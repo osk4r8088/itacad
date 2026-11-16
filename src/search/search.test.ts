@@ -11,12 +11,17 @@ import { TOOLS, entryHref } from '../tools/registry';
 import { PORTS } from '../tools/ports/data';
 import { readyTopics, findTopic } from '../basics/catalog';
 import { hasQuiz } from '../quizzes/catalog';
+import { slugOf } from '../basics/terms/match';
 
 let docs: SearchDoc[];
 let index: SearchIndex;
+/** Key terms by topic id, as slugs, to check links to a term. */
+const termSlugs = new Map<string, Set<string>>();
 beforeAll(async () => {
   docs = await buildIndex();
   index = prepare(docs);
+  const topics = await Promise.all(readyTopics().map((t) => t.load!()));
+  for (const t of topics) termSlugs.set(t.id, new Set(t.terms.map((k) => slugOf(k.term))));
 });
 
 const first = (query: string) => search(index, query)[0]?.hits[0]?.doc;
@@ -70,6 +75,7 @@ describe('the index', () => {
           break;
         case 'topic':
           expect(findTopic(route.id)?.status, where).toBe('ready');
+          if (route.term) expect(termSlugs.get(route.id)?.has(route.term), where).toBe(true);
           break;
         case 'category':
         case 'glossary':
@@ -98,7 +104,7 @@ describe('known queries', () => {
     ['port 443', 'port', '#/explore/ports'],
     ['window', 'field', '#/protocols/tcp/1/tcp/window'],
     ['MSS', 'field', '#/protocols/tcp/1/tcp/options'],
-    ['nvme', 'term', '#/basics/hardware/storage'],
+    ['nvme', 'term', '#/basics/hardware/storage/term/nvme'],
     ['cpu', 'basics', '#/basics/hardware/cpu'],
     ['glossary', 'basics', '#/basics/glossary'],
     ['vlan', 'protocol', '#/protocols/vlan/1'],

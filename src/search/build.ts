@@ -6,6 +6,7 @@ import { lessonExchanges } from '../learn/exchanges';
 import { TOOLS, entryHref } from '../tools/registry';
 import { PORTS } from '../tools/ports/data';
 import { CATEGORIES, readyTopics, topicsOf } from '../basics/catalog';
+import { slugOf } from '../basics/terms/match';
 import type { Block } from '../basics/schema';
 import { allQuizzes } from '../quizzes/all';
 import { href } from '../app/router';
@@ -105,7 +106,7 @@ export async function buildIndex(): Promise<SearchDoc[]> {
     docs.push({ kind: 'basics', title: entry.title, context: 'topic', text: plain(`${entry.summary} ${topic.definition} ${topic.why}`), href: link });
     for (const s of topic.sections) docs.push({ kind: 'basics', title: s.heading, context: entry.title, text: plain(s.blocks.map(blockText).join(' ')), href: link });
     for (const m of topic.misconceptions) docs.push({ kind: 'basics', title: m.myth, context: `${entry.title}, misconception`, text: plain(m.truth), href: link });
-    for (const t of topic.terms) docs.push({ kind: 'term', title: t.term, context: entry.title, text: plain(t.definition), href: link });
+    for (const t of topic.terms) docs.push({ kind: 'term', title: t.term, context: entry.title, text: plain(t.definition), href: href.term(entry.category, entry.id, slugOf(t.term)) });
   });
 
   for (const p of CATALOG) {

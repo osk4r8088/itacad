@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
  *   #/learn, #/learn/<id>  learning content; lessons that are exchanges take a step: #/learn/<id>/<step>
  *   #/learn/quizzes/tcp    the quiz of one protocol
  *   #/basics, #/basics/<category>, #/basics/<category>/<topic>  Basics & Concepts
+ *   #/basics/<category>/<topic>/term/<term>  a topic with one of its key terms highlighted
  *   #/basics/glossary      all key terms
  * Links of the old form #/tcp/3 redirect to #/protocols/tcp/3.
  */
@@ -35,7 +36,7 @@ export type Route =
   | { page: 'quiz'; id: string }
   | { page: 'basics' }
   | { page: 'category'; id: string }
-  | { page: 'topic'; category: string; id: string }
+  | { page: 'topic'; category: string; id: string; term?: string }
   | { page: 'glossary' }
   | { page: 'redirect'; to: string };
 
@@ -54,6 +55,7 @@ export const href = {
   basics: '#/basics',
   category: (id: string) => `#/basics/${id}`,
   topic: (category: string, id: string) => `#/basics/${category}/${id}`,
+  term: (category: string, topic: string, slug: string) => `#/basics/${category}/${topic}/term/${slug}`,
   glossary: '#/basics/glossary',
 };
 
@@ -79,7 +81,7 @@ export function parseRoute(hash: string): Route {
       return id ? { page: 'lesson', id, step: stepOf(rest), ...select } : { page: 'learn' };
     case 'basics':
       if (id === 'glossary') return { page: 'glossary' };
-      if (id && rest) return { page: 'topic', category: id, id: rest };
+      if (id && rest) return { page: 'topic', category: id, id: rest, ...(layer === 'term' && field ? { term: field } : {}) };
       return id ? { page: 'category', id } : { page: 'basics' };
     default:
       // Old links: #/tcp/3 meant step 3 of TCP.

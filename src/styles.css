@@ -4418,3 +4418,26 @@ table.compare tbody th {
     order: -1;
   }
 }
+
+/* Key terms of other topics in topic texts (#94): a quieter link than ordinary links. */
+.term-link {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+.term-link:hover,
+.term-link:focus-visible {
+  color: var(--accent);
+  text-decoration-style: solid;
+}
+/* The key term a link pointed to. */
+.terms .is-target {
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  margin: -0.3rem -0.5rem;
+}
+.terms dt:focus {
+  outline: none;
+}

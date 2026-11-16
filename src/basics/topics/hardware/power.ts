@@ -133,7 +133,8 @@ export const power: Topic = {
     { ...ATX, note: 'output rails +12 V, +5 V, +3.3 V and +5 V standby' },
     { spec: 'Intel: ATX12VO (12V Only) Desktop Power Supply Design Guide', note: 'single 12 V rail, other voltages generated on the mainboard' },
     { ...EIGHTY, note: 'efficiency requirements per level and load point' },
-    { spec: 'IEC 62040-3: Uninterruptible power systems (UPS), Part 3: Method of specifying the performance and test requirements', note: 'classification VFD, VI, VFI' },
+    { spec: 'IEC 62040-3: Uninterruptible power systems (UPS), Part 3: Method of specifying the performance and test requirements', note: 'classification VFD, VI, VFI; not freely available, so the classes were checked against the source below' },
+    { spec: 'Schneider Electric: Choosing the Right UPS Topology for IIoT and Critical Power Applications (2016)', url: 'https://blog.se.com/infrastructure-and-grid/power-management-metering-monitoring-power-quality/2016/12/14/ups-topology-iiot-critical-power-applications/', note: 'the three classes of IEC 62040-3 and their common names' },
     { spec: 'Network UPS Tools: user manual', url: 'https://networkupstools.org/docs/user-manual.chunked/index.html', note: 'monitoring a UPS and shutting down on low battery' },
   ],
   quiz: [

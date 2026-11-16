@@ -25,6 +25,8 @@ describe('parseRoute', () => {
     ['#/basics/hardware', { page: 'category', id: 'hardware' }],
     ['#/basics/hardware/cpu', { page: 'topic', category: 'hardware', id: 'cpu' }],
     ['#/basics/glossary', { page: 'glossary' }],
+    ['#/basics/os/virtual-memory/term/page-table', { page: 'topic', category: 'os', id: 'virtual-memory', term: 'page-table' }],
+    ['#/basics/os/virtual-memory/other/page-table', { page: 'topic', category: 'os', id: 'virtual-memory' }],
     ['#/tcp/3', { page: 'redirect', to: '#/protocols/tcp/3' }],
     ['#/dns', { page: 'redirect', to: '#/protocols/dns/1' }],
   ])('%s', (hash, route) => {

@@ -10,8 +10,16 @@ import { CATEGORIES, categoryOf, findTopic, readyTopics, topicsOf, type TopicEnt
 import { FIGURES } from './figures';
 import { resolveRef } from '../app/entries';
 import type { Block, Command, Topic, TopicQuestion } from './schema';
+import TERMS from 'virtual:term-index';
+import { expandTermIndex } from './terms/build';
+import { compileMatcher, slugOf } from './terms/match';
+import { linkTopic, type LinkedBlock } from './terms/topic';
+import { LinkedText } from './terms/LinkedText';
 
-export type BasicsRoute = { page: 'basics' } | { page: 'category'; id: string } | { page: 'topic'; category: string; id: string } | { page: 'glossary' };
+/** Key terms of all topics that may be linked, compiled once for every topic page. */
+const MATCHER = compileMatcher(expandTermIndex(TERMS));
+
+export type BasicsRoute = { page: 'basics' } | { page: 'category'; id: string } | { page: 'topic'; category: string; id: string; term?: string } | { page: 'glossary' };
 
 /** All pages of Basics & Concepts, rendered from the catalog and the topic data. */
 export default function BasicsPages({ route }: { route: BasicsRoute }) {
@@ -21,7 +29,7 @@ export default function BasicsPages({ route }: { route: BasicsRoute }) {
     case 'category':
       return <CategoryPage id={route.id} />;
     case 'topic':
-      return <TopicPage id={route.id} />;
+      return <TopicPage id={route.id} term={route.term} />;
     case 'glossary':
       return <GlossaryPage />;
   }
@@ -164,7 +172,7 @@ function TopicCard({ topic: t }: { topic: TopicEntry }) {
 
 type Loaded<T> = { status: 'loading' } | { status: 'ready'; data: T } | { status: 'failed' };
 
-function TopicPage({ id }: { id: string }) {
+function TopicPage({ id, term }: { id: string; term?: string }) {
   const entry = findTopic(id);
   const [state, setState] = useState<Loaded<Topic>>({ status: 'loading' });
   useTitle(entry?.title ?? 'Basics & Concepts');
@@ -195,11 +203,21 @@ function TopicPage({ id }: { id: string }) {
     );
   if (state.status === 'loading') return <p className="notice muted">Loading...</p>;
   if (state.status === 'failed') return <p className="notice">Could not load this topic. Reload the page to try again.</p>;
-  return <TopicView topic={state.data} />;
+  return <TopicView topic={state.data} term={term} />;
 }
 
-function TopicView({ topic: t }: { topic: Topic }) {
+function TopicView({ topic: t, term }: { topic: Topic; term?: string }) {
   const category = categoryOf(t.category)!;
+  const linked = useMemo(() => linkTopic(t, MATCHER), [t]);
+
+  // A link to a key term opens the topic at that term.
+  useEffect(() => {
+    if (!term) return;
+    const target = document.getElementById(`term-${term}`);
+    if (!target) return;
+    target.scrollIntoView({ block: 'center' });
+    target.focus({ preventScroll: true });
+  }, [t, term]);
   const siblings = topicsOf(t.category).filter((s) => s.status === 'ready');
   const index = siblings.findIndex((s) => s.id === t.id);
   const prev = siblings[index - 1];
@@ -213,16 +231,18 @@ function TopicView({ topic: t }: { topic: Topic }) {
       </p>
       <h1>{t.title}</h1>
       <ReadFirst entry={{ topic: t.id }} />
-      <p className="lead topic-definition">{t.definition}</p>
+      <p className="lead topic-definition">
+        <LinkedText segments={linked.definition} />
+      </p>
       <p className="topic-why">
-        <strong>Why it matters:</strong> {t.why}
+        <strong>Why it matters:</strong> <LinkedText segments={linked.why} />
       </p>
 
-      {t.sections.map((s) => (
+      {t.sections.map((s, si) => (
         <section key={s.heading} className="topic-section">
           <h2>{s.heading}</h2>
-          {s.blocks.map((b, i) => (
-            <BlockView key={i} block={b} />
+          {linked.sections[si].map((b, i) => (
+            <LinkedBlockView key={i} block={b} />
           ))}
         </section>
       ))}
@@ -230,13 +250,13 @@ function TopicView({ topic: t }: { topic: Topic }) {
       <section className="topic-section">
         <h2>Common misconceptions</h2>
         <ul className="misconceptions">
-          {t.misconceptions.map((m) => (
+          {t.misconceptions.map((m, mi) => (
             <li key={m.myth}>
               <p className="myth">
-                <span className="tag">Myth</span> {m.myth}
+                <span className="tag">Myth</span> <LinkedText segments={linked.misconceptions[mi].myth} />
               </p>
               <p>
-                <span className="tag">In fact</span> {m.truth}
+                <span className="tag">In fact</span> <LinkedText segments={linked.misconceptions[mi].truth} />
               </p>
             </li>
           ))}
@@ -279,10 +299,12 @@ function TopicView({ topic: t }: { topic: Topic }) {
       <section className="topic-section">
         <h2>Key terms</h2>
         <dl className="terms">
-          {t.terms.map((term) => (
-            <div key={term.term}>
-              <dt>{term.term}</dt>
-              <dd>{term.definition}</dd>
+          {t.terms.map((k) => (
+            <div key={k.term} className={slugOf(k.term) === term ? 'is-target' : undefined}>
+              <dt id={`term-${slugOf(k.term)}`} tabIndex={-1}>
+                {k.term}
+              </dt>
+              <dd>{k.definition}</dd>
             </div>
           ))}
         </dl>
@@ -320,6 +342,36 @@ function TopicView({ topic: t }: { topic: Topic }) {
       </nav>
     </article>
   );
+}
+
+/** A block whose running text may contain linked key terms. */
+function LinkedBlockView({ block: b }: { block: LinkedBlock }) {
+  switch (b.kind) {
+    case 'text':
+      return (
+        <p>
+          <LinkedText segments={b.segments} />
+        </p>
+      );
+    case 'note':
+      return (
+        <p className="topic-note">
+          <LinkedText segments={b.segments} />
+        </p>
+      );
+    case 'list':
+      return (
+        <ul>
+          {b.items.map((item, i) => (
+            <li key={i}>
+              <LinkedText segments={item} />
+            </li>
+          ))}
+        </ul>
+      );
+    case 'other':
+      return <BlockView block={b.block} />;
+  }
 }
 
 function BlockView({ block: b }: { block: Block }) {
@@ -516,7 +568,7 @@ function GlossaryPage() {
               <div key={`${e.term}-${e.topic.id}`}>
                 <dt>{e.term}</dt>
                 <dd>
-                  {e.definition} <a href={href.topic(e.topic.category, e.topic.id)}>{e.topic.title}</a>
+                  {e.definition} <a href={href.term(e.topic.category, e.topic.id, slugOf(e.term))}>{e.topic.title}</a>
                 </dd>
               </div>
             ))}

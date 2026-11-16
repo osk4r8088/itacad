@@ -159,6 +159,8 @@ src/basics/
   catalog.ts              categories and topics (metadata; topics load on demand)
   topics/<category>/      one file per topic
   figures/                diagrams and interactive pieces that topics refer to by id
+  terms/                  key terms of other topics linked in topic texts: matcher, exclusions,
+                          the term index built with the site, and its tests
   BasicsPages.tsx         overview, category, topic and glossary pages
 src/search/
   build.ts                builds the index from catalogs, registries, exchanges, topics, ports and quizzes
@@ -198,7 +200,8 @@ Every topic, protocol, tool and lesson has a `level` (1 Foundations, 2 Practitio
 1. Create `src/basics/topics/<category>/<id>.ts` exporting a `Topic` (see `src/basics/schema.ts`). Sections are made of blocks: text, list, comparison table, note, or a figure by id.
 2. Add the topic to `TOPICS` in `src/basics/catalog.ts` with its level, prerequisites and a loader, or flip a planned entry to ready.
 3. An interactive piece is a small component in `src/basics/figures/`, registered in `figures/index.ts`; topics refer to it by id.
-4. `pnpm test` checks that every part of the template is there, that related links and figures resolve, that quiz answers are valid, that glossary terms are unique, and that no source is Wikipedia.
+4. Key terms of other topics are linked in the running text by themselves; nothing is written by hand. A term is linked once per section and never in its own topic. If a new topic uses a linked term in another sense (a "table" that is a routing table), add it to `src/basics/terms/exclusions.ts`: to `EXCLUDED` when the word is ambiguous in general, to `EXCLUDED_IN` when only that topic uses it differently. Terms with a qualifier, such as "Service (cluster)", are never linked.
+5. `pnpm test` checks that every part of the template is there, that related links and figures resolve, that quiz answers are valid, that glossary terms are unique, and that no source is Wikipedia.
 
 Sources for topics without RFCs: formal standards first (ISO/IEC, IEEE, JEDEC, NIST, vendor-neutral specifications), then official documentation, then established textbooks. Values that vary between machines are given as typical ranges and say so.
 
@@ -240,6 +243,7 @@ Hash routes work on any static host:
 | `#/learn/quizzes/tcp`, `#/learn/quizzes/syn-flood` | the quiz of one protocol or lesson |
 | `#/basics`, `#/basics/<category>` | Basics & Concepts, one category |
 | `#/basics/<category>/<topic>` | one topic |
+| `#/basics/<category>/<topic>/term/<term>` | the topic with one of its key terms highlighted |
 | `#/basics/glossary` | all key terms |
 
 Old links of the form `#/tcp/3` redirect to `#/protocols/tcp/3`. Build links with the `href` helpers in `src/app/router.ts`.

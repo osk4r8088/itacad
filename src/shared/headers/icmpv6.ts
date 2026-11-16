@@ -25,7 +25,7 @@ const checksumField: FieldDef = {
     'Internet checksum over the ICMPv6 message and an IPv6 pseudo-header: source and destination address, length and Next Header 58. Unlike ICMP for IPv4, the addresses are covered, because IPv6 has no header checksum of its own. The value shown is computed for this example.',
   source: { rfc: 4443, section: '2.3' },
 };
-const optionsField = (about: string, section: string): FieldDef => ({ id: 'options', name: 'Options', bits: 'variable', about, source: ND(section) });
+const optionsField = (about: string, section: string): FieldDef => ({ id: 'options', name: 'Options', bits: 'variable', compact: true, about, source: ND(section) });
 const targetField = (about: string, section: string): FieldDef => ({ id: 'target', name: 'Target Address', bits: 128, about, source: ND(section) });
 const reservedField = (bits: number, section: string): FieldDef => ({ id: 'reserved', name: 'Reserved', bits, about: 'Zero when sent, ignored when received.', source: ND(section) });
 

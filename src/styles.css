@@ -339,6 +339,10 @@ main {
     flex: 1;
     min-width: 0;
   }
+  /* A long step label without spaces wraps instead of widening the page. */
+  .controls-label {
+    overflow-wrap: break-word;
+  }
   .controls-hint {
     display: none;
   }
@@ -1051,6 +1055,17 @@ main {
 .option th {
   font-weight: 600;
   white-space: nowrap;
+}
+/* Long values without spaces (hex strings, names with underscores) wrap instead of widening the page. */
+.option td.mono,
+.option > strong {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .option th {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 .hex {
   margin: 0.8rem 0 0;
@@ -3672,6 +3687,18 @@ table.compare tbody th {
   .ex-title > .level {
     display: none;
   }
+  /* A long protocol title must not push the search button out of a narrow screen. */
+  .ex-title {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+  }
+  /* Six layers at their minimum width are wider than a 320 px screen: scroll the bar, not the page.
+     The padding keeps the outline of the selected layer visible inside the scroll box. */
+  .encap > .encap-bar {
+    overflow-x: auto;
+    padding: 3px;
+    margin: -3px;
+  }
 }
 
 /* ---- Site search ---- */
@@ -4372,5 +4399,22 @@ table.compare tbody th {
   .idx-track {
     grid-column: 1 / -1;
     grid-row: 2;
+  }
+}
+
+/* Long tokens in step texts (keys, header values) wrap instead of widening the page on a phone. */
+.step-details {
+  overflow-wrap: break-word;
+}
+
+/* On very narrow screens the step label gets a line of its own above the buttons. */
+@media (max-width: 380px) {
+  .controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .controls-status {
+    flex: 1 1 100%;
+    order: -1;
   }
 }

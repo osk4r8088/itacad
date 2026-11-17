@@ -28,6 +28,7 @@ export const EXCLUDED: Record<string, string> = {
   Process: 'to process, as a verb',
   Redundancy: 'redundancy in data that compression removes',
   Region: 'regions of a code page',
+  Remote: 'the remote end of a connection, a remote host',
   Registry: 'the Windows registry',
   Repository: 'image repositories in a container registry',
   Restore: 'restoring a saved state in general',
@@ -55,10 +56,33 @@ export const EXCLUDED: Record<string, string> = {
 export const EXCLUDED_FORMS: Record<string, string> = {
   ECC: 'error-correcting code memory, not elliptic-curve cryptography',
   MAC: 'medium access control and MAC addresses, not message authentication code',
+  RTO: 'the retransmission timeout of TCP, not a recovery time objective',
 };
 
-/** Terms that are linked in general, but not in the topics listed, where they mean something else. */
+/**
+ * Terms that are linked in general, but not on the pages listed, where they mean something else.
+ * A page is a topic id, an exchange ("protocols/tcp", "learn/syn-flood"), or all exchanges of a
+ * section ("protocols/*", "learn/*"): network protocols use some words in their own sense.
+ */
 export const EXCLUDED_IN: Record<string, string[]> = {
+  // DNS queries and the like, not database queries.
+  Query: ['protocols/*', 'learn/*'],
+  // DHCP and SMTP transactions, request and answer that belong together.
+  Transaction: ['protocols/*', 'learn/*'],
+  // Capabilities that a protocol peer announces (TCP options, IMAP CAPABILITY).
+  Capabilities: ['protocols/*', 'learn/*'],
+  // TLS alerts, messages that end a connection.
+  Alert: ['protocols/*'],
+  // Salts of key derivation (HKDF in QUIC and TLS), not password salts.
+  Salt: ['protocols/*', 'learn/*'],
+  // IP address spaces, not the virtual address space of a process.
+  'Address space': ['protocols/*', 'learn/*'],
+  // The UID of a message in IMAP.
+  'User ID (UID)': ['protocols/imap'],
+  // A second log server, not a backup copy of data.
+  Backup: ['protocols/udp'],
+  // A queue that overflows, not an arithmetic overflow.
+  Overflow: ['learn/syn-flood'],
   // To interrupt, as a verb: an outage interrupts a service, an alert interrupts a person.
   Interrupt: ['high-availability', 'monitoring'],
   // To swap, as a verb.
@@ -75,6 +99,6 @@ export const EXCLUDED_IN: Record<string, string[]> = {
   Thread: ['cpu'],
   // The scheduler of a cluster, which places pods on nodes.
   Scheduler: ['orchestration'],
-  // COMMIT of a database transaction, not a version control commit.
-  Commit: ['transactions', 'sql-basics'],
+  // COMMIT of a database transaction, and to commit to an address in DHCP; not a version control commit.
+  Commit: ['transactions', 'sql-basics', 'protocols/*', 'learn/*'],
 };

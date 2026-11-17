@@ -4,7 +4,10 @@ import type { Topic } from '../schema';
 import { href, parseRoute } from '../../app/router';
 import { buildTermIndex, expandTermIndex } from './build';
 import { EXCLUDED, EXCLUDED_FORMS, EXCLUDED_IN } from './exclusions';
-import { compileMatcher, linkTerms, slugOf, termForms, type LinkableTerm, type Matcher, type Segment } from './match';
+import { compileMatcher, excludedOn, linkProse, linkTerms, slugOf, termForms, type LinkableTerm, type Matcher, type Segment } from './match';
+import { exchangePage, linkAbout, linkStepDetails } from './exchange';
+import { exchanges as protocolExchanges } from '../../protocols/exchanges';
+import { lessonExchanges } from '../../learn/exchanges';
 import { linkTopic, type LinkedTopic } from './topic';
 
 const entry = (term: string, topic = 't', extra: Partial<LinkableTerm> = {}): LinkableTerm => ({
@@ -64,6 +67,20 @@ describe('linkTerms', () => {
   });
 });
 
+describe('pages in exclusion lists', () => {
+  it('matches a page directly or through its section', () => {
+    expect(excludedOn(['gpu'], 'gpu')).toBe(true);
+    expect(excludedOn(['protocols/*'], 'protocols/dns')).toBe(true);
+    expect(excludedOn(['protocols/*'], 'learn/dns-poisoning')).toBe(false);
+    expect(excludedOn(['protocols/imap'], 'protocols/imaps')).toBe(false);
+    expect(excludedOn(undefined, 'cpu')).toBe(false);
+  });
+  it('links paragraphs with one shared set', () => {
+    const m = compileMatcher([entry('Kernel', 'kernel')]);
+    expect(linkProse('A kernel.\n\nThe kernel again.', m, 'other', new Set()).map(links)).toEqual([['kernel>Kernel'], []]);
+  });
+});
+
 describe('the term index and all topics', () => {
   let terms: LinkableTerm[];
   let matcher: Matcher;
@@ -104,7 +121,8 @@ describe('the term index and all topics', () => {
   it('names only existing terms and topics in the exclusion lists', () => {
     const all = topics.flatMap((t) => t.terms.map((k) => k.term));
     for (const term of [...Object.keys(EXCLUDED), ...Object.keys(EXCLUDED_IN)]) expect(all, term).toContain(term);
-    for (const ids of Object.values(EXCLUDED_IN)) for (const id of ids) expect(findTopic(id), id).toBeDefined();
+    const pages = new Set([...readyTopics().map((t) => t.id), ...protocolExchanges.map((e) => exchangePage(e, false)), ...lessonExchanges.map((e) => exchangePage(e, true)), 'protocols/*', 'learn/*']);
+    for (const ids of Object.values(EXCLUDED_IN)) for (const id of ids) expect(pages, id).toContain(id);
   });
 
   it('leaves excluded terms and shared abbreviations out of the index', () => {
@@ -147,5 +165,45 @@ describe('the term index and all topics', () => {
   it('links a reasonable share of the topics', () => {
     const count = linked.reduce((n, l) => n + groups(l).reduce((m, g) => m + termsIn(g).length, 0), 0);
     expect(count).toBeGreaterThan(300);
+  });
+});
+
+describe('term links on protocol and lesson exchanges', () => {
+  let matcher: Matcher;
+  beforeAll(async () => {
+    matcher = compileMatcher(expandTermIndex(await buildTermIndex()));
+  });
+  const all = () => [...protocolExchanges.map((e) => ({ e, page: exchangePage(e, false) })), ...lessonExchanges.map((e) => ({ e, page: exchangePage(e, true) }))];
+  const text = (paragraphs: Segment[][]) => paragraphs.map((p) => p.map((x) => (typeof x === 'string' ? x : x.text)).join('')).join('\n\n');
+  const termsIn = (paragraphs: Segment[][]) => paragraphs.flat().flatMap((s) => (typeof s === 'string' ? [] : [s.term]));
+
+  it('keeps every text unchanged apart from the links', () => {
+    for (const { e, page } of all()) {
+      const about = linkAbout(e, matcher, page);
+      expect(text([about.scenario]), e.id).toBe(e.scenario);
+      expect(text(about.intro).replace(/\n\s*\n/g, '\n\n'), e.id).toBe(e.intro.replace(/\n\s*\n/g, '\n\n'));
+      for (const s of e.steps) {
+        const l = linkStepDetails(s.details, matcher, page);
+        for (const k of ['what', 'why', 'typical', 'wrong', 'insight'] as const) {
+          const original = s.details[k];
+          if (original) expect(text(l[k]!).replace(/\n\s*\n/g, '\n\n'), `${page} ${s.id} ${k}`).toBe(original.replace(/\n\s*\n/g, '\n\n'));
+        }
+      }
+    }
+  });
+
+  it('links each term at most once per step, and never where it is excluded', () => {
+    let count = 0;
+    for (const { e, page } of all()) {
+      for (const s of e.steps) {
+        const l = linkStepDetails(s.details, matcher, page);
+        const found = [l.what, l.why, l.typical ?? [], l.wrong ?? [], l.insight ?? []].flatMap(termsIn);
+        count += found.length;
+        for (const t of found) expect(excludedOn(t.notIn, page), `${page} ${s.id}: ${t.term}`).toBe(false);
+        const keys = found.map((t) => `${t.topic}/${t.slug}`);
+        expect(new Set(keys).size, `${page} ${s.id}`).toBe(keys.length);
+      }
+    }
+    expect(count).toBeGreaterThan(200);
   });
 });

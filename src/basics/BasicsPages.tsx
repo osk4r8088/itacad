@@ -10,14 +10,11 @@ import { CATEGORIES, categoryOf, findTopic, readyTopics, topicsOf, type TopicEnt
 import { FIGURES } from './figures';
 import { resolveRef } from '../app/entries';
 import type { Block, Command, Topic, TopicQuestion } from './schema';
-import TERMS from 'virtual:term-index';
-import { expandTermIndex } from './terms/build';
-import { compileMatcher, slugOf } from './terms/match';
+import { MATCHER } from './terms/matcher';
+import { slugOf } from './terms/match';
 import { linkTopic, type LinkedBlock } from './terms/topic';
 import { LinkedText } from './terms/LinkedText';
 
-/** Key terms of all topics that may be linked, compiled once for every topic page. */
-const MATCHER = compileMatcher(expandTermIndex(TERMS));
 
 export type BasicsRoute = { page: 'basics' } | { page: 'category'; id: string } | { page: 'topic'; category: string; id: string; term?: string } | { page: 'glossary' };
 

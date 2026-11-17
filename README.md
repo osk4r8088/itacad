@@ -159,8 +159,8 @@ src/basics/
   catalog.ts              categories and topics (metadata; topics load on demand)
   topics/<category>/      one file per topic
   figures/                diagrams and interactive pieces that topics refer to by id
-  terms/                  key terms of other topics linked in topic texts: matcher, exclusions,
-                          the term index built with the site, and its tests
+  terms/                  key terms linked in topic texts, step texts and lessons: matcher,
+                          exclusions, the term index built with the site, and its tests
   BasicsPages.tsx         overview, category, topic and glossary pages
 src/search/
   build.ts                builds the index from catalogs, registries, exchanges, topics, ports and quizzes
@@ -181,8 +181,9 @@ Each protocol, tool and lesson is loaded only when it is opened.
 
 1. If the protocol has a header that does not exist yet, add `src/shared/headers/<name>.ts` with a `LayerDef` (fields with their RFC names and sizes, `about` texts, sources) and a builder function. Add a stack helper to `stacks.ts` if the encapsulation is new. Text protocols over TCP need no new header code: build their messages with `textMessage` and send them with `TcpConversation`.
 2. Create `src/protocols/exchanges/<name>.ts` exporting an `Exchange`: participants with positions, links, initial states and steps. Each step has a sender, receiver, the path through the network, details texts, key fields and one capture per link of interest. For the packet flow table each step also has a send time, a category, a protocol name and an info line in the style of a packet analyzer.
-3. Add it to `src/protocols/exchanges/index.ts` and to `src/protocols/catalog.ts` (id, title, summary, group, loader). To show it as a highlight on the start page, add it to `src/app/sections.ts`. Its `group` (Application, Security, Transport, Internet, Link) decides where it appears in the menu.
-4. Run `pnpm test`.
+3. Key terms of Basics & Concepts are linked in the step texts and the introduction by themselves. Read them on the page: if the protocol uses a linked word in its own sense (a DNS query, a TLS alert), add the term to `EXCLUDED_IN` in `src/basics/terms/exclusions.ts` with `protocols/<id>`, or with `protocols/*` when it holds for network protocols in general.
+4. Add it to `src/protocols/exchanges/index.ts` and to `src/protocols/catalog.ts` (id, title, summary, group, loader). To show it as a highlight on the start page, add it to `src/app/sections.ts`. Its `group` (Application, Security, Transport, Internet, Link) decides where it appears in the menu.
+5. Run `pnpm test`.
 
 ## Adding a tool or lesson
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SECTIONS } from './sections';
 import { PATHS, resolveRef } from './entries';
 import { LEVELS, type Level } from '../shared/levels';
+import { ProgressNote, VisitedCount, VisitedTag } from '../shared/components/Progress';
 
 /** Start page: a suggested path for the reader's level, then one tile per section. Everything comes from the registries. */
 export function Home() {
@@ -22,18 +23,21 @@ export function Home() {
             </button>
           ))}
         </div>
-        <p className="muted">{path.about}</p>
+        <p className="muted">
+          {path.about} <VisitedCount entries={path.steps.map((s) => s.ref)} className="progress-count" />
+        </p>
         <ol>
           {path.steps.map((step) => {
             const info = resolveRef(step.ref)!;
             return (
               <li key={info.href}>
-                <a href={info.href}>{info.title}</a>
+                <a href={info.href}>{info.title}</a> <VisitedTag entry={step.ref} />
                 <span className="muted"> {step.why}</span>
               </li>
             );
           })}
         </ol>
+        <ProgressNote />
       </section>
 
       <ul className="section-tiles" aria-label="Sections">

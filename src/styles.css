@@ -4441,3 +4441,39 @@ table.compare tbody th {
 .terms dt:focus {
   outline: none;
 }
+
+/* Progress kept in this browser (#95). */
+.tag.visited {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.card .tag.visited {
+  margin-top: 0.35rem;
+  padding-top: 0.05rem;
+  align-self: flex-start;
+}
+.progress-count {
+  white-space: nowrap;
+}
+.quiz-history {
+  display: block;
+  font-size: 0.85rem;
+}
+.card .quiz-history {
+  margin-top: auto;
+  padding-top: 0.35rem;
+  color: var(--muted);
+}
+.progress-note {
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+}
+.progress-note .link-button {
+  font-size: inherit;
+  padding: 0;
+}

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { navGroups } from '../catalog';
+import { CATALOG, navGroups } from '../catalog';
 import { href } from '../../app/router';
 import { sectionAbout } from '../../app/sections';
 import type { Level } from '../../shared/levels';
 import { LevelBadge } from '../../shared/components/LevelBadge';
 import { LevelFilter } from '../../shared/components/LevelFilter';
+import { VisitedCount, VisitedTag } from '../../shared/components/Progress';
 
 /** Overview: all protocols, grouped by layer from top (application) to bottom (link), filterable by level. */
 export function ProtocolIndex() {
@@ -15,6 +16,9 @@ export function ProtocolIndex() {
   return (
     <div className="index">
       <p className="lead">{sectionAbout('protocols')}</p>
+      <p>
+        <VisitedCount entries={CATALOG.map((p) => ({ protocol: p.id }))} />
+      </p>
       <LevelFilter value={level} onChange={setLevel} />
       <div className="layer-map">
         {groups.map((g) => (
@@ -28,6 +32,7 @@ export function ProtocolIndex() {
                       <strong>{e.title}</strong>
                       <span>{e.summary}</span>
                       {e.level && <LevelBadge level={e.level} />}
+                      <VisitedTag entry={{ protocol: e.id }} />
                     </a>
                   ) : (
                     <div className="card planned" aria-disabled="true">

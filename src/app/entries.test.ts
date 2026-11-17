@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PATHS, allEntries, resolveRef } from './entries';
+import { PATHS, allEntries, resolveRef, visitedRef } from './entries';
 import { parseRoute } from './router';
 import type { Level } from '../shared/levels';
 import type { EntryRef } from '../shared/refs';
@@ -47,5 +47,26 @@ describe('start page paths', () => {
       expect(parseRoute(info!.href).page, info!.href).not.toBe('redirect');
       expect(step.why).not.toContain('—');
     }
+  });
+});
+
+describe('visits for the reader\'s progress', () => {
+  it.each([
+    ['#/basics/hardware/cpu', { topic: 'cpu' }],
+    ['#/basics/os/virtual-memory/term/page-table', { topic: 'virtual-memory' }],
+    ['#/protocols/tcp/3', { protocol: 'tcp' }],
+    ['#/protocols/tcp/3/tcp/window', { protocol: 'tcp' }],
+    ['#/learn/syn-flood/2', { entry: 'syn-flood' }],
+    ['#/learn/layers/4', { entry: 'layers' }],
+    ['#/tools/subnet', { entry: 'subnet' }],
+    ['#/explore/raid', { entry: 'raid' }],
+  ])('%s counts as a visit', (hash, ref) => {
+    expect(visitedRef(parseRoute(hash))).toEqual(ref);
+  });
+  it.each(['#/', '#/basics', '#/basics/hardware', '#/basics/glossary', '#/protocols', '#/learn', '#/learn/quizzes/tcp', '#/protocols/nope/1', '#/basics/hardware/nope', '#/learn/subnet', '#/tools/raid'])('%s does not', (hash) => {
+    expect(visitedRef(parseRoute(hash))).toBeUndefined();
+  });
+  it('counts every step of every start page path', () => {
+    for (const level of [1, 2, 3] as Level[]) for (const step of PATHS[level].steps) expect(visitedRef(parseRoute(resolveRef(step.ref)!.href)), JSON.stringify(step.ref)).toEqual(step.ref);
   });
 });

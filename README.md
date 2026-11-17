@@ -78,6 +78,10 @@ Interactive models and references that show how something works inside. A sectio
 
 One search field for the whole site, in the header of every page (shortcut `/`). It finds topics, protocols, tools, lessons, single steps, header fields, glossary terms, ports and quiz questions, grouped by kind. A header field opens in the packet view of a step that shows it. The index is built together with the site and loaded when the search is opened; nothing is sent anywhere.
 
+### Progress, in this browser only
+
+Opening a topic, protocol, lesson or tool marks it as visited, and every quiz keeps its last and best result with the date of the last attempt. Cards, category tiles, the start page paths and the quiz overview show it. Everything stays in the browser's local storage, nothing is sent anywhere, and the start page has a button to reset it. Where the browser does not allow storage, progress lasts until the page is closed. The logic is in `src/shared/progress.ts`, the pieces on the pages in `src/shared/components/Progress.tsx`.
+
 ### Correct by construction
 
 - Every field name, size and meaning follows the RFCs (IEEE 802.3 for Ethernet), and every page lists its sources.
@@ -194,7 +198,7 @@ Lessons work the same way in `src/learn/`. A lesson can also be an exchange: giv
 
 ## Levels and prerequisites
 
-Every topic, protocol, tool and lesson has a `level` (1 Foundations, 2 Practitioner, 3 Deep dive; see `src/shared/levels.ts`) and optional `prereqs`, references to other entries shown as "Read first" links. Cards show the level, and overview pages filter by it. The start page suggests a path per level, defined in `PATHS` in `src/app/entries.ts`. `pnpm test` checks that prerequisites exist, are never at a higher level than the entry, and form no cycles, and that the paths link only to ready pages. Nothing is stored about the reader.
+Every topic, protocol, tool and lesson has a `level` (1 Foundations, 2 Practitioner, 3 Deep dive; see `src/shared/levels.ts`) and optional `prereqs`, references to other entries shown as "Read first" links. Cards show the level, and overview pages filter by it. The start page suggests a path per level, defined in `PATHS` in `src/app/entries.ts`. `pnpm test` checks that prerequisites exist, are never at a higher level than the entry, and form no cycles, and that the paths link only to ready pages, each of which counts as visited when opened. The reader's progress stays in the browser (see Progress above).
 
 ## Adding a Basics & Concepts topic
 

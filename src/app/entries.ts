@@ -1,4 +1,4 @@
-import { href } from './router';
+import { href, type Route } from './router';
 import { CATALOG } from '../protocols/catalog';
 import { LESSONS } from '../learn/registry';
 import { TOOLS, entryHref } from '../tools/registry';
@@ -105,3 +105,22 @@ export const PATHS: Record<Level, { about: string; steps: PathStep[] }> = {
     ],
   },
 };
+
+/**
+ * The entry a route shows, if it counts for the reader's progress: a topic, protocol, lesson or tool.
+ * Tools count because the start page paths contain them. Overview pages and planned or unknown entries count for nothing.
+ */
+export function visitedRef(route: Route): EntryRef | undefined {
+  const ref: EntryRef | undefined =
+    route.page === 'topic'
+      ? { topic: route.id }
+      : route.page === 'exchange'
+        ? { protocol: route.id }
+        : route.page === 'lesson' || route.page === 'tool' || route.page === 'explorer'
+          ? { entry: route.id }
+          : undefined;
+  const info = ref && resolveRef(ref);
+  if (!info || info.planned) return undefined;
+  const kind = { lesson: 'Lesson', tool: 'Tool', explorer: 'Explore' }[route.page as string];
+  return kind && info.kind !== kind ? undefined : ref;
+}

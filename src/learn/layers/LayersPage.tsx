@@ -6,6 +6,9 @@ import { TOOLS, entryHref } from '../../tools/registry';
 import { tcpExchange } from '../../protocols/exchanges/tcp';
 import { href } from '../../app/router';
 import { SourceList } from '../../shared/components/SourceList';
+import { MATCHER } from '../../basics/terms/matcher';
+import { linkTerms } from '../../basics/terms/match';
+import { LinkedText } from '../../basics/terms/LinkedText';
 import { LAYERS, SOURCES, UNIT_NOTE, placementOf } from './data';
 
 const OSI_ORDER: OsiLayer[] = [7, 6, 5, 4, 3, 2, 1];
@@ -134,7 +137,9 @@ export default function LayersPage() {
           <h2>
             Layer {layer}: {OSI_LAYERS[layer].name}
           </h2>
-          <p>{facts.job}</p>
+          <p>
+            <LinkedText segments={linkTerms(facts.job, MATCHER, 'learn/layers', new Set())} />
+          </p>
           <dl className="layers-facts">
             <dt>Unit of data</dt>
             <dd>{facts.unit}</dd>

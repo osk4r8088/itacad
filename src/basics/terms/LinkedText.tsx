@@ -18,3 +18,16 @@ export function LinkedText({ segments }: { segments: Segment[] }) {
     </>
   );
 }
+
+/** Paragraphs of linked text, as Prose renders plain text. */
+export function LinkedProse({ paragraphs }: { paragraphs: Segment[][] }) {
+  return (
+    <>
+      {paragraphs.map((p, i) => (
+        <p key={i}>
+          <LinkedText segments={p} />
+        </p>
+      ))}
+    </>
+  );
+}

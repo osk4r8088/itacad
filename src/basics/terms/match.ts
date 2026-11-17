@@ -12,7 +12,10 @@ export interface LinkableTerm {
   slug: string;
   /** The words that are matched in texts, longest first; see termForms. */
   forms: string[];
-  /** Topics in which this term means something else and is never linked. */
+  /**
+   * Pages on which this term means something else and is never linked: a topic id ("gpu"), an exchange
+   * ("protocols/tcp", "learn/syn-flood"), or every exchange of a section ("protocols/*").
+   */
   notIn?: string[];
 }
 
@@ -76,20 +79,25 @@ export function compileMatcher(terms: LinkableTerm[]): Matcher {
   return { pattern, forms };
 }
 
+/** Whether a page is named in a notIn list, directly or through "<section>/*". */
+export const excludedOn = (notIn: string[] | undefined, page: string): boolean =>
+  notIn?.some((p) => p === page || (p.endsWith('/*') && page.startsWith(p.slice(0, -1)))) ?? false;
+
 /**
  * Splits a text into plain pieces and linked terms.
- * `topic` is the topic the text belongs to: its own terms are never linked there.
+ * `page` names where the text is shown: a topic id, or "protocols/<id>" and "learn/<id>" for exchanges.
+ * A topic never links its own terms.
  * `linked` collects the terms already linked in the current section, so that each term is linked
  * once per section; pass the same set for every text of one section.
  */
-export function linkTerms(text: string, matcher: Matcher, topic: string, linked: Set<string>): Segment[] {
+export function linkTerms(text: string, matcher: Matcher, page: string, linked: Set<string>): Segment[] {
   const out: Segment[] = [];
   let last = 0;
   for (const m of text.matchAll(matcher.pattern)) {
     const index = m.slice(1).findIndex((g) => g !== undefined);
     const { term } = matcher.forms[index];
     const key = `${term.topic}/${term.slug}`;
-    if (term.topic === topic || term.notIn?.includes(topic) || linked.has(key)) continue;
+    if (term.topic === page || excludedOn(term.notIn, page) || linked.has(key)) continue;
     linked.add(key);
     if (m.index! > last) out.push(text.slice(last, m.index));
     out.push({ text: m[0], term });
@@ -98,3 +106,7 @@ export function linkTerms(text: string, matcher: Matcher, topic: string, linked:
   if (last < text.length) out.push(text.slice(last));
   return out;
 }
+
+/** A text with paragraphs separated by blank lines, as Prose renders it, linked paragraph by paragraph. */
+export const linkProse = (text: string, matcher: Matcher, page: string, linked: Set<string>): Segment[][] =>
+  text.split(/\n\s*\n/).map((p) => linkTerms(p, matcher, page, linked));

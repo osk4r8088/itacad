@@ -1,7 +1,10 @@
 import type { Exchange, OsiLayer, Step } from '../../shared/schema';
 import { OSI_LAYERS } from '../../shared/layers';
 import type { Selection } from '../../shared/components/PacketView';
-import { Prose } from '../../shared/components/Prose';
+import { useMemo } from 'react';
+import { MATCHER } from '../../basics/terms/matcher';
+import { linkStepDetails } from '../../basics/terms/exchange';
+import { LinkedProse } from '../../basics/terms/LinkedText';
 import { SourceLink } from '../../shared/components/SourceList';
 
 /** OSI layers carried in the first capture of a step, as "1 Physical", "2 Data Link", ... */
@@ -44,10 +47,12 @@ interface Props {
   exchange: Exchange;
   step: Step;
   index: number;
+  /** Page id for the key term links: "protocols/<id>" or "learn/<id>". */
+  page: string;
   onSelectField: (s: Selection) => void;
 }
 
-export function StepDetails({ exchange, step, index, onSelectField }: Props) {
+export function StepDetails({ exchange, step, index, page, onSelectField }: Props) {
   const name = (id: string) => exchange.participants.find((p) => p.id === id)?.label ?? id;
   const layers = step.captures[0].layers;
   const fieldName = (layer: string, field: string) => {
@@ -56,6 +61,7 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
     return f ? `${def.name.replace(/ header$/, '')}: ${f.name}` : `${layer}.${field}`;
   };
   const d = step.details;
+  const linked = useMemo(() => linkStepDetails(d, MATCHER, page), [d, page]);
 
   return (
     <div className="step-details">
@@ -78,9 +84,9 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
       <KnownSoFar exchange={exchange} index={index} />
 
       <h3>In this step</h3>
-      <Prose text={d.what} />
+      <LinkedProse paragraphs={linked.what} />
       <h3>Why it works this way</h3>
-      <Prose text={d.why} />
+      <LinkedProse paragraphs={linked.why} />
 
       {d.keyFields.length > 0 && (
         <>
@@ -100,19 +106,19 @@ export function StepDetails({ exchange, step, index, onSelectField }: Props) {
       {d.typical && (
         <>
           <h3>Typical values</h3>
-          <Prose text={d.typical} />
+          <LinkedProse paragraphs={linked.typical!} />
         </>
       )}
       {d.wrong && (
         <>
           <h3>What can go wrong</h3>
-          <Prose text={d.wrong} />
+          <LinkedProse paragraphs={linked.wrong!} />
         </>
       )}
       {d.insight && (
         <div className="insight">
           <h3>Insight</h3>
-          <Prose text={d.insight} />
+          <LinkedProse paragraphs={linked.insight!} />
         </div>
       )}
 

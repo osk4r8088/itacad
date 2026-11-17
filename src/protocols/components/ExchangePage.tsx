@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Exchange } from '../../shared/schema';
 import { href, replaceHash } from '../../app/router';
 import { NetworkView } from './NetworkView';
@@ -7,7 +7,9 @@ import { StepControls } from './StepControls';
 import { StepDetails } from './StepDetails';
 import { PacketView, type Selection } from '../../shared/components/PacketView';
 import { SourceList } from '../../shared/components/SourceList';
-import { Prose } from '../../shared/components/Prose';
+import { MATCHER } from '../../basics/terms/matcher';
+import { exchangePage, linkAbout } from '../../basics/terms/exchange';
+import { LinkedProse, LinkedText } from '../../basics/terms/LinkedText';
 import { FlowTable } from './FlowTable';
 import { ProtocolSwitcher } from './ProtocolSwitcher';
 import { SearchButton } from '../../search/SearchButton';
@@ -103,6 +105,8 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry, sel
 
   const capture = step.captures.find((c) => c.link === link) ?? step.captures[0];
   const level = resolveRef(entry ?? { protocol: exchange.id })?.level;
+  const page = exchangePage(exchange, entry !== undefined && 'entry' in entry);
+  const about = useMemo(() => linkAbout(exchange, MATCHER, page), [exchange, page]);
 
   return (
     <div className="exchange" style={{ '--seq-fr': seqWeight(exchange) } as React.CSSProperties}>
@@ -118,8 +122,10 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry, sel
             <summary>About this exchange</summary>
             <div className="about-pop">
               <ReadFirst entry={entry ?? { protocol: exchange.id }} />
-              <p className="scenario">{exchange.scenario}</p>
-              <Prose text={exchange.intro} />
+              <p className="scenario">
+                <LinkedText segments={about.scenario} />
+              </p>
+              <LinkedProse paragraphs={about.intro} />
               <h2>Sources</h2>
               <SourceList sources={exchange.sources} />
             </div>
@@ -178,6 +184,7 @@ export function ExchangePage({ exchange, stepNumber, stepHref, crumb, entry, sel
             exchange={exchange}
             step={step}
             index={index}
+            page={page}
             onSelectField={(s) => {
               setSelection(s);
               document.getElementById('packet')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });

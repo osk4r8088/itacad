@@ -2,6 +2,7 @@ import { CATALOG, GROUPS } from '../protocols/catalog';
 import { href } from '../app/router';
 import { hasQuiz } from './catalog';
 import { LESSONS } from '../learn/registry';
+import { ProgressNote, QuizHistory } from '../shared/components/Progress';
 
 /** The "Quizzes" lesson: every protocol that has a quiz, in the groups of the protocol overview, then the lessons. */
 export default function QuizIndex() {
@@ -10,7 +11,8 @@ export default function QuizIndex() {
   return (
     <div className="index">
       <h1>Quizzes</h1>
-      <p className="lead">Check what you took from a protocol page or a lesson. Each answer is explained and links to the step that shows it. Nothing is saved.</p>
+      <p className="lead">Check what you took from a protocol page or a lesson. Each answer is explained and links to the step that shows it. Your last and best result of each quiz is kept in this browser.</p>
+      <ProgressNote />
       {GROUPS.map((group) => {
         const entries = ready.filter((e) => e.group === group);
         if (entries.length === 0) return null;
@@ -23,6 +25,7 @@ export default function QuizIndex() {
                   <a className="card" href={href.quiz(e.id)}>
                     <strong>{e.title}</strong>
                     <span>{e.summary}</span>
+                    <QuizHistory entry={{ protocol: e.id }} prefix="Your result:" />
                   </a>
                 </li>
               ))}
@@ -39,6 +42,7 @@ export default function QuizIndex() {
                 <a className="card" href={href.quiz(l.id)}>
                   <strong>{l.title}</strong>
                   <span>{l.summary}</span>
+                  <QuizHistory entry={{ entry: l.id }} prefix="Your result:" />
                 </a>
               </li>
             ))}

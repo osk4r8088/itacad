@@ -9,6 +9,9 @@ import { HubEntryPage } from './HubEntryPage';
 import { ProtocolIndex } from '../protocols/components/ProtocolIndex';
 import { SECTION_INFO, TOOLS, toolsFor } from '../tools/registry';
 import { LESSONS } from '../learn/registry';
+import { visitedRef } from './entries';
+import { progress } from '../shared/progress';
+import { VisitedCount } from '../shared/components/Progress';
 
 // The exchange page and the exchange data load only when a protocol is opened.
 const ExchangeRoute = lazy(() => import('../protocols/ExchangeRoute'));
@@ -47,6 +50,12 @@ function sectionOf(route: Route): Section | undefined {
 
 export function App() {
   const route = useHashRoute();
+
+  // Opening a topic, protocol or lesson counts as a visit, kept in this browser only.
+  useEffect(() => {
+    const ref = visitedRef(route);
+    if (ref) progress.visit(ref);
+  }, [route]);
 
   useEffect(() => {
     if (route.page === 'redirect') replaceHash(route.to);
@@ -100,6 +109,9 @@ export function App() {
           <div className="index">
             <h1>Learn</h1>
             <p className="lead">{sectionAbout('learn')}</p>
+            <p>
+              <VisitedCount entries={LESSONS.filter((l) => l.status === 'ready').map((l) => ({ entry: l.id }))} />
+            </p>
             <HubCards entries={LESSONS} link={href.lesson} />
           </div>
         )}

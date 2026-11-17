@@ -14,6 +14,7 @@ import { MATCHER } from './terms/matcher';
 import { slugOf } from './terms/match';
 import { linkTopic, type LinkedBlock } from './terms/topic';
 import { LinkedText } from './terms/LinkedText';
+import { QuizHistory, VisitedCount, VisitedTag, useRecordQuiz } from '../shared/components/Progress';
 
 
 export type BasicsRoute = { page: 'basics' } | { page: 'category'; id: string } | { page: 'topic'; category: string; id: string; term?: string } | { page: 'glossary' };
@@ -86,7 +87,8 @@ function BasicsHome() {
                     <p className="tile-all">
                       <a href={href.category(c.id)}>
                         All {ready.length} topics{ready.length < topics.length ? `, ${topics.length - ready.length} more planned` : ''}
-                      </a>
+                      </a>{' '}
+                      <VisitedCount entries={ready.map((t) => ({ topic: t.id }))} />
                     </p>
                   </>
                 ) : (
@@ -135,6 +137,9 @@ function CategoryPage({ id }: { id: string }) {
         </figure>
       )}
       <LevelFilter value={level} onChange={setLevel} />
+      <p>
+        <VisitedCount entries={topicsOf(id).filter((t) => t.status === 'ready').map((t) => ({ topic: t.id }))} />
+      </p>
       <ul className="cards">
         {topics.map((t) => (
           <li key={t.id}>
@@ -153,6 +158,7 @@ function TopicCard({ topic: t }: { topic: TopicEntry }) {
         <strong>{t.title}</strong>
         <span>{t.summary}</span>
         <LevelBadge level={t.level} />
+        <VisitedTag entry={{ topic: t.id }} />
       </a>
     );
   const issue = categoryOf(t.category)?.issue;
@@ -312,7 +318,10 @@ function TopicView({ topic: t, term }: { topic: Topic; term?: string }) {
 
       <section className="topic-section">
         <h2>Check yourself</h2>
-        <TopicQuiz key={t.id} questions={t.quiz} />
+        <p className="muted">
+          <QuizHistory entry={{ topic: t.id }} />
+        </p>
+        <TopicQuiz key={t.id} topic={t.id} questions={t.quiz} />
       </section>
 
       {related.length > 0 && (
@@ -452,10 +461,11 @@ function Commands({ commands }: { commands: Command[] }) {
   );
 }
 
-function TopicQuiz({ questions }: { questions: TopicQuestion[] }) {
+function TopicQuiz({ topic, questions }: { topic: string; questions: TopicQuestion[] }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const answered = questions.filter((q) => q.id in answers).length;
   const correct = questions.filter((q) => answers[q.id] === q.answer).length;
+  useRecordQuiz({ topic }, answered, correct, questions.length);
   return (
     <div className="quiz">
       <ol className="quiz-list">

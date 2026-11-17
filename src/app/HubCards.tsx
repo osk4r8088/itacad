@@ -3,6 +3,7 @@ import { ISSUES_URL, type HubEntry } from '../shared/hub';
 import type { Level } from '../shared/levels';
 import { LevelBadge } from '../shared/components/LevelBadge';
 import { LevelFilter } from '../shared/components/LevelFilter';
+import { VisitedTag } from '../shared/components/Progress';
 
 /** Cards for tools or learning content, with a level filter. Planned entries link to their GitHub issue. */
 export function HubCards({ entries, link }: { entries: HubEntry[]; link: (id: string) => string }) {
@@ -19,6 +20,7 @@ export function HubCards({ entries, link }: { entries: HubEntry[]; link: (id: st
                 <strong>{e.title}</strong>
                 <span>{e.summary}</span>
                 <LevelBadge level={e.level} />
+                <VisitedTag entry={{ entry: e.id }} />
               </a>
             ) : (
               <a className="card planned" href={e.issue ? `${ISSUES_URL}/${e.issue}` : ISSUES_URL} title="Planned, opens the issue on GitHub">

@@ -8,6 +8,8 @@ import { OSI_LAYERS } from '../shared/layers';
 import { href } from '../app/router';
 import { SourceList } from '../shared/components/SourceList';
 import { pageTitle } from '../shared/hub';
+import { QuizHistory, useRecordQuiz } from '../shared/components/Progress';
+import type { EntryRef } from '../shared/refs';
 
 /** What a quiz is about: a protocol exchange, a lesson that is an exchange, or a lesson page without steps. */
 interface Subject {
@@ -49,6 +51,15 @@ export default function QuizPage({ id }: { id: string }) {
   }, [id]);
 
   const title = state.status === 'ready' ? `${state.subject.title} quiz` : 'Quiz';
+  // The quiz belongs to the protocol or lesson it is about; its results are kept under that page.
+  const ready = state.status === 'ready' ? state : undefined;
+  const entry: EntryRef | undefined = ready && (ready.subject.kind === 'protocol' ? { protocol: id } : { entry: id });
+  useRecordQuiz(
+    entry,
+    ready ? ready.quiz.questions.filter((q) => q.id in answers).length : 0,
+    ready ? ready.quiz.questions.filter((q) => answers[q.id] === q.answer).length : 0,
+    ready ? ready.quiz.questions.length : 0,
+  );
   useEffect(() => {
     document.title = pageTitle(title);
   }, [title]);
@@ -75,6 +86,9 @@ export default function QuizPage({ id }: { id: string }) {
       <p className="lead">
         {total} questions about {subject.kind === 'protocol' ? 'the ' : 'the lesson '}
         <a href={subject.href}>{subject.kind === 'protocol' ? `${subject.title} exchange` : subject.title}</a>. Each answer is explained, with a link to {subject.exchange ? 'the step' : 'the layer'} that shows it.
+      </p>
+      <p className="muted">
+        <QuizHistory entry={entry!} />
       </p>
       <ol className="quiz-list">
         {quiz.questions.map((q, i) => (

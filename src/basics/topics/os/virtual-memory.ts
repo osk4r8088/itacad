@@ -66,6 +66,11 @@ export const virtualMemory: Topic = {
           kind: 'text',
           text: 'If the access was not legitimate, for example to an address that belongs to nothing or a write to a read-only page, the kernel ends the program. On Unix systems that is the segmentation fault; on Windows an access violation.',
         },
+        {
+          kind: 'figure',
+          figure: 'page-translation',
+          caption: 'Two processes and their page tables. Pick a process and an address: the address splits into page and offset, the page table gives the frame, or a page fault shows what the kernel does instead.',
+        },
       ],
     },
     {
@@ -127,6 +132,7 @@ export const virtualMemory: Topic = {
     { ...SDM, section: 'Volume 3A, chapter Paging (4-level and 5-level paging, page sizes of 4 KiB, 2 MiB and 1 GiB)' },
     { ...KERNEL_MM, note: '128 TiB of user address space with 4 levels; 256 TiB and 128 PiB in total with 4 and 5 levels' },
     MAN('free', 1, 'the meaning of free and available'),
+    { spec: 'Linux kernel documentation: Documentation for /proc/sys/vm', url: 'https://docs.kernel.org/admin-guide/sysctl/vm.html', section: 'mmap_min_addr', note: 'the lowest addresses that user processes may not map' },
   ],
   quiz: [
     {

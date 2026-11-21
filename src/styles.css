@@ -517,7 +517,7 @@ main {
 }
 .link.active line {
   stroke: var(--net-on);
-  opacity: 0.55;
+  opacity: 0.75;
 }
 .link line.flow {
   opacity: 1;
@@ -1725,7 +1725,7 @@ table.kv th {
   cursor: default;
 }
 .hex-byte:not(.in-layer) {
-  opacity: 0.55;
+  opacity: 0.75;
 }
 .hex-byte.in-layer {
   box-shadow: inset 0 -2px 0 var(--kb);
@@ -1872,7 +1872,7 @@ table.kv th {
   fill: none;
   stroke: var(--muted);
   stroke-width: 1.2;
-  opacity: 0.55;
+  opacity: 0.75;
 }
 .tcp-diagram .edge text {
   fill: var(--muted);
@@ -4476,4 +4476,153 @@ table.compare tbody th {
 .progress-note .link-button {
   font-size: inherit;
   padding: 0;
+}
+
+/* Virtual memory figure (#97): page tables of two processes and physical memory. */
+.vm-figure {
+  display: grid;
+  gap: 0.8rem;
+}
+.vm-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  align-items: center;
+}
+.vm-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.vm-choice > span,
+.vm-address > span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.vm-address {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.vm-address input {
+  font: inherit;
+  font-family: var(--mono);
+  width: 11rem;
+  max-width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.vm-address input[aria-invalid='true'] {
+  border-color: var(--bad);
+}
+.vm-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  font-size: 0.9rem;
+}
+.vm-split {
+  margin: 0;
+}
+.vm-bits {
+  font-size: 1.1rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  background: var(--panel);
+}
+.vm-page {
+  text-decoration: underline solid var(--accent) 2px;
+  text-underline-offset: 0.2em;
+}
+.vm-offset {
+  text-decoration: underline dashed var(--muted) 2px;
+  text-underline-offset: 0.2em;
+  margin-left: 0.15rem;
+}
+.vm-tables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.vm-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+.vm-table.is-active {
+  opacity: 1;
+}
+.vm-table caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.25rem;
+}
+.vm-table th,
+.vm-table td {
+  text-align: left;
+  padding: 0.2rem 0.4rem 0.2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.vm-table th {
+  font-weight: 600;
+  color: var(--muted);
+}
+.vm-table tr.is-hit td {
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.vm-table tr.is-not-present td,
+.vm-table tr.is-protection td {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.vm-memory {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+}
+.vm-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-height: 3.6rem;
+  padding: 0.25rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+.vm-frame.is-free {
+  color: var(--muted);
+  border-style: dashed;
+}
+.vm-frame.is-hit {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+.vm-frame-no {
+  font-weight: 600;
+}
+.vm-result {
+  margin: 0;
+  max-width: 75ch;
+}
+.vm-note {
+  margin: 0;
+  max-width: 75ch;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+@media (max-width: 700px) {
+  .vm-tables {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vm-memory {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }

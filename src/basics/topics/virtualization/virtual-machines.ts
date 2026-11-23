@@ -100,7 +100,7 @@ export const virtualMachines: Topic = {
       { os: 'macOS', command: 'VBoxManage list vms', shows: 'The virtual machines known to VirtualBox on this machine.' },
     ],
     numbers: [
-      { label: 'Time to take a snapshot', value: 'about a second', note: 'it only redirects writes; including memory it takes as long as writing that memory out' },
+      { label: 'Time to take a snapshot', value: 'seconds', note: 'without memory it only starts redirecting writes to a new file; including memory it takes as long as writing that memory out' },
       { label: 'A thin disk of 100 GB holding 8 GB', value: 'about 8 GB on the host', note: 'plus the format overhead; it grows as the guest writes and rarely shrinks' },
     ],
     examples: [
@@ -121,8 +121,8 @@ export const virtualMachines: Topic = {
   sources: [
     { spec: 'libvirt documentation: domain XML format', url: 'https://libvirt.org/formatdomain.html', note: 'configuration of a virtual machine: CPUs, memory, disks, interfaces' },
     { spec: 'QEMU documentation: disk images', url: 'https://www.qemu.org/docs/master/system/images.html', note: 'qcow2 and other formats, preallocation' },
-    { spec: 'Microsoft Learn: Hyper-V virtual hard disks and checkpoints', url: 'https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/', note: 'VHDX, dynamically expanding disks, checkpoints' },
-    { spec: 'VMware documentation: vSphere virtual machine administration', url: 'https://techdocs.broadcom.com/', note: 'thick and thin provisioning, snapshots as a short-term mechanism' },
+    { spec: 'Microsoft Learn: Using checkpoints in Hyper-V', url: 'https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/checkpoints', note: 'standard and production checkpoints, stored as .avhdx files next to the .vhdx and merged back when deleted' },
+    { spec: 'Broadcom knowledge base 318825: Best practices for using VMware snapshots in the vSphere environment', url: 'https://knowledge.broadcom.com/external/article/318825', note: 'a snapshot is a change log in a delta disk, not a backup; keep chains short' },
     MAN('fstrim', 8, 'reporting free blocks, which lets thin storage reclaim them'),
   ],
   quiz: [

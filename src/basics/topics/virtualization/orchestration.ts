@@ -123,7 +123,7 @@ export const orchestration: Topic = {
     K8S('Deployments', 'concepts/workloads/controllers/deployment/', 'desired state, replicas, rolling updates and rollback'),
     K8S('Service', 'concepts/services-networking/service/', 'a stable address in front of a changing set of pods'),
     K8S('Resource management for pods and containers', 'concepts/configuration/manage-resources-containers/', 'requests for scheduling, limits enforced through cgroups'),
-    K8S('Liveness, readiness and startup probes', 'concepts/configuration/liveness-readiness-startup-probes/'),
+    K8S('Liveness, readiness and startup probes', 'concepts/workloads/pods/probes/'),
     { spec: 'Burns et al.: Borg, Omega, and Kubernetes, ACM Queue 14(1), 2016', url: 'https://doi.org/10.1145/2898442.2898444', note: 'where the model comes from' },
   ],
   quiz: [

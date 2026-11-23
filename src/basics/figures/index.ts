@@ -17,4 +17,10 @@ export const FIGURES: Record<string, LazyExoticComponent<ComponentType>> = {
   'index-lookup': lazy(() => import('./IndexLookup')),
   'page-translation': lazy(() => import('./PageTranslation')),
   'lost-update': lazy(() => import('./LostUpdate')),
+  'switch-learning': lazy(() => import('./SwitchLearning')),
+  lz77: lazy(() => import('./Lz77')),
+  'commit-graph': lazy(() => import('./CommitGraph')),
+  'backup-week': lazy(() => import('./BackupWeek')),
+  'bit-toggler': lazy(() => import('./BitToggler')),
+  'scheduler-timeline': lazy(() => import('./SchedulerTimeline')),
 };

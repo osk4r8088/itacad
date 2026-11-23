@@ -145,13 +145,13 @@ export const symmetricAsymmetric: Topic = {
   ],
   related: [{ topic: 'hashing-encryption' }, { topic: 'certificates-pki' }, { protocol: 'tls' }, { protocol: 'ssh' }, { protocol: 'http3' }, { topic: 'number-systems' }],
   sources: [
-    { spec: 'NIST Special Publication 800-57 Part 1, revision 5: Recommendation for Key Management', url: 'https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final', note: 'comparable security strengths of symmetric, RSA and elliptic-curve keys' },
+    { spec: 'NIST Special Publication 800-57 Part 1, revision 5: Recommendation for Key Management', url: 'https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final', note: 'section 5.6.1.1, table 2: comparable security strengths of symmetric, RSA and elliptic-curve keys' },
     { spec: 'FIPS PUB 197: Advanced Encryption Standard (AES)', note: 'key sizes 128, 192, 256 bits; block size 128 bits' },
     { rfc: 8446, note: 'TLS 1.3: ephemeral key exchange, signatures, AEAD ciphers, HKDF' },
     { rfc: 7748, note: 'X25519 key exchange' },
     { rfc: 8032, note: 'Ed25519 signatures' },
     { spec: 'Diffie, Hellman: New Directions in Cryptography. IEEE Transactions on Information Theory 22(6), 1976' },
-    { spec: 'FIPS 203, 204: Module-Lattice-Based Key-Encapsulation and Digital Signature Standards, 2024', note: 'post-quantum algorithms; not checked for this page' },
+    { spec: 'FIPS 203 and FIPS 204: Module-Lattice-Based Key-Encapsulation Mechanism Standard and Digital Signature Standard, August 2024', url: 'https://csrc.nist.gov/pubs/fips/203/final', note: 'post-quantum algorithms ML-KEM and ML-DSA' },
   ],
   quiz: [
     {

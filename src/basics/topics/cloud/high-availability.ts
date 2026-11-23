@@ -130,9 +130,9 @@ export const highAvailability: Topic = {
   related: [{ topic: 'regions-zones' }, { topic: 'backup' }, { topic: 'monitoring' }, { entry: 'raid' }, { topic: 'power' }, { topic: 'orchestration' }, { topic: 'server' }],
   sources: [
     { spec: 'Beyer, Jones, Petoff, Murphy (eds.): Site Reliability Engineering, chapter 3: Embracing Risk', url: 'https://sre.google/sre-book/embracing-risk/', note: 'availability as a target, the cost of each additional nine' },
-    { spec: 'IEC 60050-192: International Electrotechnical Vocabulary, Part 192: Dependability', note: 'definitions of availability and related terms; not checked for this page' },
+    { spec: 'IEC 60050-192: International Electrotechnical Vocabulary, Part 192: Dependability, entry 192-01-23', url: 'https://electropedia.org/iev/iev.nsf/IEVref_xref/en:192-01-23', note: 'availability: the ability to be in a state to perform as required, with an up state and a down state' },
     { spec: 'Kleppmann: Designing Data-Intensive Applications, chapters 5, 8 and 9', note: 'replication, failover, split brain, quorums' },
-    { spec: 'Gray, Siewiorek: High-Availability Computer Systems. IEEE Computer 24(9), 1991', note: 'availability classes counted in nines' },
+    { spec: 'Gray, Siewiorek: High-Availability Computer Systems. IEEE Computer 24(9), 39 to 48, 1991', url: 'https://doi.org/10.1109/2.84898', note: 'table 1: availability classes counted in nines' },
   ],
   quiz: [
     {

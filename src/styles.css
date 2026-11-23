@@ -4626,3 +4626,175 @@ table.compare tbody th {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* Scheduler timeline figure */
+.sch-figure {
+  display: grid;
+  gap: 0.8rem;
+}
+.sch-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  align-items: center;
+}
+.sch-processes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+.sch-tag {
+  display: inline-block;
+  min-width: 1.4rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.sch-running {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.sch-pA {
+  background: var(--k-link);
+  border-color: var(--k-link-b);
+}
+.sch-pB {
+  background: var(--k-transport);
+  border-color: var(--k-transport-b);
+}
+.sch-pC {
+  background: var(--k-internet);
+  border-color: var(--k-internet-b);
+}
+.sch-pD {
+  background: var(--k-application);
+  border-color: var(--k-application-b);
+}
+.sch-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.sch-grid {
+  display: grid;
+  gap: 2px;
+  align-items: center;
+  width: max-content;
+}
+.sch-label {
+  font-size: 0.8rem;
+  padding-right: 0.5rem;
+  white-space: nowrap;
+}
+.sch-axis {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: left;
+}
+.sch-axis.is-now {
+  color: var(--accent);
+  font-weight: 600;
+}
+.sch-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.4rem;
+  min-width: 1.4rem;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sch-legend .sch-done {
+  border: 1px solid var(--border);
+}
+.sch-legend .sch-cell {
+  height: 0.9rem;
+  min-width: 0.9rem;
+  vertical-align: middle;
+  cursor: default;
+}
+.sch-core.is-idle {
+  border: 1px dashed var(--border);
+}
+.sch-ready {
+  border: 1px dashed var(--muted);
+}
+.sch-blocked {
+  background: repeating-linear-gradient(135deg, var(--border) 0 2px, transparent 2px 5px);
+  border-color: var(--border);
+}
+.sch-cell.is-now {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+}
+.sch-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  font-size: 0.85rem;
+}
+.sch-step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.sch-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+.sch-slider span {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.sch-slider input {
+  flex: 1;
+  min-width: 0;
+}
+.sch-now {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.sch-stats {
+  margin: 0;
+  max-width: 75ch;
+}
+.sch-cell.sch-running {
+  border-color: var(--accent);
+}
+.sch-cell.sch-pA {
+  border-color: var(--k-link-b);
+}
+.sch-cell.sch-pB {
+  border-color: var(--k-transport-b);
+}
+.sch-cell.sch-pC {
+  border-color: var(--k-internet-b);
+}
+.sch-cell.sch-pD {
+  border-color: var(--k-application-b);
+}
+/* Choice chips in figures (page translation, scheduler): show which option is on. */
+.vm-choice .chip {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--border);
+}
+.vm-choice .chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 600;
+}

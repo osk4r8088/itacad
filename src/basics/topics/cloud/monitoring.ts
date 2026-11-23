@@ -130,9 +130,9 @@ export const monitoring: Topic = {
   sources: [
     { spec: 'Beyer, Jones, Petoff, Murphy (eds.): Site Reliability Engineering, chapter 6: Monitoring Distributed Systems', url: 'https://sre.google/sre-book/monitoring-distributed-systems/', note: 'the four golden signals, symptoms and causes, black-box and white-box monitoring' },
     { spec: 'Site Reliability Engineering, chapter 4: Service Level Objectives', url: 'https://sre.google/sre-book/service-level-objectives/', note: 'SLI, SLO, SLA' },
-    { spec: 'OpenTelemetry Specification', url: 'https://opentelemetry.io/docs/specs/otel/', note: 'traces, metrics and logs as signals; not checked for this page' },
+    { spec: 'OpenTelemetry Specification', url: 'https://opentelemetry.io/docs/specs/otel/', note: 'traces, metrics and logs as signals (specification overview)' },
     { rfc: 5424, note: 'the syslog protocol: severity levels of log messages' },
-    { spec: 'Prometheus documentation: Exposition formats', url: 'https://prometheus.io/docs/instrumenting/exposition_formats/', note: 'metrics as text; not checked for this page' },
+    { spec: 'Prometheus documentation: Exposition formats', url: 'https://prometheus.io/docs/instrumenting/exposition_formats/', note: 'the line-oriented text format for metrics' },
   ],
   quiz: [
     {

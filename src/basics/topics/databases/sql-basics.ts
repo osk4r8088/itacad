@@ -140,7 +140,7 @@ export const sqlBasics: Topic = {
     { spec: 'ISO/IEC 9075: Information technology, Database languages, SQL', note: 'the standard; dialects differ in details' },
     { spec: 'PostgreSQL documentation: Part II, The SQL Language', url: 'https://www.postgresql.org/docs/current/sql.html', note: 'queries, joins, aggregates, data definition, constraints' },
     { spec: 'SQLite documentation: SQL As Understood By SQLite', url: 'https://www.sqlite.org/lang.html', note: 'the dialect the examples were run with' },
-    { spec: 'OWASP: SQL Injection Prevention Cheat Sheet', url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html', note: 'parameterized queries as the primary defense; not checked for this page' },
+    { spec: 'OWASP: SQL Injection Prevention Cheat Sheet', url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html', note: 'parameterized queries as the primary defense, allow-lists for parts that cannot be parameterized' },
     { spec: 'Chamberlin, Boyce: SEQUEL: A Structured English Query Language, 1974', note: 'the origin of SQL' },
   ],
   quiz: [

@@ -4627,6 +4627,12 @@ table.compare tbody th {
   }
 }
 
+/* Zone failure figure */
+.zn-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.zn-controls {
 /* Certificate chain figure */
 .cc-figure {
   display: grid;
@@ -4786,6 +4792,11 @@ table.compare tbody th {
   align-items: center;
   gap: 0.4rem 0.5rem;
 }
+.zn-controls > span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.zn-figure .chip {
 .cg-controls > span {
   font-size: 0.85rem;
   color: var(--muted);
@@ -4795,6 +4806,7 @@ table.compare tbody th {
   color: var(--text);
   border-color: var(--border);
 }
+.zn-figure .chip[aria-pressed='true'] {
 .lu-figure .chip[aria-pressed='true'] {
 .sw-figure .chip[aria-pressed='true'] {
 .cg-controls .chip[aria-pressed='true'] {
@@ -4802,6 +4814,32 @@ table.compare tbody th {
   border-color: var(--accent);
   font-weight: 600;
 }
+.zn-regions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.zn-region {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+}
+.zn-region-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.zn-zones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+.zn-zone {
+  font: inherit;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.4rem 0.3rem;
 .lu-summary,
 .lu-verdict {
   margin: 0;
@@ -5063,6 +5101,60 @@ table.compare tbody th {
   background: var(--panel);
   color: var(--text);
   cursor: pointer;
+  text-align: center;
+  min-width: 0;
+}
+.zn-zone-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.zn-role {
+  font-size: 0.72rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.zn-zone.is-unused {
+  border-style: dashed;
+  color: var(--muted);
+}
+.zn-zone.is-active,
+.zn-zone.is-standby {
+  border-color: var(--accent);
+}
+.zn-zone.is-serving {
+  background: var(--accent-soft);
+}
+.zn-zone.is-out {
+  background: var(--bad-bg);
+  border-color: var(--bad);
+  border-style: solid;
+}
+.zn-zone.is-out .zn-role {
+  color: var(--bad);
+  font-weight: 600;
+}
+.zn-status {
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  max-width: 75ch;
+}
+.zn-status.is-up {
+  background: var(--ok-bg);
+}
+.zn-status.is-overloaded,
+.zn-status.is-failed-over {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.zn-status.is-down {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+@media (max-width: 560px) {
+  .zn-regions {
+    grid-template-columns: minmax(0, 1fr);
+  }
   min-width: 0;
 }
 .bw-day {

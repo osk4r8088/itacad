@@ -125,10 +125,10 @@ export const buildSystems: Topic = {
   related: [{ topic: 'compiler' }, { topic: 'linker' }, { topic: 'ci-cd' }, { topic: 'version-control' }, { topic: 'images' }],
   sources: [
     { spec: 'GNU Make Manual, chapter 2: An Introduction to Makefiles', url: 'https://www.gnu.org/software/make/manual/', note: 'targets, prerequisites, recipes; rebuilding by time stamp' },
-    { spec: 'POSIX.1-2017, Shell and Utilities: make' },
+    { spec: 'POSIX.1-2024, Shell and Utilities: make', url: 'https://pubs.opengroup.org/onlinepubs/9799919799/utilities/make.html' },
     { spec: 'Semantic Versioning 2.0.0', url: 'https://semver.org/', note: 'MAJOR, MINOR, PATCH' },
     { spec: 'Reproducible Builds: Definitions', url: 'https://reproducible-builds.org/docs/definition/' },
-    { spec: 'Feldman: Make, A Program for Maintaining Computer Programs. Software: Practice and Experience 9(4), 1979' },
+    { spec: 'Feldman: Make, A Program for Maintaining Computer Programs. Software: Practice and Experience 9(4), 255 to 265, 1979', url: 'https://doi.org/10.1002/spe.4380090402' },
   ],
   quiz: [
     {

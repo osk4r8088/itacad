@@ -106,7 +106,7 @@ export const jitBytecode: Topic = {
     ],
     numbers: [
       { label: 'Magic number of a Java class file', value: '0xCAFEBABE', note: 'Java Virtual Machine Specification, section 4.1' },
-      { label: 'Size of a Java VM opcode', value: '1 byte', note: 'hence the name bytecode; at most 256 instructions' },
+      { label: 'Size of a Java VM opcode', value: '1 byte', note: 'Java Virtual Machine Specification, section 2.11; hence the name bytecode, and at most 256 instructions' },
     ],
     examples: [
       'After a deployment, the first requests to a Java service take ten times as long as usual; a minute later response times are normal. The JIT has compiled the hot paths.',
@@ -129,7 +129,7 @@ export const jitBytecode: Topic = {
     { spec: 'Python documentation: dis, Disassembler for Python bytecode', url: 'https://docs.python.org/3/library/dis.html', note: 'bytecode is an implementation detail of CPython and changes between versions' },
     { spec: 'WebAssembly Core Specification, W3C', url: 'https://www.w3.org/TR/wasm-core-2/', note: 'stack machine, validation' },
     { spec: 'ECMA-335: Common Language Infrastructure (CLI)', note: 'the bytecode (CIL) and runtime of .NET' },
-    { spec: 'Aycock: A Brief History of Just-In-Time, ACM Computing Surveys 35(2), 2003' },
+    { spec: 'Aycock: A Brief History of Just-In-Time, ACM Computing Surveys 35(2), 97 to 113, 2003', url: 'https://doi.org/10.1145/857076.857077' },
   ],
   quiz: [
     {

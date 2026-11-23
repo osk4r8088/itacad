@@ -140,11 +140,11 @@ export const transactions: Topic = {
   ],
   related: [{ topic: 'sql-basics' }, { topic: 'relational-nosql' }, { topic: 'indexes' }, { topic: 'file-systems' }, { topic: 'high-availability' }, { topic: 'processes' }],
   sources: [
-    { spec: 'Haerder, Reuter: Principles of Transaction-Oriented Database Recovery. ACM Computing Surveys 15(4), 1983', note: 'atomicity, consistency, isolation, durability; origin of the acronym ACID' },
+    { spec: 'Haerder, Reuter: Principles of Transaction-Oriented Database Recovery. ACM Computing Surveys 15(4), 287 to 317, 1983', url: 'https://doi.org/10.1145/289.291', note: 'atomicity, consistency, isolation, durability; origin of the acronym ACID' },
     { spec: 'PostgreSQL documentation: 13.2 Transaction Isolation', url: 'https://www.postgresql.org/docs/current/transaction-iso.html', note: 'the four standard levels and the phenomena; read committed as default; repeatable read without phantoms' },
     { spec: 'ISO/IEC 9075-2: SQL, Part 2: Foundation', note: 'isolation levels defined by the phenomena they exclude' },
-    { spec: 'Berenson, Bernstein, Gray, Melton, O\'Neil, O\'Neil: A Critique of ANSI SQL Isolation Levels. SIGMOD 1995', note: 'lost update and other anomalies beyond the three of the standard; cited from memory' },
-    { spec: 'PostgreSQL documentation: 28.3 Write-Ahead Logging (WAL)', note: 'section number not checked' },
+    { spec: 'Berenson, Bernstein, Gray, Melton, O\'Neil, O\'Neil: A Critique of ANSI SQL Isolation Levels. SIGMOD 1995, 1 to 10', url: 'https://doi.org/10.1145/223784.223785', note: 'the three phenomena of the standard do not characterize the levels; lost update, snapshot isolation and other additions' },
+    { spec: 'PostgreSQL documentation: 28.3 Write-Ahead Logging (WAL)', url: 'https://www.postgresql.org/docs/current/wal-intro.html', note: 'section number as of PostgreSQL 18; changes to data files are written only after they are logged' },
     { spec: 'Gray, Reuter: Transaction Processing: Concepts and Techniques, 1992' },
   ],
   quiz: [

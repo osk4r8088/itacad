@@ -41,7 +41,7 @@ export const debugger_: Topic = {
         },
         {
           kind: 'note',
-          text: 'On x86 the trap instruction is the one-byte int3, 0xCC, and Linux reports it to the debugger as the signal SIGTRAP. This detail is stated from the processor and kernel documentation without a check in this project; treat it as unverified.',
+          text: 'On x86 the trap instruction is the one-byte int3, 0xCC, and Linux reports it to the debugger as the signal SIGTRAP.',
         },
       ],
     },
@@ -125,8 +125,9 @@ export const debugger_: Topic = {
     { spec: 'ptrace(2), Linux manual page', url: 'https://man7.org/linux/man-pages/man2/ptrace.2.html', note: 'tracer and tracee; used for breakpoint debugging and system call tracing' },
     { spec: 'DWARF Debugging Information Format, Version 5', url: 'https://dwarfstd.org/dwarf5std.html', note: 'line number table, variable locations, call frame information' },
     { spec: 'Debugging with GDB (GDB manual)', url: 'https://sourceware.org/gdb/current/onlinedocs/gdb.html/', note: 'breakpoints, watchpoints, stepping, core files' },
-    { spec: 'Intel 64 and IA-32 Architectures Software Developer\'s Manual, Volume 3, chapter "Debug, Branch Profile, TSC, and Intel Resource Director Technology Features"', note: 'breakpoint exception and debug registers; not checked for this page' },
-    { spec: 'core(5), Linux manual page', note: 'core dump files' },
+    { spec: 'Intel 64 and IA-32 Architectures Software Developer\'s Manual, Volume 2A (INT n/INTO/INT3/INT1) and Volume 3A (Interrupt 3, Breakpoint Exception)', note: 'INT3 is the one-byte opcode CC and raises the breakpoint exception #BP; checked against published copies of the manual pages, not the current Intel PDF' },
+    { spec: 'signal(7), Linux manual page', url: 'https://man7.org/linux/man-pages/man7/signal.7.html', note: 'SIGTRAP: trace/breakpoint trap' },
+    { spec: 'core(5), Linux manual page', url: 'https://man7.org/linux/man-pages/man5/core.5.html', note: 'core dump files' },
   ],
   quiz: [
     {

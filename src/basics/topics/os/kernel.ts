@@ -130,6 +130,7 @@ export const kernel: Topic = {
     { ...SDM, section: 'Volume 3A, chapter Protection (privilege levels), and Volume 2, SYSCALL' },
     MAN('syscalls', 2, 'the list of Linux system calls'),
     MAN('syscall', 2, 'calling conventions per architecture: instruction and registers'),
+    { spec: 'Linux kernel source: arch/x86/entry/syscalls/syscall_64.tbl', url: 'https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl', note: 'system call numbers on x86-64; write is number 1' },
   ],
   quiz: [
     {

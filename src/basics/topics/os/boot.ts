@@ -130,11 +130,12 @@ export const boot: Topic = {
   ],
   related: [{ topic: 'mainboard' }, { topic: 'kernel' }, { topic: 'file-systems' }, { topic: 'processes' }, { topic: 'drivers' }],
   sources: [
-    { ...UEFI, note: 'boot manager and boot entries, EFI System Partition, GUID Partition Table with protective MBR, Secure Boot' },
+    { ...UEFI, section: 'chapter 5 (GPT disk layout; 5.3: at least 16,384 bytes reserved for the partition entry array)', note: 'boot manager and boot entries, EFI System Partition, legacy and protective MBR, GUID Partition Table, Secure Boot' },
     { spec: 'GNU GRUB Manual', url: 'https://www.gnu.org/software/grub/manual/grub/grub.html', note: 'loading a kernel and initial RAM disk, the kernel command line' },
     { spec: 'The Linux kernel documentation: Ramfs, rootfs and initramfs', url: 'https://docs.kernel.org/filesystems/ramfs-rootfs-initramfs.html' },
     MAN('bootup', 7, 'the system bootup process of systemd'),
-    { spec: 'Microsoft Learn: Boot and UEFI', url: 'https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/boot-and-uefi', note: 'Windows Boot Manager and the stages of a Windows boot' },
+    { spec: 'Microsoft Learn: Explore the Windows client startup architecture', url: 'https://docs.microsoft.com/learn/modules/troubleshoot-windows-startup/2-explore-windows-client-startup-architecture', note: 'Windows Boot Manager, the OS loader winload and the kernel ntoskrnl.exe' },
+    { spec: 'Microsoft Press: Troubleshooting Windows Startup and Shutdown Problems (from Windows Internals)', url: 'https://www.microsoftpressstore.com/articles/article.aspx?p=2201310', note: 'the kernel starts the Session Manager (Smss.exe)' },
   ],
   quiz: [
     {

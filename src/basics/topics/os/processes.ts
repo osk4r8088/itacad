@@ -133,6 +133,7 @@ export const processes: Topic = {
     OSTEP('26 (concurrency and threads)', 'threads-intro.pdf'),
     POSIX('fork, exec, wait, kill; signals SIGTERM and SIGKILL'),
     MAN('signal', 7, 'signal numbers and which signals cannot be caught'),
+    { spec: 'Apple: launchd(8) manual page', url: 'https://opensource.apple.com/source/launchd/launchd-442.21/man/launchd.8.auto.html', note: 'launchd runs as the first process on macOS' },
     { spec: 'Microsoft Learn: Processes and Threads', url: 'https://learn.microsoft.com/en-us/windows/win32/procthread/processes-and-threads', note: 'CreateProcess' },
   ],
   quiz: [

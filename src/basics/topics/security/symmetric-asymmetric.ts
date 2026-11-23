@@ -46,6 +46,11 @@ export const symmetricAsymmetric: Topic = {
           text: 'A signature is not "encryption with the private key", although it is often explained that way. It is a separate operation, the message is first hashed, and nothing is kept secret by it.',
         },
         {
+          kind: 'figure',
+          figure: 'key-scenes',
+          caption: 'Who holds which key. Step through the three things a key pair can do, with Alice, Bob and Eve, who sees everything that crosses the network: encrypting to Bob, agreeing on a secret, and a signature that fails when the message is changed.',
+        },
+        {
           kind: 'text',
           text: 'The security rests on mathematical problems that are easy in one direction and infeasible in the other: multiplying two large primes versus factoring the product (RSA), or computing a point on an elliptic curve versus finding the number that led to it. That is why asymmetric keys are so much longer than symmetric ones for the same strength.',
         },

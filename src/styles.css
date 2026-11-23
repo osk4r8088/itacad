@@ -4627,6 +4627,17 @@ table.compare tbody th {
   }
 }
 
+/* Key scenes figure */
+.ks-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.ks-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.ks-figure .chip {
 /* Zone failure figure */
 .zn-figure {
   display: grid;
@@ -4806,6 +4817,7 @@ table.compare tbody th {
   color: var(--text);
   border-color: var(--border);
 }
+.ks-figure .chip[aria-pressed='true'] {
 .zn-figure .chip[aria-pressed='true'] {
 .lu-figure .chip[aria-pressed='true'] {
 .sw-figure .chip[aria-pressed='true'] {
@@ -4814,6 +4826,48 @@ table.compare tbody th {
   border-color: var(--accent);
   font-weight: 600;
 }
+.ks-tamper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+.ks-text,
+.ks-wire {
+  margin: 0;
+  max-width: 75ch;
+}
+.ks-wire {
+  font-size: 0.9rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px dashed var(--muted);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.ks-people {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.ks-person {
+  display: grid;
+  align-content: start;
+  gap: 0.15rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  min-width: 0;
+}
+.ks-eve {
+  border-style: dashed;
+}
+.ks-role {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.ks-person ul {
+  margin: 0.2rem 0 0;
 .zn-regions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5344,6 +5398,27 @@ table.compare tbody th {
   list-style: none;
   display: grid;
   gap: 0.2rem;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+.ks-person li.is-secret {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  border-radius: 4px;
+  padding: 0 0.25rem;
+}
+.ks-private {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.ks-none {
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .ks-people {
+    grid-template-columns: minmax(0, 1fr);
+  }
   font-size: 0.9rem;
 }
 .sch-tag {

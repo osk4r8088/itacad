@@ -59,7 +59,7 @@ export const hypervisors: Topic = {
         },
         {
           kind: 'text',
-          text: 'Paravirtualization survives where it helps most: in the drivers. A guest that drives an emulated network card of 1999 causes an exit into the hypervisor for every register access. A paravirtualized driver (virtio on Linux, the integration services on Hyper-V) instead hands whole buffers to the host, which is far cheaper. Installing those drivers is often the single largest speed difference in a virtual machine.',
+          text: 'Paravirtualization survives where it helps most: in the drivers. A guest that drives an emulated network card, modelled on real hardware from decades ago, causes an exit into the hypervisor for every register access. A paravirtualized driver (virtio on Linux, the integration services on Hyper-V) instead hands whole buffers to the host, which is far cheaper. Installing those drivers is often the single largest speed difference in a virtual machine.',
         },
       ],
     },
@@ -116,7 +116,7 @@ export const hypervisors: Topic = {
     { spec: 'Barham et al.: Xen and the Art of Virtualization, SOSP 2003', url: 'https://doi.org/10.1145/945445.945462', note: 'paravirtualization' },
     { spec: 'Kivity et al.: kvm: the Linux Virtual Machine Monitor, Ottawa Linux Symposium 2007', url: 'https://www.kernel.org/doc/ols/2007/ols2007v1-pages-225-230.pdf' },
     { spec: 'OASIS: Virtual I/O Device (VIRTIO) Specification', url: 'https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html', note: 'paravirtualized devices' },
-    { spec: 'Clark et al.: Live Migration of Virtual Machines, NSDI 2005', url: 'https://www.usenix.org/legacy/events/nsdi05/tech/full_papers/clark/clark.pdf' },
+    { spec: 'Clark et al.: Live Migration of Virtual Machines, NSDI 2005', url: 'https://www.usenix.org/conference/nsdi-05/live-migration-virtual-machines', note: 'pre-copy migration; the paper measured service downtimes as low as 60 ms' },
     MAN('systemd-detect-virt', 1),
   ],
   quiz: [

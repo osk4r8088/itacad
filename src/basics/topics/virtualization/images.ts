@@ -119,7 +119,7 @@ export const images: Topic = {
   ],
   related: [{ topic: 'containers' }, { topic: 'orchestration' }, { topic: 'file-systems' }, { protocol: 'http2' }],
   sources: [
-    OCI('Image Format Specification: manifest', 'https://github.com/opencontainers/image-spec/blob/main/manifest.md', 'layers as tar or tar+gzip, config by digest, content-addressable images'),
+    OCI('Image Format Specification: manifest', 'https://github.com/opencontainers/image-spec/blob/main/manifest.md', 'layers as tar, tar+gzip or (recommended to support) tar+zstd, config by digest, content-addressable images'),
     OCI('Image Format Specification: configuration', 'https://github.com/opencontainers/image-spec/blob/main/config.md', 'command, environment, user, exposed ports, rootfs layers'),
     OCI('Image Format Specification: image index', 'https://github.com/opencontainers/image-spec/blob/main/image-index.md', 'one name for several platforms'),
     OCI('Distribution Specification', 'https://github.com/opencontainers/distribution-spec/blob/main/spec.md', 'the registry API: manifests and blobs, pull and push'),

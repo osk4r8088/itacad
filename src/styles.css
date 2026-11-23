@@ -4626,3 +4626,119 @@ table.compare tbody th {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* Backup week figure */
+.bw-figure {
+  display: grid;
+  gap: 0.8rem;
+}
+.bw-week {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+.bw-night {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.bw-pick {
+  font: inherit;
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  min-width: 0;
+}
+.bw-day {
+  font-weight: 600;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.bw-kind {
+  font-size: 0.75rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.bw-size {
+  font-size: 0.8rem;
+}
+.bw-bar {
+  display: block;
+  height: 0.35rem;
+  max-width: 100%;
+  border-radius: 2px;
+  background: var(--border);
+}
+.bw-full .bw-bar {
+  background: var(--k-link-b);
+}
+.bw-incremental .bw-bar {
+  background: var(--k-internet-b);
+}
+.bw-differential .bw-bar {
+  background: var(--k-transport-b);
+}
+.bw-night.is-needed .bw-pick {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.bw-night.is-target .bw-pick {
+  outline: 2px solid var(--accent);
+}
+.bw-night.is-damaged .bw-pick {
+  border-color: var(--bad);
+  background: var(--bad-bg);
+  border-style: dashed;
+}
+.bw-damage {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.bw-result,
+.bw-stats {
+  margin: 0;
+  max-width: 75ch;
+}
+@media (max-width: 700px) {
+  .bw-week {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 380px) {
+  .bw-week {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.bw-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.bw-choice > span {
+  font-size: 0.85rem;
+  color: var(--muted);
+  flex-basis: 100%;
+}
+.bw-choice .chip {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--border);
+}
+.bw-choice .chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 600;
+}

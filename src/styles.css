@@ -4627,6 +4627,18 @@ table.compare tbody th {
   }
 }
 
+/* Switch learning figure */
+.sw-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.sw-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.sw-figure .chip {
 /* LZ77 figure */
 .lz-figure {
   display: grid;
@@ -4716,11 +4728,91 @@ table.compare tbody th {
   color: var(--text);
   border-color: var(--border);
 }
+.sw-figure .chip[aria-pressed='true'] {
 .cg-controls .chip[aria-pressed='true'] {
   background: var(--accent-soft);
   border-color: var(--accent);
   font-weight: 600;
 }
+.sw-figure .sw-send {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.sw-diagram {
+  display: grid;
+  gap: 0;
+  max-width: 36rem;
+}
+.sw-box {
+  text-align: center;
+  font-weight: 600;
+  padding: 0.4rem;
+  border: 2px solid var(--muted);
+  border-radius: 6px;
+  background: var(--panel);
+}
+.sw-ports {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.sw-port {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+}
+.sw-port-no {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.sw-link {
+  width: 4px;
+  height: 2rem;
+  background: var(--border);
+  border-radius: 2px;
+}
+.sw-port.is-in .sw-link {
+  background: var(--k-internet-b);
+}
+.sw-port.is-out .sw-link,
+.sw-port.is-flood .sw-link {
+  background: var(--accent);
+}
+.sw-port.is-flood .sw-link {
+  background: repeating-linear-gradient(180deg, var(--accent) 0 5px, transparent 5px 9px);
+}
+.sw-host {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  padding: 0.3rem 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: var(--panel);
+}
+.sw-host.is-took {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.sw-host.is-dropped {
+  border-style: dashed;
+  color: var(--muted);
+}
+.sw-port.is-in .sw-host {
+  border-color: var(--k-internet-b);
+}
+.sw-result {
+  margin: 0;
+  max-width: 75ch;
+  min-height: 3em;
+}
+.sw-table {
+  max-width: 22rem;
+}
+.sw-count {
+  font-size: 0.85rem;
+  color: var(--muted);
 .cg-scroll {
   overflow-x: auto;
   max-width: 100%;

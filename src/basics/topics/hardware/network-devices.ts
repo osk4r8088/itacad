@@ -18,6 +18,11 @@ export const networkDevices: Topic = {
           text: 'A switch (in the standards: a bridge) has many ports and connects the devices of one local network. For every frame it receives, it notes the source MAC address and the port it came in on, and so builds a MAC address table. To forward a frame, it looks up the destination MAC address: if the address is known, the frame goes out of that one port only; if it is unknown, or the broadcast address, the switch floods it out of all other ports.',
         },
         {
+          kind: 'figure',
+          figure: 'switch-learning',
+          caption: 'A switch with four hosts. Send frames between them and watch the MAC address table fill: the first frame to an unknown address is flooded, the answer already goes out of one port only.',
+        },
+        {
           kind: 'text',
           text: 'Entries age out after a few minutes without traffic, so the table follows devices that move. VLANs split one physical switch into several separate networks, and the Spanning Tree Protocol keeps redundant links between switches from forming loops in which broadcast frames would circle forever.',
         },

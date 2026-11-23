@@ -56,6 +56,11 @@ export const versionControl: Topic = {
           text: 'Merging brings two lines together. Git compares both sides with their common ancestor and combines the changes automatically where they touch different places. Where both sides changed the same lines differently, it cannot decide: it reports a merge conflict, marks both versions in the file, and a person chooses the result.',
         },
         {
+          kind: 'figure',
+          figure: 'commit-graph',
+          caption: 'A small history to grow. Commit, create a branch, switch between branches and merge them: a merge either just moves the branch pointer forward or creates a commit with two parents.',
+        },
+        {
           kind: 'text',
           text: 'Teams exchange work through a shared remote repository on a server: push uploads commits, fetch and pull download them. On hosting platforms a change is proposed as a pull request (or merge request): the branch is shown with its differences, others review it, automatic checks run, and only then is it merged. Many projects keep the main branch protected so that this is the only way in.',
         },
@@ -97,7 +102,7 @@ export const versionControl: Topic = {
       { os: 'macOS', command: 'git remote -v', shows: 'The remote repositories this clone exchanges commits with.' },
     ],
     numbers: [
-      { label: 'Length of a Git commit hash', value: '40 hexadecimal digits', note: 'SHA-1, 160 bits; newer repositories can use SHA-256' },
+      { label: 'Length of a Git commit hash', value: '40 hexadecimal digits', note: 'SHA-1, 160 bits; a repository created with git init --object-format=sha256 uses SHA-256 and 64 digits, but SHA-1 is still the default' },
     ],
     examples: [
       'A service fails after an update. git log shows the three commits since the last good release; reverting the one that touched the connection settings restores it.',

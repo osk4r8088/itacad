@@ -60,6 +60,11 @@ export const backup: Topic = {
           ],
         },
         {
+          kind: 'figure',
+          figure: 'backup-week',
+          caption: 'A week of nightly backups after a full one on Sunday. Pick a night to see which backups its restore needs, switch between the three kinds, and mark a backup as damaged to see what can no longer be restored.',
+        },
+        {
           kind: 'text',
           text: 'Current backup software mostly works incrementally forever: after one full run it stores only changed blocks, removes duplicates, and can still present every point in time as if it were a full backup. How long old versions are kept is the retention. A common scheme keeps daily versions for some weeks, weekly ones for some months and monthly ones for years, because some damage is only noticed long after it happened.',
         },
@@ -127,9 +132,9 @@ export const backup: Topic = {
   ],
   related: [{ entry: 'raid' }, { topic: 'high-availability' }, { topic: 'storage' }, { topic: 'file-systems' }, { topic: 'compression' }, { topic: 'service-models' }, { topic: 'monitoring' }],
   sources: [
-    { spec: 'US-CERT (now CISA): Data Backup Options, 2012', note: 'the 3-2-1 rule: three copies, two media types, one off-site' },
+    { spec: 'US-CERT (now CISA): Data Backup Options, 2012', url: 'https://www.cisa.gov/back-business-data', note: 'the 3-2-1 rule: three copies, two media types, one off-site; the linked CISA page on backing up business data states the same rule' },
     { spec: 'NIST Special Publication 800-34 Rev. 1: Contingency Planning Guide for Federal Information Systems', url: 'https://csrc.nist.gov/glossary/term/RPO', note: 'definitions of recovery point objective and recovery time objective' },
-    { spec: 'NIST Special Publication 1800-11: Data Integrity, Recovering from Ransomware and Other Destructive Events', note: 'not checked for this page' },
+    { spec: 'NIST Special Publication 1800-11: Data Integrity, Recovering from Ransomware and Other Destructive Events, 2020', url: 'https://doi.org/10.6028/NIST.SP.1800-11', note: 'a practice guide for detecting corrupted data and restoring it from backups' },
     { spec: 'Preston: Modern Data Protection, 2021', note: 'backup kinds, retention, restore testing' },
   ],
   quiz: [

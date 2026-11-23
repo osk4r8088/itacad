@@ -60,6 +60,11 @@ export const backup: Topic = {
           ],
         },
         {
+          kind: 'figure',
+          figure: 'backup-week',
+          caption: 'A week of nightly backups after a full one on Sunday. Pick a night to see which backups its restore needs, switch between the three kinds, and mark a backup as damaged to see what can no longer be restored.',
+        },
+        {
           kind: 'text',
           text: 'Current backup software mostly works incrementally forever: after one full run it stores only changed blocks, removes duplicates, and can still present every point in time as if it were a full backup. How long old versions are kept is the retention. A common scheme keeps daily versions for some weeks, weekly ones for some months and monthly ones for years, because some damage is only noticed long after it happened.',
         },

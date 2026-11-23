@@ -119,8 +119,8 @@ export const leastPrivilege: Topic = {
   related: [{ topic: 'permissions' }, { topic: 'authn-authz' }, { topic: 'cia-triad' }, { topic: 'containers' }, { topic: 'kernel' }, { topic: 'ci-cd' }, { topic: 'service-models' }],
   sources: [
     { spec: 'Saltzer, Schroeder: The Protection of Information in Computer Systems. Proceedings of the IEEE 63(9), 1975', note: 'least privilege, fail-safe defaults, complete mediation, separation of privilege' },
-    { spec: 'NIST Special Publication 800-53, revision 5: control AC-6, Least Privilege', url: 'https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final', note: 'also AC-5, separation of duties; not checked for this page' },
-    { spec: 'NIST Special Publication 800-207: Zero Trust Architecture', url: 'https://csrc.nist.gov/pubs/sp/800/207/final', note: 'not checked for this page' },
+    { spec: 'NIST Special Publication 800-53, revision 5: control AC-6, Least Privilege', url: 'https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final', note: 'also AC-5, separation of duties' },
+    { spec: 'NIST Special Publication 800-207: Zero Trust Architecture, August 2020', url: 'https://csrc.nist.gov/pubs/sp/800/207/final', note: 'section 2.1: the tenets of zero trust' },
     { spec: 'capabilities(7) and systemd.exec(5), Linux manual pages', note: 'confining processes and services' },
   ],
   quiz: [

@@ -116,7 +116,7 @@ export const ciaTriad: Topic = {
   sources: [
     { spec: 'FIPS PUB 199: Standards for Security Categorization of Federal Information and Information Systems, 2004', note: 'the three security objectives with their definitions from 44 U.S.C. 3542' },
     { spec: 'NIST Computer Security Resource Center: Glossary', url: 'https://csrc.nist.gov/glossary/term/information_security', note: 'information security, confidentiality, integrity, availability' },
-    { spec: 'ISO/IEC 27000: Information security management systems, Overview and vocabulary', note: 'threat, vulnerability, risk; not checked for this page' },
+    { spec: 'ISO/IEC 27000:2018: Information security management systems, Overview and vocabulary', url: 'https://www.iso.org/standard/73906.html', note: 'threat, vulnerability, risk; withdrawn in July 2026, and the 2026 edition is an overview without this vocabulary; the standard itself was not opened' },
     { rfc: 4949, note: 'Internet Security Glossary, Version 2' },
   ],
   quiz: [

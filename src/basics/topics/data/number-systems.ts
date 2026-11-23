@@ -59,6 +59,11 @@ export const numberSystems: Topic = {
           kind: 'text',
           text: 'Negative numbers are stored in two\'s complement: the highest bit counts negative. In 8 bits it is worth -128 instead of +128, so the range is -128 to 127, and 1111 1111 means -1. The same bit pattern is therefore 255 or -1, depending on whether the program reads it as unsigned or signed. The bits do not say which; the type does.',
         },
+        {
+          kind: 'figure',
+          figure: 'bit-toggler',
+          caption: 'One byte. Switch bits on and off and read the same pattern as an unsigned number, a signed number, hexadecimal and binary. Add 1 to 127 or 255, or negate a number, to see the limits.',
+        },
       ],
     },
     {

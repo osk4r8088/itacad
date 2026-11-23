@@ -55,6 +55,11 @@ export const regionsZones: Topic = {
           text: 'Zones are the cheap way to survive the most common large failure. The standard design places at least two copies of every component in different zones, with a load balancer in front that sends traffic only to the healthy ones, and a database that keeps a synchronized standby in another zone. When a zone fails, the remaining ones must be able to carry the full load, so capacity has to be planned with one zone missing.',
         },
         {
+          kind: 'figure',
+          figure: 'zone-failure',
+          caption: 'Two regions with three zones each. Choose where the application runs and how large its copies are, then switch zones off and see whether it stays up, slows down, moves to the other region or goes down.',
+        },
+        {
           kind: 'text',
           text: 'Resources have a scope, which is worth knowing for each service used: a virtual machine and its disk live in one zone; many managed services are regional and spread over zones by themselves; a few, such as user accounts or name resolution, are global. Traffic between zones and especially between regions is usually billed.',
         },

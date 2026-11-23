@@ -84,6 +84,11 @@ export const transactions: Topic = {
           kind: 'text',
           text: 'The default is rarely the strictest: PostgreSQL, for example, uses read committed unless told otherwise, and its repeatable read is stricter than the standard requires and shows no phantoms. A classic bug that weaker levels permit is the lost update: two sessions read a stock of 5, each subtracts 1 and writes 4. One sale has disappeared. The cures are an atomic statement (SET stock = stock - 1), locking the row when reading it (SELECT ... FOR UPDATE), or a stricter level with a retry.',
         },
+        {
+          kind: 'figure',
+          figure: 'lost-update',
+          caption: 'Two sessions sell from the same stock of 5 at the same moment. Step through four ways of writing the sale: the plain read and write loses one, the three cures from the text keep both.',
+        },
       ],
     },
     {

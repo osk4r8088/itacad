@@ -102,7 +102,7 @@ export const versionControl: Topic = {
       { os: 'macOS', command: 'git remote -v', shows: 'The remote repositories this clone exchanges commits with.' },
     ],
     numbers: [
-      { label: 'Length of a Git commit hash', value: '40 hexadecimal digits', note: 'SHA-1, 160 bits; newer repositories can use SHA-256' },
+      { label: 'Length of a Git commit hash', value: '40 hexadecimal digits', note: 'SHA-1, 160 bits; a repository created with git init --object-format=sha256 uses SHA-256 and 64 digits, but SHA-1 is still the default' },
     ],
     examples: [
       'A service fails after an update. git log shows the three commits since the last good release; reverting the one that touched the connection settings restores it.',

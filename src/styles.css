@@ -4627,6 +4627,22 @@ table.compare tbody th {
   }
 }
 
+/* Boot chain figure */
+.bt-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.bt-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.2rem;
+}
+.bt-group {
+  display: flex;
+  gap: 0.4rem;
+}
+.bt-figure .chip {
 /* Key scenes figure */
 .ks-figure {
   display: grid;
@@ -4817,6 +4833,7 @@ table.compare tbody th {
   color: var(--text);
   border-color: var(--border);
 }
+.bt-figure .chip[aria-pressed='true'] {
 .ks-figure .chip[aria-pressed='true'] {
 .zn-figure .chip[aria-pressed='true'] {
 .lu-figure .chip[aria-pressed='true'] {
@@ -4826,12 +4843,27 @@ table.compare tbody th {
   border-color: var(--accent);
   font-weight: 600;
 }
+.bt-check {
 .ks-tamper {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.9rem;
 }
+.bt-faults {
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: grid;
+  gap: 0.25rem;
+}
+.bt-faults legend {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0 0.3rem;
+}
+.bt-stages {
 .ks-text,
 .ks-wire {
   margin: 0;
@@ -5106,6 +5138,53 @@ table.compare tbody th {
   margin: 0;
   padding: 0;
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+.bt-stage {
+  text-align: center;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.bt-stage.is-reached {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.bt-stage.is-now {
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.bt-stage.is-failed {
+  background: var(--bad-bg);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.bt-step {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  max-width: 75ch;
+}
+.bt-step p {
+  margin: 0.25rem 0 0;
+}
+.bt-step.is-failed {
+  border-color: var(--bad);
+  background: var(--bad-bg);
+}
+.bt-who {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.bt-done {
+  color: var(--ok);
+  font-weight: 600;
+}
   gap: 0.15rem;
   font-size: 0.85rem;
 }

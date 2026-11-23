@@ -4627,6 +4627,75 @@ table.compare tbody th {
   }
 }
 
+/* LZ77 figure */
+.lz-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.lz-input {
+  display: grid;
+  gap: 0.25rem;
+}
+.lz-input span,
+.lz-heading {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 0.25rem;
+}
+.lz-input textarea {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+}
+.lz-tokens,
+.lz-original {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.lz-lit {
+  white-space: pre;
+}
+.lz-ref {
+  font: inherit;
+  font-size: 0.75rem;
+  margin: 0 0.15rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lz-ref[aria-pressed='true'] {
+  outline: 2px solid var(--focus);
+}
+.lz-original .is-source {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  text-decoration: underline dashed;
+}
+.lz-original .is-target {
+  background: var(--accent-soft);
+  text-decoration: underline;
+}
+.lz-stats {
+  margin: 0;
+  max-width: 75ch;
+}
+.lz-figure .vm-choice .chip {
 /* Commit graph figure */
 .cg-figure {
   display: grid;
@@ -5082,6 +5151,7 @@ table.compare tbody th {
   color: var(--text);
   border-color: var(--border);
 }
+.lz-figure .vm-choice .chip[aria-pressed='true'] {
 .bw-choice .chip[aria-pressed='true'] {
 @media (max-width: 420px) {
   .bits-row {
@@ -5109,4 +5179,7 @@ table.compare tbody th {
   background: var(--accent-soft);
   border-color: var(--accent);
   font-weight: 600;
+}
+.lz-figure .vm-choice {
+  flex-wrap: wrap;
 }

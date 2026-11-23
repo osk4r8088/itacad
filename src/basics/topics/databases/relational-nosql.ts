@@ -137,7 +137,7 @@ export const relationalNosql: Topic = {
   sources: [
     { spec: 'Codd: A Relational Model of Data for Large Shared Data Banks. Communications of the ACM 13(6), 1970', note: 'the relational model' },
     { spec: 'ISO/IEC 9075: Information technology, Database languages, SQL', note: 'the SQL standard' },
-    { spec: 'Gilbert, Lynch: Brewer\'s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services. ACM SIGACT News 33(2), 2002', note: 'the CAP theorem; cited from memory' },
+    { spec: 'Gilbert, Lynch: Brewer\'s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services. ACM SIGACT News 33(2), 51 to 59, 2002', url: 'https://doi.org/10.1145/564585.564601', note: 'the CAP theorem, proved for the asynchronous network model' },
     { spec: 'Kleppmann: Designing Data-Intensive Applications, chapters 2, 5 and 6', note: 'data models, replication, partitioning' },
     { spec: 'PostgreSQL documentation: Tutorial, The SQL Language', url: 'https://www.postgresql.org/docs/current/tutorial-sql.html', note: 'tables, keys, joins' },
   ],

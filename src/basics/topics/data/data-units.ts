@@ -109,6 +109,8 @@ export const dataUnits: Topic = {
   sources: [
     { spec: 'IEC 80000-13: Quantities and units, Part 13: Information science and technology', note: 'bit, byte, binary prefixes kibi to yobi' },
     { spec: 'NIST Reference on Constants, Units, and Uncertainty: Prefixes for binary multiples', url: 'https://physics.nist.gov/cuu/Units/binary.html' },
+    { spec: 'Apple Support: How storage capacity is measured on Apple devices', url: 'https://support.apple.com/102119', note: 'macOS since Snow Leopard and iOS since 11 report decimal units' },
+    { spec: 'Microsoft Learn: about_Numeric_Literals (PowerShell)', url: 'https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_numeric_literals', note: 'the multipliers kb, mb, gb, tb and pb are powers of 1024' },
     { spec: 'BIPM: The International System of Units (SI Brochure)', url: 'https://www.bipm.org/en/publications/si-brochure', note: 'SI prefixes are powers of ten and must not be used for powers of two' },
   ],
   quiz: [

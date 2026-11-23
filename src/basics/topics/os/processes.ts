@@ -43,6 +43,11 @@ export const processes: Topic = {
           kind: 'text',
           text: 'The scheduler is the part of the kernel that decides which ready process runs next on which core. It lets each one run for a short time and then, driven by the timer interrupt, takes the core away again and gives it to the next. Replacing one process on a core by another is a context switch: the kernel saves the registers of the first and loads those of the second. Because this happens many times per second, everything seems to run at once.',
         },
+        {
+          kind: 'figure',
+          figure: 'scheduler-timeline',
+          caption: 'Four processes share the processor in round robin. Each runs for at most one time slice, gives the core up early when it has to wait, and joins the queue again when its wait is over. Step through the ticks, or change the slice and the number of cores.',
+        },
       ],
     },
     {
@@ -130,6 +135,7 @@ export const processes: Topic = {
     OSTEP('4 (the process)', 'cpu-intro.pdf'),
     OSTEP('5 (process API: fork, exec, wait)', 'cpu-api.pdf'),
     OSTEP('7 (scheduling)', 'cpu-sched.pdf'),
+    { spec: 'The Linux kernel documentation: EEVDF Scheduler', url: 'https://docs.kernel.org/scheduler/sched-eevdf.html', note: 'Linux began moving from CFS to EEVDF in version 6.6' },
     OSTEP('26 (concurrency and threads)', 'threads-intro.pdf'),
     POSIX('fork, exec, wait, kill; signals SIGTERM and SIGKILL'),
     MAN('signal', 7, 'signal numbers and which signals cannot be caught'),

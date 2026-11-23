@@ -135,8 +135,8 @@ export const authnAuthz: Topic = {
     { spec: 'NIST Special Publication 800-63B, revision 4: Digital Identity Guidelines, Authentication and Authenticator Management', url: 'https://pages.nist.gov/800-63-4/sp800-63b/authenticators', note: 'factors, password length, no composition rules, no periodic change' },
     { rfc: 9110, section: '15.5', note: 'HTTP status codes 401 Unauthorized and 403 Forbidden' },
     { rfc: 6749, note: 'OAuth 2.0 authorization framework' },
-    { spec: 'W3C: Web Authentication (WebAuthn)', url: 'https://www.w3.org/TR/webauthn-3/', note: 'public key credentials bound to an origin; not checked for this page' },
-    { spec: 'OWASP Top 10: Broken Access Control', url: 'https://owasp.org/Top10/', note: 'missing authorization checks as a leading web risk; not checked for this page' },
+    { spec: 'W3C: Web Authentication (WebAuthn)', url: 'https://www.w3.org/TR/webauthn-3/', note: 'public key credentials scoped to a relying party, usable only by its origins; a W3C Recommendation since August 2026' },
+    { spec: 'OWASP Top 10:2025, A01 Broken Access Control', url: 'https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/', note: 'first place again in the 2025 list, as in 2021' },
     { spec: 'Ferraiolo, Kuhn: Role-Based Access Controls, 1992', note: 'origin of RBAC' },
   ],
   quiz: [

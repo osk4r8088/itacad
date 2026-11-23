@@ -139,8 +139,8 @@ export const certificatesPki: Topic = {
   sources: [
     { rfc: 5280, note: 'X.509 certificates and revocation lists: fields, extensions, path validation' },
     { rfc: 8446, section: '4.4', note: 'TLS 1.3 authentication: Certificate and CertificateVerify' },
-    { rfc: 9110, section: '4.3.4', note: 'https certificate verification; not checked for this page' },
-    { rfc: 9525, note: 'matching the service name against the certificate; not checked for this page' },
+    { rfc: 9110, section: '4.3.4', note: 'https certificate verification: a certificate not valid for the origin means the connection is not trusted' },
+    { rfc: 9525, note: 'Service Identity in TLS: matching the service name against the certificate; obsoletes RFC 6125' },
     { rfc: 8555, note: 'ACME, automatic certificate management' },
     { rfc: 6960, note: 'OCSP, online certificate status' },
     { rfc: 9162, note: 'Certificate Transparency, version 2.0' },

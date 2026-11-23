@@ -4627,6 +4627,64 @@ table.compare tbody th {
   }
 }
 
+/* Certificate chain figure */
+.cc-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.cc-verdict {
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  max-width: 75ch;
+}
+.cc-verdict.is-ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cc-verdict.is-bad {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+.cc-chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.cc-cert {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+}
+.cc-cert.is-bad {
+  border-color: var(--bad);
+}
+.cc-cert.is-missing {
+  border-style: dashed;
+  opacity: 0.8;
+}
+.cc-link {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.cc-link::before {
+  content: '\2191  ';
+}
+.cc-head {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.cc-head strong {
+  font-size: 0.95rem;
+}
+.cc-checks {
 /* Lost update figure */
 .lu-figure {
   display: grid;
@@ -4956,6 +5014,36 @@ table.compare tbody th {
   margin: 0;
   padding: 0;
   display: grid;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+.cc-mark {
+  display: inline-block;
+  min-width: 5.5rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+.cc-checks .is-ok .cc-mark {
+  color: var(--ok);
+}
+.cc-checks .is-bad .cc-mark {
+  color: var(--bad);
+}
+.cc-checks .is-skip {
+  color: var(--muted);
+}
+.cc-faults {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.cc-faults label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text);
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.35rem;
 }

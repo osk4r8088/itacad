@@ -64,6 +64,11 @@ export const certificatesPki: Topic = {
           text: 'A client checks every link: each signature must verify with the key of the next certificate up, the chain must end at a root in its trust store, every certificate must be within its validity period and not revoked, and the name in the address must appear among the subject alternative names. If any check fails, the connection is refused with a warning.',
         },
         {
+          kind: 'figure',
+          figure: 'cert-chain',
+          caption: 'A chain of three certificates and the checks a client makes on it. Break one link at a time, or several, and see which check fails and what the browser says.',
+        },
+        {
           kind: 'text',
           text: 'The model has a known weakness: any trusted CA can issue a certificate for any name. Certificate Transparency counters it by requiring public certificates to be entered into open, append-only logs, so that domain owners and researchers can see every certificate issued for a name.',
         },

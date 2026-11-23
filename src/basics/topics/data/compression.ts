@@ -29,6 +29,11 @@ export const compression: Topic = {
           text: 'The first idea is to replace repetition with references. The compressor remembers the data it has just seen, and when a sequence appears again it writes "copy 12 bytes from 300 bytes back" instead of the bytes themselves. This is the LZ77 family, named after Lempel and Ziv.',
         },
         {
+          kind: 'figure',
+          figure: 'lz77',
+          caption: 'Repetition replaced by references. Type a text or pick an example: repeated strings become "copy so many characters from so far back". Select a reference to see what it copies, and shrink the window to see what a short memory misses.',
+        },
+        {
           kind: 'text',
           text: 'The second idea is to give frequent symbols short codes and rare symbols long ones, as Morse code gives the letter e a single dot. Huffman coding builds such a code from the measured frequencies, in a way that no code is the beginning of another, so the bit stream can be read without separators.',
         },
@@ -99,7 +104,7 @@ export const compression: Topic = {
     ],
     numbers: [
       { label: 'DEFLATE search window', value: '32 KiB back, matches up to 258 bytes', note: 'RFC 1951' },
-      { label: 'English text with DEFLATE', value: 'smaller by a factor of 2.5 to 3', note: 'RFC 1951' },
+      { label: 'English text with DEFLATE', value: 'smaller by a factor of 2.5 to 3', note: 'RFC 1951, section 1.1' },
       { label: 'gzip overhead', value: '18 bytes', note: 'calculated: 10 bytes of header and 8 of trailer (CRC-32 and size), RFC 1952' },
       { label: 'First bytes of a gzip file', value: '1f 8b', note: 'RFC 1952' },
     ],
@@ -121,7 +126,7 @@ export const compression: Topic = {
   ],
   related: [{ topic: 'data-units' }, { topic: 'number-systems' }, { topic: 'serialization' }, { topic: 'file-systems' }, { protocol: 'http1' }],
   sources: [
-    { rfc: 1951, note: 'DEFLATE: LZ77 with Huffman coding, 32K window, lengths up to 258; no lossless method compresses every input' },
+    { rfc: 1951, note: 'DEFLATE: LZ77 with Huffman coding, 32K window, lengths up to 258; section 1.1 on why no lossless method compresses every input and on typical ratios' },
     { rfc: 1952, section: '2.3', note: 'gzip member format: header, CRC-32 and ISIZE trailer' },
     { rfc: 8878, note: 'Zstandard' },
     { rfc: 7932, note: 'Brotli' },

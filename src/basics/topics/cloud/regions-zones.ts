@@ -110,9 +110,9 @@ export const regionsZones: Topic = {
   related: [{ topic: 'service-models' }, { topic: 'high-availability' }, { topic: 'backup' }, { entry: 'bandwidth' }, { protocol: 'dns' }, { topic: 'power' }],
   sources: [
     { spec: 'AWS documentation: AWS Regions and Availability Zones', url: 'https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html', note: 'regions as separate geographic areas; zones as isolated locations of one or more data centers with redundant power and networking' },
-    { spec: 'Microsoft Azure documentation: What are Azure regions and availability zones?', note: 'the same two levels at another provider; not checked for this page' },
-    { spec: 'Google Cloud documentation: Geography and regions', note: 'regions and zones at a third provider; not checked for this page' },
-    { spec: 'ITU-T Recommendation G.652: Characteristics of a single-mode optical fibre and cable', note: 'basis for the signal speed in fiber; the 200 km per millisecond figure is the usual rounding and not taken from the text' },
+    { spec: 'Microsoft Learn: What are Azure regions?', url: 'https://learn.microsoft.com/azure/reliability/regions-overview', note: 'the same two levels at another provider; many regions offer availability zones, each a group of separate data centers' },
+    { spec: 'Google Cloud documentation: Geography and regions', url: 'https://docs.cloud.google.com/docs/geography-and-regions', note: 'regions and zones at a third provider; a zone is a single failure domain within a region' },
+    { spec: 'Prysmian (Draka): Single-Mode Optical Fiber (SSMF) data sheet', url: 'https://www.prysmian.com/sites/default/files/business_markets/markets/downloads/datasheets/SMF---Single-Mode-Optical-Fiber-SSMF.pdf', note: 'effective group index 1.468 at 1550 nm; light then travels at about 204,000 km/s, rounded to 200 km per millisecond' },
   ],
   quiz: [
     {

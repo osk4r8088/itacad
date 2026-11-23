@@ -126,8 +126,8 @@ export const serviceModels: Topic = {
   related: [{ topic: 'regions-zones' }, { topic: 'high-availability' }, { topic: 'backup' }, { topic: 'virtual-machines' }, { topic: 'hypervisors' }, { topic: 'server' }],
   sources: [
     { spec: 'NIST Special Publication 800-145: The NIST Definition of Cloud Computing, 2011', url: 'https://doi.org/10.6028/NIST.SP.800-145', note: 'five essential characteristics, three service models, four deployment models' },
-    { spec: 'ISO/IEC 22123-1: Information technology, Cloud computing, Part 1: Vocabulary', note: 'international vocabulary; not checked for this page' },
-    { spec: 'NIST Special Publication 500-292: NIST Cloud Computing Reference Architecture', note: 'roles of provider and consumer per service model; not checked for this page' },
+    { spec: 'ISO/IEC 22123-1:2023: Information technology, Cloud computing, Part 1: Vocabulary', url: 'https://www.iso.org/standard/82758.html', note: 'international vocabulary; the standard itself was not opened' },
+    { spec: 'NIST Special Publication 500-292: NIST Cloud Computing Reference Architecture, 2011', url: 'https://doi.org/10.6028/NIST.SP.500-292', note: 'actors such as cloud provider and cloud consumer and their roles' },
   ],
   quiz: [
     {

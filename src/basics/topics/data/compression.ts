@@ -99,7 +99,7 @@ export const compression: Topic = {
     ],
     numbers: [
       { label: 'DEFLATE search window', value: '32 KiB back, matches up to 258 bytes', note: 'RFC 1951' },
-      { label: 'English text with DEFLATE', value: 'smaller by a factor of 2.5 to 3', note: 'RFC 1951' },
+      { label: 'English text with DEFLATE', value: 'smaller by a factor of 2.5 to 3', note: 'RFC 1951, section 1.1' },
       { label: 'gzip overhead', value: '18 bytes', note: 'calculated: 10 bytes of header and 8 of trailer (CRC-32 and size), RFC 1952' },
       { label: 'First bytes of a gzip file', value: '1f 8b', note: 'RFC 1952' },
     ],
@@ -121,7 +121,7 @@ export const compression: Topic = {
   ],
   related: [{ topic: 'data-units' }, { topic: 'number-systems' }, { topic: 'serialization' }, { topic: 'file-systems' }, { protocol: 'http1' }],
   sources: [
-    { rfc: 1951, note: 'DEFLATE: LZ77 with Huffman coding, 32K window, lengths up to 258; no lossless method compresses every input' },
+    { rfc: 1951, note: 'DEFLATE: LZ77 with Huffman coding, 32K window, lengths up to 258; section 1.1 on why no lossless method compresses every input and on typical ratios' },
     { rfc: 1952, section: '2.3', note: 'gzip member format: header, CRC-32 and ISIZE trailer' },
     { rfc: 8878, note: 'Zstandard' },
     { rfc: 7932, note: 'Brotli' },

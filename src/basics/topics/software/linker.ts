@@ -125,7 +125,7 @@ export const linker: Topic = {
   sources: [
     { spec: 'System V Application Binary Interface, chapter 4: Object Files', note: 'ELF header, sections, symbol table, relocation' },
     { spec: 'elf(5), Linux manual page', url: 'https://man7.org/linux/man-pages/man5/elf.5.html', note: 'file types ET_REL, ET_EXEC, ET_DYN, ET_CORE' },
-    { spec: 'ld.so(8), Linux manual page', note: 'the dynamic linker and its search order' },
+    { spec: 'ld.so(8), Linux manual page', url: 'https://man7.org/linux/man-pages/man8/ld.so.8.html', note: 'the dynamic linker and its search order' },
     { spec: 'Levine: Linkers and Loaders', note: 'symbol resolution, relocation, static and dynamic linking' },
     { spec: 'Bryant, O\'Hallaron: Computer Systems: A Programmer\'s Perspective, chapter 7: Linking' },
   ],

@@ -4626,3 +4626,93 @@ table.compare tbody th {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* Commit graph figure */
+.cg-figure {
+  display: grid;
+  gap: 0.7rem;
+}
+.cg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+}
+.cg-controls > span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.cg-controls .chip {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--border);
+}
+.cg-controls .chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.cg-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+}
+.cg-graph {
+  display: block;
+}
+.cg-lane {
+  font-size: 12px;
+  fill: var(--muted);
+}
+.cg-edge {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+.cg-commit {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.cg-commit.is-merge {
+  stroke-width: 3.5;
+}
+.cg-id {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-anchor: middle;
+  fill: var(--text);
+}
+.cg-tag {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+.cg-tag.is-current {
+  fill: var(--accent);
+}
+.cg-tag-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-anchor: middle;
+  fill: var(--text);
+}
+.cg-tag-text.is-current {
+  fill: var(--panel);
+  font-weight: 600;
+}
+.cg-result {
+  margin: 0;
+  max-width: 75ch;
+}
+.cg-log summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.cg-log ol {
+  margin: 0.3rem 0 0;
+  padding-left: 1.5rem;
+  font-size: 0.85rem;
+}

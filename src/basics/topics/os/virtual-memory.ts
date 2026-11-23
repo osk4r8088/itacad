@@ -41,7 +41,7 @@ export const virtualMemory: Topic = {
         },
         {
           kind: 'note',
-          text: 'The page size depends on the processor architecture and the system. 4 KiB is the base size on x86-64. Apple computers with Arm processors use 16 KiB; that value is not checked against a primary source here, the command pagesize shows it on such a machine.',
+          text: 'The page size depends on the processor architecture and the system. 4 KiB is the base size on x86-64. Apple computers with Arm processors use 16 KiB for their own programs; Apple tells developers not to assume a size but to read it from the system, and the command pagesize shows it.',
         },
       ],
     },
@@ -127,9 +127,13 @@ export const virtualMemory: Topic = {
   related: [{ topic: 'memory' }, { topic: 'processes' }, { topic: 'kernel' }, { topic: 'virtualization-hardware' }, { entry: 'numbers' }],
   sources: [
     OSTEP('13 (address spaces)', 'vm-intro.pdf'),
-    OSTEP('18 to 20 (paging, translation lookaside buffers, smaller tables)', 'vm-paging.pdf'),
+    OSTEP('18 (introduction to paging)', 'vm-paging.pdf'),
+    OSTEP('19 (translation lookaside buffers)', 'vm-tlbs.pdf'),
+    OSTEP('20 (advanced page tables)', 'vm-smalltables.pdf'),
     OSTEP('21 (swapping)', 'vm-beyondphys.pdf'),
     { ...SDM, section: 'Volume 3A, chapter Paging (4-level and 5-level paging, page sizes of 4 KiB, 2 MiB and 1 GiB)' },
+    { spec: 'Apple Developer Documentation: Addressing architectural differences in your macOS code', url: 'https://developer.apple.com/documentation/apple-silicon/addressing-architectural-differences-in-your-macos-code', note: 'page sizes differ on Apple silicon; read vm_page_size instead of assuming one' },
+    { spec: 'Apple Developer Forums: VM page size on iPhone6 and iPhone6 Plus (answer by Apple Developer Technical Support)', url: 'https://developer.apple.com/forums/thread/47532', note: '16 KiB pages on 64-bit Arm platforms, 4 KiB elsewhere' },
     { ...KERNEL_MM, note: '128 TiB of user address space with 4 levels; 256 TiB and 128 PiB in total with 4 and 5 levels' },
     MAN('free', 1, 'the meaning of free and available'),
     { spec: 'Linux kernel documentation: Documentation for /proc/sys/vm', url: 'https://docs.kernel.org/admin-guide/sysctl/vm.html', section: 'mmap_min_addr', note: 'the lowest addresses that user processes may not map' },

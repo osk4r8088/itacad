@@ -109,6 +109,7 @@ export const drivers: Topic = {
   related: [{ topic: 'kernel' }, { topic: 'mainboard' }, { topic: 'nic' }, { topic: 'boot' }, { topic: 'virtualization-hardware' }],
   sources: [
     OSTEP('36 (I/O devices: registers, interrupts, DMA, device drivers)', 'file-devices.pdf'),
+    MAN('pci.ids', 5, 'vendor ID and device ID are 16-bit integers'),
     { spec: 'The Linux kernel documentation: How To Write Linux PCI Drivers', url: 'https://docs.kernel.org/PCI/pci.html', note: 'matching drivers to devices by vendor, device and class IDs' },
     { spec: 'PCI-SIG: PCI Express Base Specification', url: 'https://pcisig.com/specifications', note: 'configuration space with Vendor ID, Device ID and class code' },
     { spec: 'USB Implementers Forum: USB device class specifications', url: 'https://www.usb.org/defined-class-codes', note: 'mass storage, human interface devices and other classes' },

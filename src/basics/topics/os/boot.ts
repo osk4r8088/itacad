@@ -29,6 +29,11 @@ export const boot: Topic = {
             ['First process', 'Starts all services and the login', 'systemd, with PID 1', 'Session Manager, then services and logon'],
           ],
         },
+        {
+          kind: 'figure',
+          figure: 'boot-chain',
+          caption: 'From power-on to the login, one step at a time, on Linux or Windows. Switch Secure Boot on or off and break the chain in one place to see where the start stops.',
+        },
       ],
     },
     {

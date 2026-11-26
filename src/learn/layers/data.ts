@@ -1,6 +1,7 @@
 import type { OsiLayer, Source } from '../../shared/schema';
 import { arpDef } from '../../shared/headers/arp';
 import { icmpEchoDef } from '../../shared/headers/icmp';
+import { ospfHelloDef } from '../../shared/headers/ospf';
 import { longDef } from '../../shared/headers/quic';
 import { tlsRecordDef } from '../../shared/headers/tls';
 import { packetDef } from '../../shared/headers/ssh';
@@ -123,6 +124,7 @@ export const PLACEMENTS: Record<string, Placement> = {
   ipv6: { osi: [3] },
   vlan: { osi: [2] },
   stp: { osi: [2] },
+  ospf: { osi: [3], note: ospfHelloDef.osiNote },
   nat: { osi: [3, 4], note: 'NAT is not a protocol with its own header. The router rewrites fields of other layers: IP addresses at layer 3 and, for PAT, TCP and UDP ports at layer 4, plus the checksums that cover them.' },
   arp: { osi: [2], note: arpDef.osiNote },
 };

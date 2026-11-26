@@ -177,6 +177,15 @@ export const CATALOG: CatalogEntry[] = [
     load: () => import('./exchanges/nat').then((m) => m.natExchange),
   },
   {
+    id: 'ospf',
+    title: 'OSPF',
+    summary: 'Two routers on a LAN become OSPF neighbors: Hello, DR election, database exchange, Full, and the first route.',
+    group: 'Internet',
+    level: 3,
+    prereqs: [{ protocol: 'ipv4' }, { topic: 'network-devices' }],
+    load: () => import('./exchanges/ospf').then((m) => m.ospfExchange),
+  },
+  {
     id: 'icmp',
     title: 'ICMP',
     summary: 'Ping and traceroute: Echo Request and Reply, and Time Exceeded from the routers on the way.',

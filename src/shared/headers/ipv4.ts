@@ -127,7 +127,7 @@ export const ipv4Def: LayerDef = {
   sources: [{ rfc: 791 }, { rfc: 2474 }, { rfc: 3168 }, { rfc: 6864 }, { rfc: 1812 }, { rfc: 1071 }],
 };
 
-const PROTOCOLS: Record<number, string> = { 1: 'ICMP', 6: 'TCP', 17: 'UDP' };
+const PROTOCOLS: Record<number, string> = { 1: 'ICMP', 6: 'TCP', 17: 'UDP', 89: 'OSPF' };
 
 export interface Ipv4Params extends Annotations {
   src: string;

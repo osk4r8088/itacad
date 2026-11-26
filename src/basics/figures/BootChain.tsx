@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DEFAULTS, STAGE_LABEL, boot, faultsFor, type Options, type Stage } from './boot';
+import StepButtons from './StepButtons';
 
 const STAGES: Stage[] = ['firmware', 'loader', 'kernel', 'first'];
 const FAULT_LABEL: Record<string, string> = {
@@ -64,14 +65,7 @@ export default function BootChain() {
         <p>{current.text}</p>
         {n === steps.length - 1 && !current.failed && <p className="bt-done">The system has started.</p>}
       </div>
-      <div className="sch-step">
-        <button type="button" className="chip" onClick={() => setStep(n - 1)} disabled={n === 0}>
-          Back
-        </button>
-        <button type="button" className="chip" onClick={() => setStep(n + 1)} disabled={n === steps.length - 1}>
-          Next
-        </button>
-      </div>
+      <StepButtons value={n} max={steps.length - 1} onChange={setStep} />
       <p className="vm-note">The stages follow the table above, on UEFI firmware. Details differ between versions, distributions and boot loaders.</p>
     </div>
   );

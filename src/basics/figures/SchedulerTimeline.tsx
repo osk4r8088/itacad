@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { PROCESSES, describeTick, simulate, type State } from './scheduler';
+import StepButtons from './StepButtons';
 
 const CORE_CHOICES = [1, 2];
 const SLICE_CHOICES = [1, 2, 4];
@@ -94,18 +95,12 @@ export default function SchedulerTimeline() {
         ))}
       </div>
 
-      <div className="sch-step">
-        <button type="button" className="chip" onClick={() => setTick(Math.max(0, t - 1))} disabled={t === 0} aria-label="Previous tick">
-          Back
-        </button>
+      <StepButtons value={t} max={last} onChange={setTick}>
         <label className="sch-slider">
           <span>Tick {t} (last {last})</span>
           <input type="range" min={0} max={last} value={t} onChange={(e) => setTick(Number(e.target.value))} />
         </label>
-        <button type="button" className="chip" onClick={() => setTick(Math.min(last, t + 1))} disabled={t === last} aria-label="Next tick">
-          Next
-        </button>
-      </div>
+      </StepButtons>
 
       <ul className="sch-now" aria-live="polite">
         {lines.map((l) => (

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { sha256Hex } from './hash';
+import StepButtons from './StepButtons';
 import { encryptScene, exchangeScene, signScene, type Actor, type Item, type Step } from './key-scenes';
 
 type SceneId = 'encrypt' | 'exchange' | 'sign';
@@ -79,14 +80,7 @@ export default function KeyScenes() {
               On the network: <span className="mono">{s.wire.label}: {s.wire.value}</span>
             </p>
           )}
-          <div className="sch-step">
-            <button type="button" className="chip" onClick={() => setStep(n - 1)} disabled={n === 0}>
-              Back
-            </button>
-            <button type="button" className="chip" onClick={() => setStep(n + 1)} disabled={n === steps.length - 1}>
-              Next
-            </button>
-          </div>
+          <StepButtons value={n} max={steps.length - 1} onChange={setStep} />
         </>
       ) : (
         <p className="ks-text">Computing the hashes...</p>

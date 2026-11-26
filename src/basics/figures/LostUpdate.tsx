@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { SCENARIOS, START, run } from './lost-update';
+import StepButtons from './StepButtons';
 
 /** Two sessions sell from the same stock at the same time; four ways of writing it, step by step. */
 export default function LostUpdate() {
@@ -46,20 +47,14 @@ export default function LostUpdate() {
         </table>
       </div>
 
-      <div className="sch-step">
-        <button type="button" className="chip" onClick={() => setShown(Math.max(1, n - 1))} disabled={n <= 1}>
-          Back
-        </button>
+      <StepButtons value={n} min={1} max={events.length} onChange={setShown}>
         <span className="lu-count">
           Step {n} of {events.length}
         </span>
-        <button type="button" className="chip" onClick={() => setShown(n + 1)} disabled={done}>
-          Next
-        </button>
         <button type="button" className="link-button" onClick={() => setShown(events.length)} disabled={done}>
           Show all
         </button>
-      </div>
+      </StepButtons>
 
       <p className="lu-verdict" aria-live="polite">
         {done ? (

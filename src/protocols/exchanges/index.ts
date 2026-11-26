@@ -20,6 +20,7 @@ import { natExchange } from './nat';
 import { ipv6Exchange } from './ipv6';
 import { vlanExchange } from './vlan';
 import { stpExchange } from './stp';
+import { ospfExchange } from './ospf';
 
 /** All exchanges, loaded eagerly. Used by the tests; the site loads exchanges through catalog.ts. */
 export const exchanges: Exchange[] = [
@@ -44,4 +45,5 @@ export const exchanges: Exchange[] = [
   ipv6Exchange,
   vlanExchange,
   stpExchange,
+  ospfExchange,
 ];

@@ -23,6 +23,7 @@ export const QUIZZES: Record<string, () => Promise<Quiz>> = {
   ipv6: () => import('./ipv6').then((m) => m.ipv6Quiz),
   vlan: () => import('./vlan').then((m) => m.vlanQuiz),
   stp: () => import('./stp').then((m) => m.stpQuiz),
+  ospf: () => import('./ospf').then((m) => m.ospfQuiz),
   // ---- lessons
   layers: () => import('./layers').then((m) => m.layersQuiz),
   'url-to-page': () => import('./url-to-page').then((m) => m.urlToPageQuiz),

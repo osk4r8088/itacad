@@ -47,3 +47,7 @@ Ethernet frames appear in every exchange as the bottom layer. Later possible: an
 - Then TCP end to end, then review, then the remaining protocols in small batches. Commit after each step.
 - A short `README.md`: how to add a protocol, how to develop and deploy.
 - Style: no emojis in code or UI, no em dashes in text, clean structure.
+- Keep changes lean: the smallest change that fully does the job. Reuse existing components, helpers and CSS classes before writing new ones; no options or abstractions nobody asked for.
+- One topic per pull request, with a short body: what changed, what was verified, what needs a decision.
+- Before a pull request is merged, merge `main` into its branch and run typecheck, tests and build again.
+- Check in a headless browser only when a change affects layout.
